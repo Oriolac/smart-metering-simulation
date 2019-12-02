@@ -1,14 +1,16 @@
 package udl.cig.sms.runnable;
 
-import cat.udl.cig.ecc.GeneralECPoint;
-import com.moandjiezana.toml.Toml;
+import udl.cig.sms.crypt.Cypher;
+import udl.cig.sms.crypt.CypherMessage;
 
 import java.io.File;
-import java.io.FileReader;
 import java.math.BigInteger;
 import java.util.HashMap;
 
 public class SmartMeterRunnable {
+
+    private static Cypher cypher;
+
 
     public static void main(String[] args) {
         initVariables(args);
@@ -18,14 +20,10 @@ public class SmartMeterRunnable {
     }
 
     private static void initVariables(String[] args) {
+        HashMap<String, BigInteger> param = new HashMap<>();
         File file = new File(args[1]);
-        Toml toml = new Toml().read(file);
-        toml.getString("module");
-
+        cypher = new CypherMessage(new Settings(file));
 
     }
 
-    private BigInteger getItBig(String key) {
-        return null;
-    }
 }

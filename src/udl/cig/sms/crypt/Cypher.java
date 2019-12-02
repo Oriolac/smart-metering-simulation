@@ -1,6 +1,7 @@
 package udl.cig.sms.crypt;
 
 import cat.udl.cig.ecc.GeneralECPoint;
+import cat.udl.cig.fields.Ring;
 import javafx.util.Pair;
 
 import java.math.BigInteger;
