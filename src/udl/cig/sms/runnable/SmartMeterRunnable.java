@@ -22,7 +22,7 @@ public class SmartMeterRunnable {
     private static void initVariables(String[] args) {
         HashMap<String, BigInteger> param = new HashMap<>();
         File file = new File(args[1]);
-        cypher = new CypherMessage(new Settings(file));
+        cypher = new CypherMessage(file);
 
     }
 
