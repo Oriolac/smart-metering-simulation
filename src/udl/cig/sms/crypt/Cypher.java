@@ -10,6 +10,6 @@ import java.util.List;
 public interface Cypher {
 
     public GeneralECPoint encrypt(BigInteger message);
-    public List<Pair<BigInteger, Integer>> generateSij();
+    public List<Pair<BigInteger, Integer>> generateSij(final int l);
     // Creates Si, and returns Sij to be send to substation.
 }
