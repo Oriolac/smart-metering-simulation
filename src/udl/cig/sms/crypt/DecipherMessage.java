@@ -6,6 +6,7 @@ import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeField;
 import cat.udl.cig.fields.PrimeFieldElement;
 import cat.udl.cig.fields.RingElement;
+import cat.udl.cig.operations.wrapper.PollardsLambda;
 import com.moandjiezana.toml.Toml;
 
 import java.io.File;
@@ -16,23 +17,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class DecypherMessage implements Decypher {
+public class DecipherMessage implements Decypher {
 
     private ECPrimeOrderSubgroup grup;
     final static int A = -3;
     private BigInteger privateKey;  // Si in formulas
     private PrimeField field;
     private GeneralEC curve;
+    private PollardsLambda pol;
 
-    public DecypherMessage(File file) {
+
+    public DecipherMessage(File file) {
         RingElement[] COEF = new RingElement[2];
         ArrayList<BigInteger> card = new ArrayList<>();
         GeneralECPoint gen;
 
         Toml toml = new Toml().read(file);
-        BigInteger module = new BigInteger(toml.getString("module"));
+        BigInteger module = new BigInteger(toml.getString("p"));
         BigInteger n = new BigInteger(toml.getString("n"));
-        BigInteger b = new BigInteger(toml.getString("b"));
+        BigInteger b = new BigInteger(toml.getString("b")
+                .replaceAll("\\s", ""), 16);
         BigInteger gx = new BigInteger(toml.getString("gx")
                 .replaceAll("\\s", ""), 16);
         BigInteger gy = new BigInteger(toml.getString("gy")
@@ -46,6 +50,7 @@ public class DecypherMessage implements Decypher {
         gen = new GeneralECPoint(curve, new PrimeFieldElement(field, gx), new PrimeFieldElement(field, gy));
         this.grup = new ECPrimeOrderSubgroup(curve, n, gen);
     }
+
 
     private GeneralECPoint hash(BigInteger t) {
         try {
@@ -63,10 +68,23 @@ public class DecypherMessage implements Decypher {
     }
 
     @Override
-    public BigInteger decrypt(List<GeneralECPoint> messageC, BigInteger t) {
+    public Optional<BigInteger> decrypt(List<GeneralECPoint> messageC, BigInteger t) {
         Optional<GeneralECPoint> c = messageC.stream().reduce(GeneralECPoint::multiply);
         Optional<GeneralECPoint> d = c.map((x) -> x.multiply(hash(t).pow(privateKey)));
+        System.out.println("alpha2: " + grup.getGenerator().toString());
+        System.out.println("beta2: " + d);
+        return d.flatMap((beta) -> new PollardsLambda(grup.getGenerator(), beta).algorithm());
+    }
 
-        return BigInteger.ZERO;
+    ECPrimeOrderSubgroup getGroup(){
+        return this.grup;
+    }
+
+    GeneralEC getCurve(){
+        return this.curve;
+    }
+
+    void setS0(BigInteger s0) {
+        privateKey = s0;
     }
 }

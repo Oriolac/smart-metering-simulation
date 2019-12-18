@@ -20,7 +20,7 @@ public class CypherMessage implements Cypher{
 
     private ECPrimeOrderSubgroup grup;
     final static int A = -3;
-    private BigInteger privateKey;  // Si in formulas
+    private PrimeFieldElement privateKey;  // Si in formulas
     private PrimeField field;
     private GeneralEC curve;
 
@@ -30,9 +30,10 @@ public class CypherMessage implements Cypher{
         GeneralECPoint gen;
 
         Toml toml = new Toml().read(file);
-        BigInteger module = new BigInteger(toml.getString("module"));
+        BigInteger module = new BigInteger(toml.getString("p"));
         BigInteger n = new BigInteger(toml.getString("n"));
-        BigInteger b = new BigInteger(toml.getString("b"));
+        BigInteger b = new BigInteger(toml.getString("b")
+                .replaceAll("\\s", ""), 16);
         BigInteger gx = new BigInteger(toml.getString("gx")
                 .replaceAll("\\s", ""), 16);
         BigInteger gy = new BigInteger(toml.getString("gy")
@@ -48,7 +49,8 @@ public class CypherMessage implements Cypher{
 
     }
 
-    private GeneralECPoint hash(BigInteger t) {
+
+    protected GeneralECPoint hash(BigInteger t) {
         try {
             GeneralECPoint point;
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -67,24 +69,36 @@ public class CypherMessage implements Cypher{
     @Override
     public GeneralECPoint encrypt(BigInteger message, BigInteger t) {
         return grup.getGenerator().pow(message)
-                .multiply(hash(t).pow(privateKey));
+                .multiply(hash(t).pow(privateKey.getIntValue()));
     }
 
     @Override
-    public List<Pair<BigInteger, Integer>> generateSij(final int l) {
+    public List<Pair<BigInteger, Integer>> generateSij() {
         BigInteger divisor = BigInteger.TWO;
         divisor = divisor.pow(13);
         privateKey = generateSi();
         List<Pair<BigInteger, Integer>> result = new ArrayList<>();
-        BigInteger[] tmp = privateKey.divideAndRemainder(divisor);
-        for (int j = 0; j < l; j++) {
+        int j = 0;
+
+        BigInteger[] tmp = privateKey.getIntValue().divideAndRemainder(divisor);
+        while (!tmp[0].equals(BigInteger.ZERO)) {
             result.add(new Pair<>(tmp[1], j));
+            j++;
             tmp = tmp[0].divideAndRemainder(divisor);
         }
+        result.add(new Pair<>(tmp[1], j));
         return result;
     }
 
-    private BigInteger generateSi() {
-        return field.getRandomElement().getIntValue();
+    GeneralEC getCurve() {
+        return this.curve;
+    }
+
+    BigInteger getKey() {
+        return privateKey.getIntValue();
+    }
+
+    private PrimeFieldElement generateSi() {
+        return field.getRandomElement();
     }
 }
