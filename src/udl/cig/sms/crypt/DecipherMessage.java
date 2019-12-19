@@ -71,9 +71,12 @@ public class DecipherMessage implements Decypher {
     public Optional<BigInteger> decrypt(List<GeneralECPoint> messageC, BigInteger t) {
         Optional<GeneralECPoint> c = messageC.stream().reduce(GeneralECPoint::multiply);
         Optional<GeneralECPoint> d = c.map((x) -> x.multiply(hash(t).pow(privateKey)));
-        System.out.println("alpha2: " + grup.getGenerator().toString());
         System.out.println("beta2: " + d);
-        return d.flatMap((beta) -> new PollardsLambda(grup.getGenerator(), beta).algorithm());
+        Optional<PollardsLambda> lambda = d.map((beta) -> new PollardsLambda(grup.getGenerator(), beta));
+        if (lambda.isPresent()){
+            return lambda.get().algorithm();
+        }
+        return Optional.empty();
     }
 
     ECPrimeOrderSubgroup getGroup(){
