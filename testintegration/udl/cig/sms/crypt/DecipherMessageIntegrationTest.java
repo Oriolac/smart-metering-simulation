@@ -1,4 +1,4 @@
-package udl.cig.sms.crypt.integration;
+package udl.cig.sms.crypt;
 
 import cat.udl.cig.ecc.GeneralECPoint;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +15,7 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DecipherMessageTest {
+class DecipherMessageIntegrationTest {
 
     DecipherMessage dec;
     List<BigInteger> mis;
@@ -60,6 +60,7 @@ class DecipherMessageTest {
         cis.add(ci);
         s0 = s0.negate().add(order).remainder(order);
         dec.setS0(s0);
+        assertEquals(Optional.of(dec.getGroup().getGenerator().pow(BigInteger.valueOf(4L))), dec.getBeta(cis, t));
         Optional<BigInteger> m = dec.decrypt(cis, t);
         Optional<BigInteger> mExpected = mis.stream().reduce(BigInteger::add);
         assertEquals(mExpected, m);

@@ -48,6 +48,10 @@ public class CypherMessage extends LoadCurve implements Cypher, Hash{
         return result;
     }
 
+    public void setPrivateKey(PrimeFieldElement privateKey) {
+        this.privateKey = privateKey;
+    }
+
     @Override
     public GeneralEC getCurve() {
         return this.curve;
@@ -56,6 +60,10 @@ public class CypherMessage extends LoadCurve implements Cypher, Hash{
     @Override
     public PrimeField getField() {
         return this.field;
+    }
+
+    public ECPrimeOrderSubgroup getGroup() {
+        return this.grup;
     }
 
     public BigInteger getKey() {

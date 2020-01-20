@@ -1,4 +1,4 @@
-package udl.cig.sms.crypt.unit;
+package udl.cig.sms.crypt;
 
 import cat.udl.cig.ecc.GeneralEC;
 import org.junit.jupiter.api.Test;
