@@ -16,30 +16,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CypherMessage extends LoadCurve implements Cypher{
+public class CypherMessage extends LoadCurve implements Cypher, Hash{
 
     private PrimeFieldElement privateKey;  // Si in formulas
 
     public CypherMessage(File file) {
         loadCurve(file);
     }
-
-
-    public GeneralECPoint hash(BigInteger t) {
-        try {
-            GeneralECPoint point;
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            BigInteger x = new BigInteger(1, md.digest(t.toByteArray()));
-            while((point = curve.liftX(new PrimeFieldElement(field, x))) == null) {
-                x = x.add(BigInteger.ONE);
-            }
-            return point;
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
-    }
-
 
     @Override
     public GeneralECPoint encrypt(BigInteger message, BigInteger t) {
@@ -65,8 +48,14 @@ public class CypherMessage extends LoadCurve implements Cypher{
         return result;
     }
 
+    @Override
     public GeneralEC getCurve() {
         return this.curve;
+    }
+
+    @Override
+    public PrimeField getField() {
+        return this.field;
     }
 
     public BigInteger getKey() {

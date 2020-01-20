@@ -1,16 +1,19 @@
-package udl.cig.sms.crypt;
+package udl.cig.sms.crypt.unit;
 
 import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import udl.cig.sms.crypt.CypherMessage;
+import udl.cig.sms.crypt.Hash;
+import udl.cig.sms.crypt.unit.HashTest;
 
 import java.io.File;
 import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CypherMessageTest {
+class CypherMessageTest implements HashTest {
 
 
     CypherMessage cyp;
@@ -20,13 +23,7 @@ class CypherMessageTest {
         cyp = new CypherMessage(new File("./data/p192.toml"));
     }
 
-    @Test
-    void hashTest() {
-        GeneralEC curve = cyp.getCurve();
-        for(int i = 0; i < 100000; i++) {
-            assertTrue(curve.isOnCurve(cyp.hash(BigInteger.valueOf(i))));
-        }
-    }
+
 
 
     @Test
@@ -36,5 +33,10 @@ class CypherMessageTest {
                 .map(x -> BigInteger.TWO.pow(13 * x.getValue()).multiply(x.getKey()))
                 .reduce(BigInteger::add).get();
         assertEquals(cyp.getKey(), si);
+    }
+
+    @Override
+    public Hash getHash() {
+        return cyp;
     }
 }

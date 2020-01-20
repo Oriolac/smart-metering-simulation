@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class DecipherMessage extends LoadCurve implements Decypher {
+public class DecipherMessage extends LoadCurve implements Decypher, Hash {
 
     private BigInteger privateKey;  // Si in formulas
 
@@ -26,21 +26,6 @@ public class DecipherMessage extends LoadCurve implements Decypher {
         loadCurve(file);
     }
 
-
-    private GeneralECPoint hash(BigInteger t) {
-        try {
-            GeneralECPoint point;
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            BigInteger x = new BigInteger(1, md.digest(t.toByteArray()));
-            while((point = curve.liftX(new PrimeFieldElement(field, x))) == null) {
-                x = x.add(BigInteger.ONE);
-            }
-            return point;
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
-    }
 
     @Override
     public Optional<BigInteger> decrypt(List<GeneralECPoint> messageC, BigInteger t) {
@@ -57,8 +42,14 @@ public class DecipherMessage extends LoadCurve implements Decypher {
         return this.grup;
     }
 
-    GeneralEC getCurve(){
+    @Override
+    public GeneralEC getCurve(){
         return this.curve;
+    }
+
+    @Override
+    public PrimeField getField() {
+        return this.field;
     }
 
     public void setS0(BigInteger s0) {

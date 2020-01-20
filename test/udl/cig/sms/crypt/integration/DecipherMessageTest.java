@@ -1,8 +1,10 @@
-package udl.cig.sms.crypt;
+package udl.cig.sms.crypt.integration;
 
 import cat.udl.cig.ecc.GeneralECPoint;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import udl.cig.sms.crypt.CypherMessage;
+import udl.cig.sms.crypt.DecipherMessage;
 
 import java.io.File;
 import java.math.BigInteger;
