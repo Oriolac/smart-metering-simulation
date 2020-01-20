@@ -1,10 +1,8 @@
 package udl.cig.sms.crypt;
 
 import cat.udl.cig.ecc.GeneralECPoint;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import udl.cig.sms.crypt.CypherMessage;
-import udl.cig.sms.crypt.DecipherMessage;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -17,53 +15,80 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DecipherMessageIntegrationTest {
 
-    DecipherMessage dec;
-    List<BigInteger> mis;
-    List<BigInteger> sis;
-    List<GeneralECPoint> cis;
-    BigInteger t = BigInteger.TEN;
-    BigInteger m;
+    static DecipherMessage dec;
+    static List<BigInteger> mis;
+    static List<BigInteger> sis;
+    static List<GeneralECPoint> cis;
+    static BigInteger t = BigInteger.TEN;
+    static BigInteger message = new BigInteger("9");
+    static BigInteger si;
+    static BigInteger s0;
+    static GeneralECPoint ci;
+    static CypherMessage cyp;
+    static BigInteger order;
 
-    @BeforeEach
-    void createDecipher() {
+    @BeforeAll
+    static void createDecipher() {
         dec = new DecipherMessage(new File("./data/p192.toml"));
-        sis = new LinkedList<>();
-        for (int i = 0; i < 1; i++) {
-            sis.add(randomMessage());
-        }
+        createSecretKeys();
+        createMessage();
+        cyp = new CypherMessage(new File("./data/p192.toml"));
+        keyEstablishment();
+    }
+
+    static void createMessage() {
         mis = new LinkedList<>();
         for (int i = 0; i < 1; i++) {
             mis.add(randomMessage());
         }
     }
 
-    BigInteger randomMessage() {
-        Random r = new Random();
-        return BigInteger.valueOf(4);
+    static void createSecretKeys() {
+        sis = new LinkedList<>();
+        for (int i = 0; i < 1; i++) {
+            sis.add(randomMessage());
+        }
     }
 
-
-    @Test
-    void decrypt() {
-        CypherMessage cyp = new CypherMessage(new File("./data/p192.toml"));
-        BigInteger si;
-        BigInteger s0 = BigInteger.ZERO;
-        GeneralECPoint ci;
+    static void keyEstablishment() {
         cis = new LinkedList<>();
-        BigInteger order = dec.getGroup().getSize();
+        order = dec.getGroup().getSize();
         //noinspection OptionalGetWithoutIsPresent
         si = cyp.generateSij().stream()
                 .map(x -> BigInteger.TWO.pow(13 * x.getValue()).multiply(x.getKey()))
                 .reduce(BigInteger::add).get();
-        s0 = s0.add(si).remainder(order);
+        s0 = si.remainder(order);
         ci = cyp.encrypt(mis.get(0), t);
         cis.add(ci);
         s0 = s0.negate().add(order).remainder(order);
         dec.setS0(s0);
-        assertEquals(Optional.of(dec.getGroup().getGenerator().pow(BigInteger.valueOf(4L))), dec.getBeta(cis, t));
+
+    }
+
+
+    static BigInteger randomMessage() {
+        return message;
+    }
+
+    @Test
+    void decrypt() {
         Optional<BigInteger> m = dec.decrypt(cis, t);
         Optional<BigInteger> mExpected = mis.stream().reduce(BigInteger::add);
         assertEquals(mExpected, m);
+    }
+
+    @Test
+    void isS0Correct() {
+        assertEquals(BigInteger.ZERO, si.add(s0).remainder(order));
+    }
+
+
+    @Test
+    void isSameAlphaBetaInDecryptFunction() {
+        assertEquals(Optional.of(dec.getGroup().getGenerator().pow(message)), dec.getBeta(cis, t));
+        GeneralECPoint expectedGenerator = dec.getGroup()
+                .toElement(new BigInteger("188da80eb03090f67cbf20eb43a18800f4ff0afd82ff1012", 16));
+        assertEquals(expectedGenerator , dec.getGroup().getGenerator());
     }
 
 }

@@ -33,7 +33,8 @@ public class DecipherMessage extends LoadCurve implements Decypher, Hash {
 
     @Override
     public Optional<BigInteger> decrypt(List<GeneralECPoint> messageC, BigInteger time) {
-        return getBeta(messageC, time).flatMap((beta) -> lambda.algorithm(beta));
+        Optional<GeneralECPoint> d = getBeta(messageC, time);
+        return d.flatMap((beta) -> lambda.algorithm(beta));
     }
 
     protected Optional<GeneralECPoint> getBeta(List<GeneralECPoint> messageC, BigInteger t) {
