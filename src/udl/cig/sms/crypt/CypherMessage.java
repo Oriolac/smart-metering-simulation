@@ -16,41 +16,16 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CypherMessage implements Cypher{
+public class CypherMessage extends LoadCurve implements Cypher{
 
-    private ECPrimeOrderSubgroup grup;
-    final static int A = -3;
     private PrimeFieldElement privateKey;  // Si in formulas
-    private PrimeField field;
-    private GeneralEC curve;
 
     public CypherMessage(File file) {
-        RingElement[] COEF = new RingElement[2];
-        ArrayList<BigInteger> card = new ArrayList<>();
-        GeneralECPoint gen;
-
-        Toml toml = new Toml().read(file);
-        BigInteger module = new BigInteger(toml.getString("p"));
-        BigInteger n = new BigInteger(toml.getString("n"));
-        BigInteger b = new BigInteger(toml.getString("b")
-                .replaceAll("\\s", ""), 16);
-        BigInteger gx = new BigInteger(toml.getString("gx")
-                .replaceAll("\\s", ""), 16);
-        BigInteger gy = new BigInteger(toml.getString("gy")
-                .replaceAll("\\s", ""), 16);
-
-        this.field = new PrimeField(module);
-        COEF[0] = new PrimeFieldElement(field, BigInteger.valueOf(A));
-        COEF[1] = new PrimeFieldElement(field, b);
-        card.add(n);
-        curve = new GeneralEC(field, COEF, card);
-        gen = new GeneralECPoint(curve, new PrimeFieldElement(field, gx), new PrimeFieldElement(field, gy));
-        this.grup = new ECPrimeOrderSubgroup(curve, n, gen);
-
+        loadCurve(file);
     }
 
 
-    protected GeneralECPoint hash(BigInteger t) {
+    public GeneralECPoint hash(BigInteger t) {
         try {
             GeneralECPoint point;
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -90,11 +65,11 @@ public class CypherMessage implements Cypher{
         return result;
     }
 
-    GeneralEC getCurve() {
+    public GeneralEC getCurve() {
         return this.curve;
     }
 
-    BigInteger getKey() {
+    public BigInteger getKey() {
         return privateKey.getIntValue();
     }
 
