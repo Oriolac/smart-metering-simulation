@@ -13,18 +13,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class DecipherMessageSetUp192 extends LoadCurve {
 
     final File file = new File("data/p192.toml");
-
+    GeneralECPoint alpha;
+    PollardsLambda lambda;
 
     @Test
     void decryptUsingConstantLambda() {
         loadCurve(file);
-        GeneralECPoint alpha = this.grup.getGenerator();
-        PollardsLambda lambda = new PollardsLambda(alpha);
         DecipherMessage dec = new DecipherMessage(file);
+        alpha = this.grup.getGenerator();
+        lambda = new PollardsLambda(alpha);
         assertEquals(lambda, dec.getLambda());
-        dec.setLambda(lambda);
+        // dec.setLambda(lambda);
         assertEquals(this.grup, dec.getGroup());
         assertEquals(alpha, dec.getGroup().getGenerator());
         assertEquals(Optional.of(BigInteger.ONE), dec.decrypt(alpha));
+        assertEquals(Optional.of(BigInteger.TWO), dec.decrypt(alpha.pow(BigInteger.TWO)));
     }
 }

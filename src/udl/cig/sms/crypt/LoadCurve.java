@@ -20,27 +20,37 @@ public abstract class LoadCurve {
     protected GeneralEC curve;
 
     protected void loadCurve(File file) {
-        RingElement[] COEF = new RingElement[2];
-        ArrayList<BigInteger> card = new ArrayList<>();
-        GeneralECPoint gen;
-
         Toml toml = new Toml().read(file);
         BigInteger module = new BigInteger(toml.getString("p"));
         BigInteger n = new BigInteger(toml.getString("n"));
-        BigInteger b = new BigInteger(toml.getString("b")
-                .replaceAll("\\s", ""), 16);
-        BigInteger gx = new BigInteger(toml.getString("gx")
-                .replaceAll("\\s", ""), 16);
-        BigInteger gy = new BigInteger(toml.getString("gy")
-                .replaceAll("\\s", ""), 16);
+        BigInteger b = new BigInteger(getTrimmedString(toml,"b"), 16);
+        BigInteger gx = new BigInteger(getTrimmedString(toml, "gx"), 16);
+        BigInteger gy = new BigInteger(getTrimmedString(toml, "gy"), 16);
+
+        curveConstruction(module, b, n);
+        groupConstruction(n, gx, gy);
+    }
+
+    private void groupConstruction(BigInteger n, BigInteger gx, BigInteger gy) {
+        GeneralECPoint gen;
+        gen = new GeneralECPoint(curve, new PrimeFieldElement(field, gx), new PrimeFieldElement(field, gy));
+        this.grup = new ECPrimeOrderSubgroup(curve, n, gen);
+    }
+
+    private void curveConstruction(BigInteger module, BigInteger b, BigInteger order) {
+        RingElement[] COEF = new RingElement[2];
+        ArrayList<BigInteger> card = new ArrayList<>();
 
         this.field = new PrimeField(module);
         COEF[0] = new PrimeFieldElement(field, BigInteger.valueOf(A));
         COEF[1] = new PrimeFieldElement(field, b);
-        card.add(n);
+        card.add(order);
         curve = new GeneralEC(field, COEF, card);
-        gen = new GeneralECPoint(curve, new PrimeFieldElement(field, gx), new PrimeFieldElement(field, gy));
-        this.grup = new ECPrimeOrderSubgroup(curve, n, gen);
+    }
+
+    private String getTrimmedString(Toml toml, String key) {
+        return toml.getString(key)
+                .replaceAll("\\s", "");
     }
 
 }

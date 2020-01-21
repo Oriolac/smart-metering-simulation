@@ -9,11 +9,10 @@ import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DecipherMessageIntegrationTest {
+class DecipherMessageIntegrationTest extends LoadCurve {
 
     static DecipherMessage dec;
     static List<BigInteger> mis;
@@ -61,7 +60,7 @@ class DecipherMessageIntegrationTest {
         ci = cyp.encrypt(mis.get(0), t);
         cis.add(ci);
         s0 = s0.negate().add(order).remainder(order);
-        dec.setS0(s0);
+        dec.setPrivateKey(s0);
 
     }
 

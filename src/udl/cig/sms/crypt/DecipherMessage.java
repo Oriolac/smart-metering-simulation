@@ -21,13 +21,13 @@ import java.util.Optional;
 
 public class DecipherMessage extends LoadCurve implements Decypher, Hash {
 
-    private BigInteger privateKey;  // Si in formulas
+    private BigInteger privateKey;
     private PollardsLambdaInt lambda;
 
 
     public DecipherMessage(File file) {
         loadCurve(file);
-        setLambda(new PollardsLambda(grup.getGenerator()));
+        lambda = new PollardsLambda(grup.getGenerator());
     }
 
     @Override
@@ -63,7 +63,7 @@ public class DecipherMessage extends LoadCurve implements Decypher, Hash {
         this.lambda = lambda;
     }
 
-    public void setS0(BigInteger s0) {
+    public void setPrivateKey(BigInteger s0) {
         privateKey = s0;
     }
 

@@ -76,7 +76,7 @@ public class DecipherMessageUnitTest implements HashTest{
         ci = cyp.encrypt(mis.get(0), t);
         cis.add(ci);
         s0 = s0.negate().add(order).remainder(order);
-        dec.setS0(s0);
+        dec.setPrivateKey(s0);
         assertEquals(Optional.of(dec.getGroup().getGenerator().pow(BigInteger.valueOf(4L))), dec.getBeta(cis, t));
         Optional<BigInteger> m = dec.decrypt(cis, t);
         Optional<BigInteger> mExpected = mis.stream().reduce(BigInteger::add);
