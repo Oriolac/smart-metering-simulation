@@ -10,9 +10,6 @@ import cat.udl.cig.operations.wrapper.PollardsLambdaInt;
 import com.moandjiezana.toml.Toml;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import udl.cig.sms.crypt.CypherMessage;
-import udl.cig.sms.crypt.DecipherMessage;
-import udl.cig.sms.crypt.Hash;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -60,7 +57,7 @@ public class DecipherMessageUnitTest implements HashTest{
     }
 
     @Test
-    public void decrypt() {
+    public void decryptUsingMockLambda() {
         PollardsLambdaMock lambda = new PollardsLambdaMock();
         dec.setLambda(lambda);
         CypherMessage cyp = new CypherMessage(new File("./data/p192.toml"));
@@ -86,6 +83,7 @@ public class DecipherMessageUnitTest implements HashTest{
         assertEquals(mExpected, m);
     }
 
+
     private static class PollardsLambdaMock implements PollardsLambdaInt{
 
         @Override
@@ -94,5 +92,7 @@ public class DecipherMessageUnitTest implements HashTest{
         }
 
     }
+
+
 
 }

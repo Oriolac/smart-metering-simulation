@@ -1,10 +1,10 @@
 package udl.cig.sms.meter;
 
-import java.math.BigInteger;
+import udl.cig.sms.meter.states.State;
 
 public interface SmartMeter {
 
-    public long getId();
-    public State getState();
-    public State setState(State state);
+    long getId();
+    State getState();
+    State setState(State state);
 }

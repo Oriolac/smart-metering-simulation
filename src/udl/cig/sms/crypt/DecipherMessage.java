@@ -27,9 +27,8 @@ public class DecipherMessage extends LoadCurve implements Decypher, Hash {
 
     public DecipherMessage(File file) {
         loadCurve(file);
-        lambda = new PollardsLambda(grup.getGenerator());
+        setLambda(new PollardsLambda(grup.getGenerator()));
     }
-
 
     @Override
     public Optional<BigInteger> decrypt(List<GeneralECPoint> messageC, BigInteger time) {
@@ -40,6 +39,10 @@ public class DecipherMessage extends LoadCurve implements Decypher, Hash {
     protected Optional<GeneralECPoint> getBeta(List<GeneralECPoint> messageC, BigInteger t) {
         Optional<GeneralECPoint> c = messageC.stream().reduce(GeneralECPoint::multiply);
         return c.map((x) -> x.multiply(hash(t).pow(privateKey)));
+    }
+
+    protected Optional<BigInteger> decrypt(GeneralECPoint beta) {
+        return lambda.algorithm(beta);
     }
 
     public ECPrimeOrderSubgroup getGroup() {
@@ -56,7 +59,7 @@ public class DecipherMessage extends LoadCurve implements Decypher, Hash {
         return this.field;
     }
 
-    public void setLambda(PollardsLambdaInt lambda) {
+    protected void setLambda(PollardsLambdaInt lambda) {
         this.lambda = lambda;
     }
 
@@ -76,5 +79,9 @@ public class DecipherMessage extends LoadCurve implements Decypher, Hash {
     @Override
     public int hashCode() {
         return Objects.hash(privateKey, lambda);
+    }
+
+    public PollardsLambdaInt getLambda() {
+        return lambda;
     }
 }
