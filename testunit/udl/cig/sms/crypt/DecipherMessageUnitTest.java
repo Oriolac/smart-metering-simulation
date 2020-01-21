@@ -3,10 +3,9 @@ package udl.cig.sms.crypt;
 import cat.udl.cig.ecc.ECPrimeOrderSubgroup;
 import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
-import cat.udl.cig.fields.GroupElement;
 import cat.udl.cig.fields.PrimeField;
 import cat.udl.cig.fields.PrimeFieldElement;
-import cat.udl.cig.operations.wrapper.PollardsLambdaInt;
+import cat.udl.cig.operations.wrapper.BruteForce;
 import com.moandjiezana.toml.Toml;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +57,7 @@ public class DecipherMessageUnitTest implements HashTest{
 
     @Test
     public void decryptUsingMockLambda() {
-        PollardsLambdaMock lambda = new PollardsLambdaMock(dec.getGroup().getGenerator());
+        BruteForce lambda = new BruteForce(dec.getGroup().getGenerator());
         dec.setLambda(lambda);
         CypherMessage cyp = new CypherMessage(new File("./data/p192.toml"));
         BigInteger si;
@@ -84,25 +83,7 @@ public class DecipherMessageUnitTest implements HashTest{
     }
 
 
-    private static class PollardsLambdaMock implements PollardsLambdaInt{
 
-        GeneralECPoint alpha;
-
-        public PollardsLambdaMock(GeneralECPoint alpha) {
-            this.alpha = alpha;
-        }
-
-        @Override
-        public Optional<BigInteger> algorithm(GroupElement beta) throws ArithmeticException {
-            for(int i = 0; BigInteger.valueOf(i).compareTo(beta.getGroup().getSize()) < 0; i++) {
-                BigInteger x = BigInteger.valueOf(i);
-                if(alpha.pow(x).equals(beta))
-                    return Optional.of(x);
-            }
-            return Optional.empty();
-        }
-
-    }
 
 
 

@@ -4,17 +4,11 @@ import cat.udl.cig.ecc.ECPrimeOrderSubgroup;
 import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeField;
-import cat.udl.cig.fields.PrimeFieldElement;
-import cat.udl.cig.fields.RingElement;
-import cat.udl.cig.operations.wrapper.PollardsLambda;
-import cat.udl.cig.operations.wrapper.PollardsLambdaInt;
-import com.moandjiezana.toml.Toml;
+import cat.udl.cig.operations.wrapper.BruteForce;
+import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,12 +16,12 @@ import java.util.Optional;
 public class DecipherMessage extends LoadCurve implements Decypher, Hash {
 
     private BigInteger privateKey;
-    private PollardsLambdaInt lambda;
+    private LogarithmAlgorithm lambda;
 
 
     public DecipherMessage(File file) {
         loadCurve(file);
-        lambda = new PollardsLambda(grup.getGenerator());
+        lambda = new BruteForce(grup.getGenerator());
     }
 
     @Override
@@ -59,7 +53,7 @@ public class DecipherMessage extends LoadCurve implements Decypher, Hash {
         return this.field;
     }
 
-    protected void setLambda(PollardsLambdaInt lambda) {
+    protected void setLambda(LogarithmAlgorithm lambda) {
         this.lambda = lambda;
     }
 
@@ -81,7 +75,7 @@ public class DecipherMessage extends LoadCurve implements Decypher, Hash {
         return Objects.hash(privateKey, lambda);
     }
 
-    public PollardsLambdaInt getLambda() {
+    public LogarithmAlgorithm getLambda() {
         return lambda;
     }
 }
