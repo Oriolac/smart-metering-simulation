@@ -23,7 +23,7 @@ public class DecipherMessageSetUp192 extends LoadCurve {
         alpha = this.grup.getGenerator();
         lambda = new PollardsLambda(alpha);
         assertEquals(lambda, dec.getLambda());
-        // dec.setLambda(lambda);
+        //dec.setLambda(lambda);
         assertEquals(this.grup, dec.getGroup());
         assertEquals(alpha, dec.getGroup().getGenerator());
         assertEquals(Optional.of(BigInteger.ONE), dec.decrypt(alpha));

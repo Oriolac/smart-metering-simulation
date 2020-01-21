@@ -5,20 +5,16 @@ import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeField;
 import cat.udl.cig.fields.PrimeFieldElement;
-import cat.udl.cig.fields.RingElement;
-import com.moandjiezana.toml.Toml;
 import javafx.util.Pair;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CypherMessage extends LoadCurve implements Cypher, Hash{
+public class CypherMessage extends LoadCurve implements Cypher, Hash {
 
-    private PrimeFieldElement privateKey;  // Si in formulas
+    private PrimeFieldElement privateKey;
 
     public CypherMessage(File file) {
         loadCurve(file);
