@@ -1,6 +1,7 @@
 package udl.cig.sms.crypt;
 
 import cat.udl.cig.ecc.GeneralECPoint;
+import cat.udl.cig.fields.PrimeFieldElement;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -9,59 +10,45 @@ import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class DecipherMessageIntegrationTest extends LoadCurve {
+class DecipherMessageIntegrationTest {
 
+    static final int N = 3;
     static DecipherMessage dec;
-    static List<BigInteger> mis;
     static List<BigInteger> sis;
     static List<GeneralECPoint> cis;
-    static BigInteger t = BigInteger.TEN;
+    static BigInteger t = BigInteger.ONE;
     static BigInteger message = new BigInteger("9");
-    static BigInteger si;
     static BigInteger s0;
-    static GeneralECPoint ci;
-    static CypherMessage cyp;
     static BigInteger order;
+    static LoadCurve loadCurve;
 
     @BeforeAll
     static void createDecipher() {
-        dec = new DecipherMessage(new File("./data/p192.toml"));
+        loadCurve = new LoadCurve(new File("./data/p192.toml"));
         createSecretKeys();
-        createMessage();
-        cyp = new CypherMessage(new File("./data/p192.toml"));
         keyEstablishment();
-    }
-
-    static void createMessage() {
-        mis = new LinkedList<>();
-        for (int i = 0; i < 1; i++) {
-            mis.add(randomMessage());
-        }
+        dec = new DecipherMessage(loadCurve, s0);
     }
 
     static void createSecretKeys() {
         sis = new LinkedList<>();
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < N; i++) {
             sis.add(randomMessage());
         }
     }
 
     static void keyEstablishment() {
         cis = new LinkedList<>();
-        order = dec.getGroup().getSize();
-        //noinspection OptionalGetWithoutIsPresent
-        si = cyp.generateSij().stream()
-                .map(x -> BigInteger.TWO.pow(13 * x.getValue()).multiply(x.getKey()))
-                .reduce(BigInteger::add).get();
-        s0 = si.remainder(order);
-        ci = cyp.encrypt(mis.get(0), t);
-        cis.add(ci);
+        order = loadCurve.getGroup().getSize();
+        s0 = sis.stream().reduce(BigInteger::add).map(s0 -> s0.remainder(order)).get();
+        cis = sis.stream()
+                .map((privateKey) -> new CypherMessage(loadCurve, privateKey))
+                .map((cyper) -> cyper.encrypt(message, t)).collect(Collectors.toList());
         s0 = s0.negate().add(order).remainder(order);
-        dec.setPrivateKey(s0);
-
     }
 
 
@@ -72,22 +59,30 @@ class DecipherMessageIntegrationTest extends LoadCurve {
     @Test
     void decrypt() {
         Optional<BigInteger> m = dec.decrypt(cis, t);
-        Optional<BigInteger> mExpected = mis.stream().reduce(BigInteger::add);
+        Optional<BigInteger> mExpected = Optional.of(message.multiply(BigInteger.valueOf(N)));
         assertEquals(mExpected, m);
     }
 
     @Test
     void isS0Correct() {
-        assertEquals(BigInteger.ZERO, si.add(s0).remainder(order));
+        assertEquals(Optional.of(BigInteger.ZERO),
+                sis.stream().reduce(BigInteger::add).map((si) -> si.add(s0).remainder(order)));
     }
 
 
     @Test
     void isSameAlphaBetaInDecryptFunction() {
-        assertEquals(Optional.of(dec.getGroup().getGenerator().pow(message)), dec.getBeta(cis, t));
+        Optional<GeneralECPoint> beta =
+                Optional.of(dec.getGroup().getGenerator().pow(message.multiply(BigInteger.valueOf(N))));
+        assertEquals(beta, dec.getBeta(cis, t));
         GeneralECPoint expectedGenerator = dec.getGroup()
                 .toElement(new BigInteger("188da80eb03090f67cbf20eb43a18800f4ff0afd82ff1012", 16));
-        assertEquals(expectedGenerator , dec.getGroup().getGenerator());
+        assertEquals(expectedGenerator, dec.getGroup().getGenerator());
     }
 
+
+    static private PrimeFieldElement generateSi() {
+        return loadCurve.getField().getRandomElement();
+
+    }
 }

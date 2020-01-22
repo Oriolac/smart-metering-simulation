@@ -12,18 +12,18 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-public abstract class LoadCurve {
+public class LoadCurve {
 
     final static int A = -3;
-    protected ECPrimeOrderSubgroup grup;
-    protected PrimeField field;
-    protected GeneralEC curve;
+    private ECPrimeOrderSubgroup grup;
+    private PrimeField field;
+    private GeneralEC curve;
 
-    protected void loadCurve(File file) {
+    public LoadCurve(File file) {
         Toml toml = new Toml().read(file);
         BigInteger module = new BigInteger(toml.getString("p"));
         BigInteger n = new BigInteger(toml.getString("n"));
-        BigInteger b = new BigInteger(getTrimmedString(toml,"b"), 16);
+        BigInteger b = new BigInteger(getTrimmedString(toml, "b"), 16);
         BigInteger gx = new BigInteger(getTrimmedString(toml, "gx"), 16);
         BigInteger gy = new BigInteger(getTrimmedString(toml, "gy"), 16);
 
@@ -53,4 +53,15 @@ public abstract class LoadCurve {
                 .replaceAll("\\s", "");
     }
 
+    public ECPrimeOrderSubgroup getGroup() {
+        return grup;
+    }
+
+    public PrimeField getField() {
+        return field;
+    }
+
+    public GeneralEC getCurve() {
+        return curve;
+    }
 }

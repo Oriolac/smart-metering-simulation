@@ -5,19 +5,21 @@ import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeField;
 import cat.udl.cig.fields.PrimeFieldElement;
-import javafx.util.Pair;
 
-import java.io.File;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
-public class CypherMessage extends LoadCurve implements Cypher, Hash {
+public class CypherMessage implements Cypher, Hash {
 
-    private PrimeFieldElement privateKey;
+    private final PrimeField field;
+    private final GeneralEC curve;
+    private final ECPrimeOrderSubgroup grup;
+    final private PrimeFieldElement privateKey;
 
-    public CypherMessage(File file) {
-        loadCurve(file);
+    public CypherMessage(LoadCurve loadCurve, BigInteger privateKey) {
+        this.curve = loadCurve.getCurve();
+        this.grup = loadCurve.getGroup();
+        this.field = loadCurve.getField();
+        this.privateKey = field.toElement(privateKey);
     }
 
     @Override
@@ -26,27 +28,7 @@ public class CypherMessage extends LoadCurve implements Cypher, Hash {
                 .multiply(hash(t).pow(privateKey.getIntValue()));
     }
 
-    @Override
-    public List<Pair<BigInteger, Integer>> generateSij() {
-        BigInteger divisor = BigInteger.TWO;
-        divisor = divisor.pow(13);
-        privateKey = generateSi();
-        List<Pair<BigInteger, Integer>> result = new ArrayList<>();
-        int j = 0;
 
-        BigInteger[] tmp = privateKey.getIntValue().divideAndRemainder(divisor);
-        while (!tmp[0].equals(BigInteger.ZERO)) {
-            result.add(new Pair<>(tmp[1], j));
-            j++;
-            tmp = tmp[0].divideAndRemainder(divisor);
-        }
-        result.add(new Pair<>(tmp[1], j));
-        return result;
-    }
-
-    public void setPrivateKey(PrimeFieldElement privateKey) {
-        this.privateKey = privateKey;
-    }
 
     @Override
     public GeneralEC getCurve() {
@@ -66,7 +48,4 @@ public class CypherMessage extends LoadCurve implements Cypher, Hash {
         return privateKey.getIntValue();
     }
 
-    private PrimeFieldElement generateSi() {
-        return field.getRandomElement();
-    }
 }

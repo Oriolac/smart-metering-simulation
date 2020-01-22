@@ -7,27 +7,32 @@ import cat.udl.cig.fields.PrimeField;
 import cat.udl.cig.operations.wrapper.BruteForce;
 import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
 
-import java.io.File;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class DecipherMessage extends LoadCurve implements Decypher, Hash {
+public class DecipherMessage implements Decypher, Hash {
 
-    private BigInteger privateKey;
+    private final ECPrimeOrderSubgroup grup;
+    private final GeneralEC curve;
+    private final PrimeField field;
+    final private BigInteger privateKey;
     private LogarithmAlgorithm lambda;
 
 
-    public DecipherMessage(File file) {
-        loadCurve(file);
+    public DecipherMessage(LoadCurve loadCurve, BigInteger privateKey) {
+        this.curve = loadCurve.getCurve();
+        this.field = loadCurve.getField();
+        this.grup = loadCurve.getGroup();
         lambda = new BruteForce(grup.getGenerator());
+        this.privateKey = privateKey;
     }
 
     @Override
     public Optional<BigInteger> decrypt(List<GeneralECPoint> messageC, BigInteger time) {
         Optional<GeneralECPoint> d = getBeta(messageC, time);
-        return d.flatMap((beta) -> lambda.algorithm(beta));
+        return d.flatMap(lambda::algorithm);
     }
 
     protected Optional<GeneralECPoint> getBeta(List<GeneralECPoint> messageC, BigInteger t) {
@@ -57,11 +62,6 @@ public class DecipherMessage extends LoadCurve implements Decypher, Hash {
         this.lambda = lambda;
     }
 
-    public void setPrivateKey(BigInteger s0) {
-        privateKey = s0;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

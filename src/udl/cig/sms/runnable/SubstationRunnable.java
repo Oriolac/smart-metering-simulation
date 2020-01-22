@@ -19,6 +19,5 @@ public class SubstationRunnable {
 
     private static void initVariables(String[] args) {
         File file = new File(args[1]);
-        cypher = new DecipherMessage(file);
     }
 }

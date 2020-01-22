@@ -17,7 +17,8 @@ class CypherMessageUnitTest implements HashTest {
 
     @BeforeEach
     void before() {
-        cyp = new CypherMessage(new File("./data/p192.toml"));
+        LoadCurve loadCurve = new LoadCurve(new File("./data/p192.toml"));
+        cyp = new CypherMessage(loadCurve, BigInteger.TEN);
     }
 
 
@@ -27,19 +28,8 @@ class CypherMessageUnitTest implements HashTest {
         BigInteger xCoordinate = new BigInteger("2540186706032044856659695301755765373940821598684077640004");
         BigInteger message = new BigInteger("4");
         BigInteger time = new BigInteger("3");
-        cyp.setPrivateKey(cyp.getField().toElement(BigInteger.TEN));
         GeneralECPoint expected = curve.liftX(cyp.getField().toElement(xCoordinate));
         assertEquals(expected, cyp.encrypt(message, time));
-    }
-
-
-    @Test
-    void generateSij() {
-        //noinspection OptionalGetWithoutIsPresent
-        BigInteger si = cyp.generateSij().stream()
-                .map(x -> BigInteger.TWO.pow(13 * x.getValue()).multiply(x.getKey()))
-                .reduce(BigInteger::add).get();
-        assertEquals(cyp.getKey(), si);
     }
 
     @Override
