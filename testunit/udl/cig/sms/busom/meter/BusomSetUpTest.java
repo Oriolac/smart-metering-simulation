@@ -3,6 +3,7 @@ package udl.cig.sms.busom.meter;
 import cat.udl.cig.fields.GroupElement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.busom.meter.doubles.SenderSpy;
 import udl.cig.sms.crypt.LoadCurve;
 
@@ -21,7 +22,7 @@ class BusomSetUpTest {
     @BeforeEach
     void setUp() {
         loadCurve = new LoadCurve(new File("./data/p192.toml"));
-        busomSetUp = new BusomSetUp("AESD-123456");
+        busomSetUp = new BusomSetUp("AESD-123456", loadCurve.getGroup().getGenerator());
     }
 
     @Test

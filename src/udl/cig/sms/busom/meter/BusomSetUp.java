@@ -1,6 +1,7 @@
 package udl.cig.sms.busom.meter;
 
 import cat.udl.cig.fields.GroupElement;
+import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.connection.Sender;
 
 import java.math.BigInteger;
@@ -9,7 +10,8 @@ import java.util.Optional;
 public class BusomSetUp implements BusomState {
 
 
-    public BusomSetUp(String certificate) {}
+    public BusomSetUp(String certificate, GroupElement generador) {
+    }
 
     @Override
     public BusomState next() {

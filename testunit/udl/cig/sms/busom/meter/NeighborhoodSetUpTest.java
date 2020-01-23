@@ -4,6 +4,7 @@ import cat.udl.cig.ecc.ECPrimeOrderSubgroup;
 import cat.udl.cig.ecc.GeneralECPoint;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.connection.Receiver;
 import udl.cig.sms.connection.SMSDatagram;
 import udl.cig.sms.connection.datagram.EndOfDatagram;

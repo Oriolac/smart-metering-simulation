@@ -1,16 +1,17 @@
 package udl.cig.sms.busom.meter;
 
 import cat.udl.cig.fields.GroupElement;
+import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.connection.Receiver;
 
 import java.math.BigInteger;
 
-public class NeighborhoodSetUp implements BusomState{
+public class NeighborhoodSetUp implements BusomState {
 
 
     private GroupElement generalKey;
 
-    public NeighborhoodSetUp(BigInteger privateKey) {
+    protected NeighborhoodSetUp(BigInteger privateKey) {
 
     }
 

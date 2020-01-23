@@ -2,7 +2,6 @@ package udl.cig.sms.crypt;
 
 import cat.udl.cig.ecc.GeneralEC;
 import org.junit.jupiter.api.Test;
-import udl.cig.sms.crypt.Hash;
 
 import java.math.BigInteger;
 
