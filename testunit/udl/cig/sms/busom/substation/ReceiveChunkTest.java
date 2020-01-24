@@ -48,7 +48,7 @@ class ReceiveChunkTest {
     void sendC() {
         SenderSpy senderSpy = new SenderSpy();
         currentState.setSender(senderSpy);
-        ElGamalCiphertext ciphertext= new ElGamalCiphertext(null); //TODO: @ori s'ha de mirar al Sagemath3
+        ElGamalCiphertext ciphertext = new ElGamalCiphertext(null); //TODO: @ori s'ha de mirar al Sagemath3
         currentState.setCipherText(ciphertext);
         currentState.sendC();
         assertEquals(3, senderSpy.getCount());
@@ -64,12 +64,11 @@ class ReceiveChunkTest {
         }
 
         @Override
-        public SMSDatagram receive(byte[] data) {
-            //TODO:
+        public SMSDatagram receive() {
             count++;
-            if(count < 4)
-                return new CipherTextDatagram();
-            return new EndOfDatagram(); //TODO: @ori Must be a Throwable exception, @see udl.cig.sms.busom.meter.BusomSetUpTest
+            if (count < 4)
+                return new CipherTextDatagram(null); //TODO: null must be an instance of cyphertext
+            return new EndOfDatagram(); //TODO : @sergisi missing number of smart meters.
         }
 
         public int getCount() {

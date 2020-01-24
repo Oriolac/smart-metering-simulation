@@ -5,8 +5,14 @@ import udl.cig.sms.connection.SMSDatagram;
 
 public class GroupElementDatagram implements SMSDatagram {
 
-    public GroupElementDatagram(GroupElement element) {
+    private final GroupElement element;
 
+    public GroupElementDatagram(GroupElement element) {
+        this.element = element;
+    }
+
+    public GroupElement getElement() {
+        return element;
     }
 
     @Override

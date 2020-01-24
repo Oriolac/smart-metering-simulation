@@ -4,6 +4,7 @@ import cat.udl.cig.fields.GroupElement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.busom.BusomState;
+import udl.cig.sms.busom.data.MeterKey;
 import udl.cig.sms.busom.meter.doubles.SenderSpy;
 import udl.cig.sms.connection.Receiver;
 import udl.cig.sms.connection.SMSDatagram;
@@ -28,7 +29,8 @@ class SendPartialDecryptionTest {
         loadCurve = new LoadCurve(new File("./data/p192.toml"));
         privateKey = new BigInteger("1234567890");
         noise = BigInteger.valueOf(13000L);
-        currentState = new SendPartialDecryption(privateKey, noise);
+        MeterKey meterKey = new MeterKey(privateKey, loadCurve.getGroup().getRandomElement());
+        currentState = new SendPartialDecryption(meterKey, noise, loadCurve);
     }
 
     @Test
@@ -66,7 +68,7 @@ class SendPartialDecryptionTest {
         }
 
         @Override
-        public SMSDatagram receive(byte[] data) {
+        public SMSDatagram receive() {
             count++;
             return new GroupElementDatagram(element);
         }

@@ -21,11 +21,14 @@ class DecriptChunkTest {
 
     DecriptChunk currentState;
     LoadCurve loadCurve;
+    ReceiverSpy receiverSpy;
 
     @BeforeEach
     void setUp() {
         loadCurve = new LoadCurve(new File("./data/p192.toml"));
         currentState = new DecriptChunk(loadCurve.getGroup());
+        receiverSpy = new ReceiverSpy(loadCurve.getGroup());
+        currentState.setReceiver(receiverSpy);
     }
 
     @Test
@@ -36,10 +39,8 @@ class DecriptChunkTest {
 
     @Test
     void receiveAndCompute() {
-        ReceiverSpy receiverSpy = new ReceiverSpy(loadCurve.getGroup());
-        currentState.setReceiver(receiverSpy);
         currentState.receiveAndCompute();
-        assertEquals(3, receiverSpy.getCount());
+        assertEquals(4, receiverSpy.getCount());
     }
 
     @Test
@@ -62,11 +63,11 @@ class DecriptChunkTest {
         }
 
         @Override
-        public SMSDatagram receive(byte[] data) {
+        public SMSDatagram receive() {
             count++;
             if(count < 4)
                 return new GroupElementDatagram(group.getGenerator());
-            return new EndOfDatagram(); //TODO @ori must be a throw new ....
+            return new EndOfDatagram(); //TODO @ori missing member to the class telling number of SmartMeters
         }
 
         public int getCount() {

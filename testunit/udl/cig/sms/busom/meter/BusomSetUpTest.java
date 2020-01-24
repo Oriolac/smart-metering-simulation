@@ -11,8 +11,7 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BusomSetUpTest {
 
@@ -22,11 +21,13 @@ class BusomSetUpTest {
     @BeforeEach
     void setUp() {
         loadCurve = new LoadCurve(new File("./data/p192.toml"));
-        busomSetUp = new BusomSetUp("AESD-123456", loadCurve.getGroup().getGenerator());
+        busomSetUp = new BusomSetUp("AESD-123456", loadCurve);
     }
 
     @Test
     void next() {
+        SenderSpy senderSpy = new SenderSpy();
+        busomSetUp.setSender(senderSpy);
         BusomState nextState = busomSetUp.next();
         assertTrue(nextState instanceof NeighborhoodSetUp);
     }
@@ -34,26 +35,33 @@ class BusomSetUpTest {
 
     @Test
     void generatePrivateKey() {
-        assertTrue(busomSetUp.generatePrivateKey().compareTo(BigInteger.ZERO) > 0);
+        busomSetUp.generatePrivateKey();
+        BigInteger random = busomSetUp.getPrivateKey();
+        busomSetUp.generatePrivateKey();
+        BigInteger random2 = busomSetUp.getPrivateKey();
+        assertNotEquals(random, random2, "Randoms are equals!");
     }
 
     @Test
     void calculatePublicKey() {
-        assertEquals(Optional.empty(), busomSetUp.calculatePublicKey());
-        BigInteger privateKey = busomSetUp.generatePrivateKey();
-        Optional<GroupElement> publicKey = busomSetUp.calculatePublicKey();
+        busomSetUp.calculatePublicKey();
+        assertEquals(Optional.empty(), busomSetUp.getPublicKey());
+        busomSetUp.generatePrivateKey();
+        busomSetUp.calculatePublicKey();
+        Optional<GroupElement> publicKey = busomSetUp.getPublicKey();
+        BigInteger privateKey = busomSetUp.getPrivateKey();
         assertEquals(Optional.of(loadCurve.getGroup().getGenerator().pow(privateKey)), publicKey);
     }
 
     @Test
     void sendPublicKey() {
         SenderSpy sender = new SenderSpy();
-        assertEquals(0,sender.getCount());
+        assertEquals(0, sender.getCount());
         busomSetUp.setSender(sender);
         busomSetUp.generatePrivateKey();
         busomSetUp.calculatePublicKey();
         busomSetUp.sendPublicKey();
-        assertEquals(1,sender.getCount());
+        assertEquals(1, sender.getCount());
     }
 
 }

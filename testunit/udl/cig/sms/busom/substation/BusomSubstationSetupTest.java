@@ -4,6 +4,7 @@ import cat.udl.cig.fields.GroupElement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.busom.BusomState;
+import udl.cig.sms.busom.CertificateTrueMock;
 import udl.cig.sms.busom.CertificateValidation;
 import udl.cig.sms.busom.meter.doubles.SenderSpy;
 import udl.cig.sms.connection.Receiver;
@@ -23,15 +24,21 @@ class BusomSubstationSetupTest {
 
     BusomSubstationSetup substationSetup;
     LoadCurve loadCurve;
+    ReceiverSpy receiverSpy;
 
     @BeforeEach
     void setUp() {
-        loadCurve = new LoadCurve(new File("/data/p192.toml"));
+        loadCurve = new LoadCurve(new File("./data/p192.toml"));
         substationSetup = new BusomSubstationSetup(loadCurve.getGroup());
+        substationSetup.setValidation(new CertificateTrueMock<>());
+        receiverSpy = new ReceiverSpy(loadCurve.getGroup().getGenerator());
+        substationSetup.setReceiver(receiverSpy);
     }
 
     @Test
     void next() {
+        SenderSpy senderSpy = new SenderSpy();
+        substationSetup.setSender(senderSpy);
         BusomState nextState = substationSetup.next();
         assertTrue(nextState instanceof ReceiveChunk);
     }
@@ -39,8 +46,7 @@ class BusomSubstationSetupTest {
     @Test
     void receiveAndComputePublicKey() {
         //TODO: Falta lo del Certificate
-        ReceiverSpy receiverSpy = new ReceiverSpy(loadCurve.getGroup().getGenerator());
-        substationSetup.receiveAndComputePublicKey();
+        substationSetup.receivePublicKeys();
         assertEquals(3, receiverSpy.getCount());
     }
 
@@ -49,10 +55,11 @@ class BusomSubstationSetupTest {
         int numberOfDatagrams = 3;
         SenderSpy senderSpy = new SenderSpy();
         substationSetup.setSender(senderSpy);
-        List<NeighborhoodDatagram> datagrams = new ArrayList<>();
-        for(int i = 0; i < numberOfDatagrams; i++)
-            datagrams.add(new NeighborhoodDatagram(loadCurve.getGroup().getGenerator(), ""));
+        List<NeighborhoodDatagram<String>> datagrams = new ArrayList<>();
+        for (int i = 0; i < numberOfDatagrams; i++)
+            datagrams.add(new NeighborhoodDatagram<>(loadCurve.getGroup().getGenerator(), ""));
         substationSetup.setDatagrams(datagrams);
+        substationSetup.sendPublicKey();
         assertEquals(numberOfDatagrams, senderSpy.getCount());
     }
 
@@ -67,11 +74,11 @@ class BusomSubstationSetupTest {
         }
 
         @Override
-        public SMSDatagram receive(byte[] data) {
+        public SMSDatagram receive() {
             count++;
             if (count < 3)
-                return new NeighborhoodDatagram(generator, "");
-            return new EndOfDatagram(); //TODO: @ori Must be a throw new FinishedReceiveTask
+                return new NeighborhoodDatagram<>(generator, "");
+            return new EndOfDatagram();
         }
 
         public int getCount() {

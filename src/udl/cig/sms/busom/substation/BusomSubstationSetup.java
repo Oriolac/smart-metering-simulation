@@ -2,10 +2,13 @@ package udl.cig.sms.busom.substation;
 
 import cat.udl.cig.ecc.ECPrimeOrderSubgroup;
 import udl.cig.sms.busom.BusomState;
+import udl.cig.sms.busom.CertificateValidation;
 import udl.cig.sms.connection.Receiver;
+import udl.cig.sms.connection.SMSDatagram;
 import udl.cig.sms.connection.Sender;
 import udl.cig.sms.connection.datagram.NeighborhoodDatagram;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BusomSubstationSetup implements BusomState {
@@ -13,23 +16,45 @@ public class BusomSubstationSetup implements BusomState {
     private final ECPrimeOrderSubgroup group;
     private Receiver receiver;
     private Sender sender;
-    private List<NeighborhoodDatagram> datagrams;
+    private List<NeighborhoodDatagram<String>> datagrams;
+    private CertificateValidation<String> validation;
 
     public BusomSubstationSetup(ECPrimeOrderSubgroup group) {
         this.group = group;
+        datagrams = new ArrayList<>();
     }
 
     @Override
     public BusomState next() {
-        return null;
+        receivePublicKeys();
+        sendPublicKey();
+        return new ReceiveChunk(group);
     }
 
-    protected void receiveAndComputePublicKey() {
-
+    @SuppressWarnings("unchecked cast")
+    protected void receivePublicKeys() {
+        SMSDatagram data = receiver.receive();
+        while (data instanceof NeighborhoodDatagram) {
+            NeighborhoodDatagram<String> neighbourData = (NeighborhoodDatagram<String>) data;
+            receivePublicMeterKey(neighbourData);
+            data = receiver.receive();
+        }
     }
+
+    private void receivePublicMeterKey(NeighborhoodDatagram<String> data) {
+        if (data.validate(validation))
+            datagrams.add(data);
+    }
+
 
     protected void sendPublicKey() {
+        for (NeighborhoodDatagram<String> data : datagrams) {
+            sender.send(data);
+        }
+    }
 
+    public void setValidation(CertificateValidation<String> validation) {
+        this.validation = validation;
     }
 
     public void setReceiver(Receiver receiver) {
@@ -40,7 +65,7 @@ public class BusomSubstationSetup implements BusomState {
         this.sender = sender;
     }
 
-    public void setDatagrams(List<NeighborhoodDatagram> datagrams) {
+    public void setDatagrams(List<NeighborhoodDatagram<String>> datagrams) {
         this.datagrams = datagrams;
     }
 }
