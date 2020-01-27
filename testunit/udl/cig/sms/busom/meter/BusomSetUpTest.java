@@ -9,7 +9,6 @@ import udl.cig.sms.crypt.LoadCurve;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,12 +44,12 @@ class BusomSetUpTest {
     @Test
     void calculatePublicKey() {
         busomSetUp.calculatePublicKey();
-        assertEquals(Optional.empty(), busomSetUp.getPublicKey());
+        assertNull(busomSetUp.getPublicKey());
         busomSetUp.generatePrivateKey();
         busomSetUp.calculatePublicKey();
-        Optional<GroupElement> publicKey = busomSetUp.getPublicKey();
+        GroupElement publicKey = busomSetUp.getPublicKey();
         BigInteger privateKey = busomSetUp.getPrivateKey();
-        assertEquals(Optional.of(loadCurve.getGroup().getGenerator().pow(privateKey)), publicKey);
+        assertEquals(loadCurve.getGroup().getGenerator().pow(privateKey), publicKey);
     }
 
     @Test

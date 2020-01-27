@@ -1,23 +1,31 @@
 package udl.cig.sms.busom.substation;
 
-import cat.udl.cig.fields.Group;
+import cat.udl.cig.cryptography.cryptosystems.ciphertexts.HomomorphicCiphertext;
 import cat.udl.cig.fields.GroupElement;
+import cat.udl.cig.fields.MultiplicativeSubgroup;
+import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
+import cat.udl.cig.operations.wrapper.PollardsLambda;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.connection.Receiver;
 import udl.cig.sms.connection.SMSDatagram;
 import udl.cig.sms.connection.datagram.GroupElementDatagram;
 
 import java.math.BigInteger;
+import java.util.Optional;
 
 public class DecriptChunk implements BusomState {
 
-    private Group group;
+    private final HomomorphicCiphertext ciphertext;
+    private LogarithmAlgorithm logarithm;
+    private MultiplicativeSubgroup group;
     private GroupElement partialDecryption;
     private Receiver receiver;
 
-    public DecriptChunk(Group group) {
+    public DecriptChunk(MultiplicativeSubgroup group, HomomorphicCiphertext ciphertext) {
         this.group = group;
         partialDecryption = group.getNeuterElement();
+        this.ciphertext = ciphertext;
+        logarithm =  new PollardsLambda(group.getGenerator());
     }
 
     @Override
@@ -33,18 +41,28 @@ public class DecriptChunk implements BusomState {
             compute(groupElementDatagram);
             data = receiver.receive();
         }
+        GroupElement d =  (GroupElement) ciphertext.getParts()[1];
+        partialDecryption = partialDecryption.inverse().multiply(d);
     }
 
     private void compute(GroupElementDatagram groupElementDatagram) {
-        partialDecryption.multiply(groupElementDatagram.getElement());
+        partialDecryption = partialDecryption.multiply(groupElementDatagram.getElement());
     }
 
-    public BigInteger readMessage() {
-        return null;
+    public Optional<BigInteger> readMessage() {
+        return logarithm.algorithm(partialDecryption);
     }
 
     protected void setPartialDecryption(GroupElement D) {
         this.partialDecryption = D;
+    }
+
+    public void setLogarithm(LogarithmAlgorithm logarithm) {
+        this.logarithm = logarithm;
+    }
+
+    protected GroupElement getPartialDecryption() {
+        return partialDecryption;
     }
 
     public void setReceiver(Receiver receiver) {

@@ -23,6 +23,9 @@ class SendPartialDecryptionTest {
     BigInteger privateKey;
     BigInteger noise;
     LoadCurve loadCurve;
+    ReceiverSpy receiver;
+    GroupElement generator;
+    SenderSpy sender;
 
     @BeforeEach
     void setUp() {
@@ -31,6 +34,11 @@ class SendPartialDecryptionTest {
         noise = BigInteger.valueOf(13000L);
         MeterKey meterKey = new MeterKey(privateKey, loadCurve.getGroup().getRandomElement());
         currentState = new SendPartialDecryption(meterKey, noise, loadCurve);
+        generator = loadCurve.getGroup().getGenerator();
+        receiver = new ReceiverSpy(generator);
+        currentState.setReceiver(receiver);
+        sender = new SenderSpy();
+        currentState.setSender(sender);
     }
 
     @Test
@@ -41,9 +49,6 @@ class SendPartialDecryptionTest {
 
     @Test
     void generatePartialDecryption() {
-        GroupElement generator = loadCurve.getGroup().getGenerator();
-        ReceiverSpy receiver = new ReceiverSpy(generator);
-        currentState.setReceiver(receiver);
         GroupElement expected = generator.pow(privateKey.add(noise));
         assertEquals(expected, currentState.generatePartialDecryption());
         assertEquals(1, receiver.getCount());
@@ -51,8 +56,6 @@ class SendPartialDecryptionTest {
 
     @Test
     void sendDecryption() {
-        SenderSpy sender = new SenderSpy();
-        currentState.setSender(sender);
         currentState.sendDecryption();
         assertEquals(1, sender.getCount());
     }

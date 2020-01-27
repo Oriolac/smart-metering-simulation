@@ -1,6 +1,6 @@
 package udl.cig.sms.busom.substation;
 
-import cat.udl.cig.ecc.ECPrimeOrderSubgroup;
+import cat.udl.cig.fields.MultiplicativeSubgroup;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.busom.CertificateValidation;
 import udl.cig.sms.connection.Receiver;
@@ -13,13 +13,13 @@ import java.util.List;
 
 public class BusomSubstationSetup implements BusomState {
 
-    private final ECPrimeOrderSubgroup group;
+    private final MultiplicativeSubgroup group;
     private Receiver receiver;
     private Sender sender;
     private List<NeighborhoodDatagram<String>> datagrams;
     private CertificateValidation<String> validation;
 
-    public BusomSubstationSetup(ECPrimeOrderSubgroup group) {
+    public BusomSubstationSetup(MultiplicativeSubgroup group) {
         this.group = group;
         datagrams = new ArrayList<>();
     }

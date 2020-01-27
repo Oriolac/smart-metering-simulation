@@ -29,7 +29,8 @@ class NeighborhoodSetUpTest {
     @BeforeAll
     static void setUp() {
         loadCurve = new LoadCurve(new File("./data/p192.toml"));
-        neighborhoodSetUp = new NeighborhoodSetUp(randomKey(), loadCurve);
+        privateKey = randomKey();
+        neighborhoodSetUp = new NeighborhoodSetUp(privateKey, loadCurve);
     }
 
     static BigInteger randomKey() {
