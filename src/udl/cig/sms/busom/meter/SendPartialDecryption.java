@@ -5,11 +5,12 @@ import cat.udl.cig.fields.GroupElement;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.busom.data.MeterKey;
 import udl.cig.sms.connection.Receiver;
-import udl.cig.sms.connection.SMSDatagram;
 import udl.cig.sms.connection.Sender;
 import udl.cig.sms.connection.datagram.GroupElementDatagram;
+import udl.cig.sms.connection.datagram.SMSDatagram;
 import udl.cig.sms.crypt.LoadCurve;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 public class SendPartialDecryption implements BusomState {
@@ -38,10 +39,15 @@ public class SendPartialDecryption implements BusomState {
 
     //TODO: S'han de vigilar els errors
     protected GroupElement generatePartialDecryption() {
-        SMSDatagram data = receiver.receive();
-        if (data instanceof GroupElementDatagram) {
-            GroupElementDatagram elementDatagram = (GroupElementDatagram) data;
-            return elementDatagram.getElement().pow(meterKey.getPrivateKey()).multiply(generator.pow(noise));
+        SMSDatagram data;
+        try {
+            data = receiver.receive();
+            if (data instanceof GroupElementDatagram) {
+                GroupElementDatagram elementDatagram = (GroupElementDatagram) data;
+                return elementDatagram.getElement().pow(meterKey.getPrivateKey()).multiply(generator.pow(noise));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return null;
     }

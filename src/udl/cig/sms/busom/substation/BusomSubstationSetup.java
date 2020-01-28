@@ -4,10 +4,11 @@ import cat.udl.cig.fields.MultiplicativeSubgroup;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.busom.CertificateValidation;
 import udl.cig.sms.connection.Receiver;
-import udl.cig.sms.connection.SMSDatagram;
 import udl.cig.sms.connection.Sender;
 import udl.cig.sms.connection.datagram.NeighborhoodDatagram;
+import udl.cig.sms.connection.datagram.SMSDatagram;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,11 +34,16 @@ public class BusomSubstationSetup implements BusomState {
 
     @SuppressWarnings("unchecked cast")
     protected void receivePublicKeys() {
-        SMSDatagram data = receiver.receive();
-        while (data instanceof NeighborhoodDatagram) {
-            NeighborhoodDatagram<String> neighbourData = (NeighborhoodDatagram<String>) data;
-            receivePublicMeterKey(neighbourData);
+        SMSDatagram data;
+        try {
             data = receiver.receive();
+            while (data instanceof NeighborhoodDatagram) {
+                NeighborhoodDatagram<String> neighbourData = (NeighborhoodDatagram<String>) data;
+                receivePublicMeterKey(neighbourData);
+                data = receiver.receive();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

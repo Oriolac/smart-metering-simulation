@@ -1,7 +1,6 @@
 package udl.cig.sms.connection.datagram;
 
 import cat.udl.cig.cryptography.cryptosystems.ciphertexts.HomomorphicCiphertext;
-import udl.cig.sms.connection.SMSDatagram;
 
 public class CipherTextDatagram implements SMSDatagram {
 

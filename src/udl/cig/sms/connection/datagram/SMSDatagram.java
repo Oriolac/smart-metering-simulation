@@ -1,4 +1,4 @@
-package udl.cig.sms.connection;
+package udl.cig.sms.connection.datagram;
 
 public interface SMSDatagram {
 

@@ -7,9 +7,10 @@ import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
 import cat.udl.cig.operations.wrapper.PollardsLambda;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.connection.Receiver;
-import udl.cig.sms.connection.SMSDatagram;
 import udl.cig.sms.connection.datagram.GroupElementDatagram;
+import udl.cig.sms.connection.datagram.SMSDatagram;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
 
@@ -25,7 +26,7 @@ public class DecriptChunk implements BusomState {
         this.group = group;
         partialDecryption = group.getNeuterElement();
         this.ciphertext = ciphertext;
-        logarithm =  new PollardsLambda(group.getGenerator());
+        logarithm = new PollardsLambda(group.getGenerator());
     }
 
     @Override
@@ -35,13 +36,18 @@ public class DecriptChunk implements BusomState {
     }
 
     protected void receiveAndCompute() {
-        SMSDatagram data = receiver.receive();
-        while (data instanceof GroupElementDatagram) {
-            GroupElementDatagram groupElementDatagram = (GroupElementDatagram) data;
-            compute(groupElementDatagram);
+        SMSDatagram data;
+        try {
             data = receiver.receive();
+            while (data instanceof GroupElementDatagram) {
+                GroupElementDatagram groupElementDatagram = (GroupElementDatagram) data;
+                compute(groupElementDatagram);
+                data = receiver.receive();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        GroupElement d =  (GroupElement) ciphertext.getParts()[1];
+        GroupElement d = (GroupElement) ciphertext.getParts()[1];
         partialDecryption = partialDecryption.inverse().multiply(d);
     }
 

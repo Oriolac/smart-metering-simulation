@@ -1,7 +1,7 @@
 package udl.cig.sms.busom.meter.doubles;
 
-import udl.cig.sms.connection.SMSDatagram;
 import udl.cig.sms.connection.Sender;
+import udl.cig.sms.connection.datagram.SMSDatagram;
 
 public class SenderSpy implements Sender {
 

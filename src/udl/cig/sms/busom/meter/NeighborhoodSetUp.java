@@ -5,10 +5,11 @@ import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.busom.CertificateValidation;
 import udl.cig.sms.busom.data.MeterKey;
 import udl.cig.sms.connection.Receiver;
-import udl.cig.sms.connection.SMSDatagram;
 import udl.cig.sms.connection.datagram.NeighborhoodDatagram;
+import udl.cig.sms.connection.datagram.SMSDatagram;
 import udl.cig.sms.crypt.LoadCurve;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 public class NeighborhoodSetUp implements BusomState {
@@ -37,15 +38,19 @@ public class NeighborhoodSetUp implements BusomState {
 
     protected void receivePublicKeysAndCertificates() {
         generalKey = generator.getGroup().getNeuterElement();
-        SMSDatagram data = receiver.receive();
-        while (data instanceof NeighborhoodDatagram) {
-            //noinspection unchecked cast
-            NeighborhoodDatagram<String> dataN = (NeighborhoodDatagram<String>) data;
-            if (dataN.validate(this.validation))
-                generalKey = generalKey.multiply(dataN.getPublicKey());
+        SMSDatagram data;
+        try {
             data = receiver.receive();
+            while (data instanceof NeighborhoodDatagram) {
+                //noinspection unchecked cast
+                NeighborhoodDatagram<String> dataN = (NeighborhoodDatagram<String>) data;
+                if (dataN.validate(this.validation))
+                    generalKey = generalKey.multiply(dataN.getPublicKey());
+                data = receiver.receive();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
     }
 
 

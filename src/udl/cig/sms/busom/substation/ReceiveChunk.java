@@ -6,9 +6,11 @@ import cat.udl.cig.fields.GroupElement;
 import cat.udl.cig.fields.MultiplicativeSubgroup;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.connection.Receiver;
-import udl.cig.sms.connection.SMSDatagram;
 import udl.cig.sms.connection.Sender;
 import udl.cig.sms.connection.datagram.CipherTextDatagram;
+import udl.cig.sms.connection.datagram.SMSDatagram;
+
+import java.io.IOException;
 
 public class ReceiveChunk implements BusomState {
 
@@ -29,13 +31,18 @@ public class ReceiveChunk implements BusomState {
     }
 
     protected void receiveAndCompute() {
-        SMSDatagram data = receiver.receive();
-        GroupElement[] elements = new GroupElement[]{group.getNeuterElement(), group.getNeuterElement()};
-        ciphertext = new ElGamalCiphertext(elements);
-        while (data instanceof CipherTextDatagram) {
-            CipherTextDatagram cipherTextDatagram= (CipherTextDatagram) data;
-            compute(cipherTextDatagram);
+        SMSDatagram data;
+        try {
             data = receiver.receive();
+            GroupElement[] elements = new GroupElement[]{group.getNeuterElement(), group.getNeuterElement()};
+            ciphertext = new ElGamalCiphertext(elements);
+            while (data instanceof CipherTextDatagram) {
+                CipherTextDatagram cipherTextDatagram = (CipherTextDatagram) data;
+                compute(cipherTextDatagram);
+                data = receiver.receive();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

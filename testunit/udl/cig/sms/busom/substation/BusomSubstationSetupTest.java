@@ -8,9 +8,9 @@ import udl.cig.sms.busom.CertificateTrueMock;
 import udl.cig.sms.busom.CertificateValidation;
 import udl.cig.sms.busom.meter.doubles.SenderSpy;
 import udl.cig.sms.connection.Receiver;
-import udl.cig.sms.connection.SMSDatagram;
 import udl.cig.sms.connection.datagram.EndOfDatagram;
 import udl.cig.sms.connection.datagram.NeighborhoodDatagram;
+import udl.cig.sms.connection.datagram.SMSDatagram;
 import udl.cig.sms.crypt.LoadCurve;
 
 import java.io.File;
