@@ -21,15 +21,15 @@ public class FactoryNeighborhoodDatagram implements FactorySMSDatagram {
 
     @Override
     public NeighborhoodDatagram<String> buildDatagram(byte[] bytes) {
-        RingElement cx = fromBytes(bytes, 0, LENGTH_CURVE);
-        RingElement cy = fromBytes(bytes, LENGTH_CURVE, LENGTH_CURVE * 2);
+        RingElement cx = fromBytes(bytes, 0, LENGTH_CURVE/8);
+        RingElement cy = fromBytes(bytes, LENGTH_CURVE/8, LENGTH_CURVE/8 * 2);
         GroupElement groupElement = new GeneralECPoint(loadCurve.getCurve(), cx, cy);
         return new NeighborhoodDatagram<>(groupElement, "");
     }
 
     @Override
     public int getByteSize() {
-        return (LENGTH_CURVE * NUM_RING_ELEMENTS + LENGTH_CERTIFICATE) / 8;
+        return (LENGTH_CURVE * NUM_RING_ELEMENTS + LENGTH_CERTIFICATE * Character.BYTES) / 8;
     }
 
     private RingElement fromBytes(byte[] bytes, int from, int to) {

@@ -21,13 +21,13 @@ public class FactoryCipherTextDatagram implements FactorySMSDatagram {
 
     @Override
     public CipherTextDatagram buildDatagram(byte[] bytes) {
-        RingElement cx = fromBytes(bytes, 0, LENGTH_CURVE);
-        RingElement cy = fromBytes(bytes, LENGTH_CURVE, LENGTH_CURVE * 2);
-        RingElement dx = fromBytes(bytes, LENGTH_CURVE * 2, LENGTH_CURVE * 3);
-        RingElement dy = fromBytes(bytes, LENGTH_CURVE * 3, LENGTH_CURVE * 4);
+        RingElement cx = fromBytes(bytes, 0, LENGTH_CURVE / 8);
+        RingElement cy = fromBytes(bytes, LENGTH_CURVE / 8, LENGTH_CURVE / 8 * 2);
+        RingElement dx = fromBytes(bytes, LENGTH_CURVE / 8 * 2, LENGTH_CURVE / 8 * 3);
+        RingElement dy = fromBytes(bytes, LENGTH_CURVE / 8 * 3, LENGTH_CURVE / 8 * 4);
         GeneralECPoint c = new GeneralECPoint(loadCurve.getCurve(), cx, cy);
         GeneralECPoint d = new GeneralECPoint(loadCurve.getCurve(), dx, dy);
-        ElGamalCiphertext ciphertext = new ElGamalCiphertext(new GeneralECPoint[]{c,d});
+        ElGamalCiphertext ciphertext = new ElGamalCiphertext(new GeneralECPoint[]{c, d});
         return new CipherTextDatagram(ciphertext);
     }
 
