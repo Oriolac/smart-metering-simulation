@@ -1,18 +1,20 @@
 package udl.cig.sms.connection;
 
-import com.moandjiezana.toml.Toml;
 import udl.cig.sms.connection.datagram.SMSDatagram;
-import udl.cig.sms.connection.factory.*;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.connection.factory.FactoryConstructor;
+import udl.cig.sms.connection.factory.FactorySMSDatagram;
+import udl.cig.sms.data.LoadCurve;
+import udl.cig.sms.data.LoadSocket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
 
-public class ConnectionMeter implements Receiver, Sender {
+import static udl.cig.sms.connection.factory.FactoryConstructor.constructFactories;
+
+public class ConnectionMeter implements ConnectionMeterInt {
 
     private final DataOutputStream out;
     private final DataInputStream in;
@@ -20,36 +22,32 @@ public class ConnectionMeter implements Receiver, Sender {
     private FactorySMSDatagram[] factories;
 
     public ConnectionMeter(File file, LoadCurve loadcurve) throws IOException {
-        socket = tomlToSocket(file);
+        socket = LoadSocket.tomlToSocket(file);
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
-        factories = new FactorySMSDatagram[Datagrams.values().length];
-        factories[Datagrams.CIPHER_TEXT_DATAGRAM.ordinal()] = new FactoryCipherTextDatagram(loadcurve);
-        factories[Datagrams.END_OF_DATAGRAM.ordinal()] = new FactoryEndOfDatagram();
-        factories[Datagrams.GROUP_ELEMENT_DATAGRAM.ordinal()] = new FactoryGroupElementDatagram(loadcurve);
-        factories[Datagrams.NEIGHBORHOOD_DATAGRAM.ordinal()] = new FactoryNeighborhoodDatagram(loadcurve);
+        factories = constructFactories(loadcurve);
     }
 
-    public static Socket tomlToSocket(File substation) throws IOException {
-        Toml substToml = new Toml().read(substation);
-        String host = substToml.getString("ip");
-        InetAddress substAddress = InetAddress.getByName(host);
-        long port = substToml.getLong("port");
-        return new Socket(substAddress, (int) port);
+    protected ConnectionMeter(DataInputStream in, DataOutputStream out, LoadCurve loadCurve) {
+        this.in = in;
+        this.out = out;
+        factories = constructFactories(loadCurve);
     }
+
+
 
     @Override
     public SMSDatagram receive() throws IOException {
-        byte[] bytes = new byte[1];
-        in.read(bytes);
-        FactorySMSDatagram factory = factories[bytes[0]];
-        bytes = new byte[factory.getByteSize()];
-        in.read(bytes);
-        return factory.buildDatagram(bytes);
+        return FactoryConstructor.buildDatagramFrom(in, factories);
     }
 
     @Override
-    public void send(SMSDatagram data) {
+    public void send(SMSDatagram data) throws IOException {
+        byte[] bytes = data.toByteArray();
+        out.write(bytes);
+    }
 
+    public Socket getSocket() {
+        return socket;
     }
 }

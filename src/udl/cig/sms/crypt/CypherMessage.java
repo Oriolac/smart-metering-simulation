@@ -5,6 +5,7 @@ import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeField;
 import cat.udl.cig.fields.PrimeFieldElement;
+import udl.cig.sms.data.LoadCurve;
 
 import java.math.BigInteger;
 

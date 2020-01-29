@@ -4,11 +4,12 @@ import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.GroupElement;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.busom.data.MeterKey;
-import udl.cig.sms.connection.Receiver;
+import udl.cig.sms.connection.ConnectionMeterInt;
+import udl.cig.sms.connection.ReceiverMeter;
 import udl.cig.sms.connection.Sender;
 import udl.cig.sms.connection.datagram.GroupElementDatagram;
 import udl.cig.sms.connection.datagram.SMSDatagram;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -19,7 +20,8 @@ public class SendPartialDecryption implements BusomState {
     private final BigInteger noise;
     private final LoadCurve loadCurve;
     private final GeneralECPoint generator;
-    private Receiver receiver;
+    private ConnectionMeterInt connection;
+    private ReceiverMeter receiverMeter;
     private Sender sender;
     private GroupElement partialDecryption;
 
@@ -30,18 +32,26 @@ public class SendPartialDecryption implements BusomState {
         this.loadCurve = loadCurve;
     }
 
+    protected SendPartialDecryption(MeterKey meterKey, BigInteger noise,
+                                    LoadCurve loadCurve, ConnectionMeterInt connection) {
+        this(meterKey, noise, loadCurve);
+        this.connection = connection;
+        this.sender = connection;
+        this.receiverMeter = connection;
+    }
+
     @Override
-    public BusomState next() {
+    public BusomState next() throws IOException {
         partialDecryption = generatePartialDecryption();
         sendDecryption();
-        return new SendChunk(meterKey, loadCurve);
+        return new SendChunk(meterKey, loadCurve, connection);
     }
 
     //TODO: S'han de vigilar els errors
     protected GroupElement generatePartialDecryption() {
         SMSDatagram data;
         try {
-            data = receiver.receive();
+            data = receiverMeter.receive();
             if (data instanceof GroupElementDatagram) {
                 GroupElementDatagram elementDatagram = (GroupElementDatagram) data;
                 return elementDatagram.getElement().pow(meterKey.getPrivateKey()).multiply(generator.pow(noise));
@@ -52,12 +62,12 @@ public class SendPartialDecryption implements BusomState {
         return null;
     }
 
-    protected void sendDecryption() {
+    protected void sendDecryption() throws IOException {
         sender.send(new GroupElementDatagram(partialDecryption));
     }
 
-    public void setReceiver(Receiver receiver) {
-        this.receiver = receiver;
+    public void setReceiverMeter(ReceiverMeter receiverMeter) {
+        this.receiverMeter = receiverMeter;
     }
 
     public void setSender(Sender sender) {

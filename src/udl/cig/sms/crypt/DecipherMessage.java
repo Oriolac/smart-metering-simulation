@@ -6,6 +6,7 @@ import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeField;
 import cat.udl.cig.operations.wrapper.BruteForce;
 import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
+import udl.cig.sms.data.LoadCurve;
 
 import java.math.BigInteger;
 import java.util.List;

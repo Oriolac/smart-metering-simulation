@@ -1,4 +1,4 @@
-package udl.cig.sms.crypt;
+package udl.cig.sms.data;
 
 import cat.udl.cig.ecc.ECPrimeOrderSubgroup;
 import cat.udl.cig.ecc.GeneralEC;
@@ -63,5 +63,9 @@ public class LoadCurve {
 
     public GeneralEC getCurve() {
         return curve;
+    }
+
+    public static LoadCurve P192() {
+        return new LoadCurve(new File("./data/p192.toml"));
     }
 }

@@ -4,16 +4,16 @@ import cat.udl.cig.fields.GroupElement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.busom.BusomState;
-import udl.cig.sms.busom.CertificateTrueMock;
-import udl.cig.sms.busom.CertificateValidation;
+import udl.cig.sms.busom.certificate.CertificateTrueMock;
+import udl.cig.sms.busom.certificate.CertificateValidation;
 import udl.cig.sms.busom.meter.doubles.SenderSpy;
-import udl.cig.sms.connection.Receiver;
-import udl.cig.sms.connection.datagram.EndOfDatagram;
+import udl.cig.sms.connection.ReceiverSubstation;
 import udl.cig.sms.connection.datagram.NeighborhoodDatagram;
 import udl.cig.sms.connection.datagram.SMSDatagram;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +36,7 @@ class BusomSubstationSetupTest {
     }
 
     @Test
-    void next() {
+    void next() throws IOException {
         SenderSpy senderSpy = new SenderSpy();
         substationSetup.setSender(senderSpy);
         BusomState nextState = substationSetup.next();
@@ -44,14 +44,14 @@ class BusomSubstationSetupTest {
     }
 
     @Test
-    void receiveAndComputePublicKey() {
+    void receiveAndComputePublicKey() throws IOException {
         //TODO: Falta lo del Certificate
         substationSetup.receivePublicKeys();
-        assertEquals(3, receiverSpy.getCount());
+        assertEquals(1, receiverSpy.getCount());
     }
 
     @Test
-    void sendPublicKey() {
+    void sendPublicKey() throws IOException {
         int numberOfDatagrams = 3;
         SenderSpy senderSpy = new SenderSpy();
         substationSetup.setSender(senderSpy);
@@ -63,7 +63,7 @@ class BusomSubstationSetupTest {
         assertEquals(numberOfDatagrams, senderSpy.getCount());
     }
 
-    static class ReceiverSpy implements Receiver {
+    static class ReceiverSpy implements ReceiverSubstation {
 
         int count;
         GroupElement generator;
@@ -74,11 +74,12 @@ class BusomSubstationSetupTest {
         }
 
         @Override
-        public SMSDatagram receive() {
+        public List<SMSDatagram> receive() {
             count++;
-            if (count < 3)
-                return new NeighborhoodDatagram<>(generator, "");
-            return new EndOfDatagram();
+            List<SMSDatagram> datas = new ArrayList<>();
+            for(int i = 0; i < 3; i++)
+                datas.add(new NeighborhoodDatagram<>(generator, ""));
+            return datas;
         }
 
         public int getCount() {

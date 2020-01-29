@@ -12,5 +12,6 @@
     <orderEntry type="library" name="com.moandjiezana.toml:toml4j:0.7.2" level="project" />
     <orderEntry type="library" name="org.junit.jupiter:junit-jupiter-api:5.0.0-M4" level="project" />
     <orderEntry type="library" name="CigLib" level="project" />
+    <orderEntry type="library" name="org.mockito:mockito-all:2.0.0-beta" level="project" />
   </component>
 </module>

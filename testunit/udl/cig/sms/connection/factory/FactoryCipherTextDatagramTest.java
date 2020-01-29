@@ -5,7 +5,7 @@ import cat.udl.cig.fields.GroupElement;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.connection.datagram.CipherTextDatagram;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
 

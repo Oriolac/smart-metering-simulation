@@ -1,7 +1,7 @@
 package udl.cig.sms.connection.datagram;
 
 import cat.udl.cig.fields.GroupElement;
-import udl.cig.sms.busom.CertificateValidation;
+import udl.cig.sms.busom.certificate.CertificateValidation;
 
 import java.util.Objects;
 

@@ -6,21 +6,23 @@ import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.GroupElement;
 import cat.udl.cig.fields.PrimeField;
+import cat.udl.cig.operations.wrapper.BruteForce;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.busom.BusomState;
-import udl.cig.sms.connection.Receiver;
-import udl.cig.sms.connection.datagram.EndOfDatagram;
+import udl.cig.sms.connection.ReceiverSubstation;
 import udl.cig.sms.connection.datagram.GroupElementDatagram;
 import udl.cig.sms.connection.datagram.SMSDatagram;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,15 +45,15 @@ class DecriptChunkTest {
     }
 
     @Test
-    void next() {
+    void next() throws IOException {
         BusomState nextState = currentState.next();
         assertTrue(nextState instanceof ReceiveChunk);
     }
 
     @Test
-    void receiveAndCompute() {
+    void receiveAndCompute() throws IOException {
         currentState.receiveAndCompute();
-        assertEquals(4, receiverSpy.getCount());
+        assertEquals(1, receiverSpy.getCount());
         assertEquals(loadCurve.getGroup().getGenerator().pow(BigInteger.valueOf(6L)),currentState.getPartialDecryption())
         ;
     }
@@ -63,9 +65,11 @@ class DecriptChunkTest {
         GeneralECPoint partialDecryption = generator.pow(message);
         currentState.setPartialDecryption(partialDecryption);
         assertEquals(Optional.of(message), currentState.readMessage());
+        currentState.setLogarithm(new BruteForce(loadCurve.getGroup().getGenerator()));
+        assertEquals(Optional.of(message), currentState.readMessage());
     }
 
-    private static class ReceiverSpy implements Receiver {
+    private static class ReceiverSpy implements ReceiverSubstation {
 
         private final GeneralEC curve;
         private final PrimeField field;
@@ -101,11 +105,9 @@ class DecriptChunkTest {
         }
 
         @Override
-        public SMSDatagram receive() {
+        public List<SMSDatagram> receive() {
             count++;
-            if (count < 4)
-                return new GroupElementDatagram(elements.get(count));
-            return new EndOfDatagram(); //TODO @ori missing member to the class telling number of SmartMeters
+            return elements.values().stream().map(GroupElementDatagram::new).collect(Collectors.toList());
         }
 
         public int getCount() {

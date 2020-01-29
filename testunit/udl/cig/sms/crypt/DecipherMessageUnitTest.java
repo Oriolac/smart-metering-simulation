@@ -5,6 +5,7 @@ import cat.udl.cig.fields.PrimeFieldElement;
 import cat.udl.cig.operations.wrapper.BruteForce;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
 import java.math.BigInteger;

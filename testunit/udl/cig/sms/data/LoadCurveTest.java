@@ -1,4 +1,4 @@
-package udl.cig.sms.crypt;
+package udl.cig.sms.data;
 
 import cat.udl.cig.ecc.ECPrimeOrderSubgroup;
 import cat.udl.cig.ecc.GeneralEC;

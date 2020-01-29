@@ -5,41 +5,52 @@ import cat.udl.cig.cryptography.cryptosystems.ciphertexts.HomomorphicCiphertext;
 import cat.udl.cig.fields.GroupElement;
 import cat.udl.cig.fields.MultiplicativeSubgroup;
 import udl.cig.sms.busom.BusomState;
-import udl.cig.sms.connection.Receiver;
+import udl.cig.sms.connection.ConnectionSubstationInt;
+import udl.cig.sms.connection.ReceiverSubstation;
 import udl.cig.sms.connection.Sender;
 import udl.cig.sms.connection.datagram.CipherTextDatagram;
 import udl.cig.sms.connection.datagram.SMSDatagram;
 
 import java.io.IOException;
+import java.util.List;
 
 public class ReceiveChunk implements BusomState {
 
     private final MultiplicativeSubgroup group;
+    private ConnectionSubstationInt connection;
     private Sender sender;
-    private Receiver receiver;
+    private ReceiverSubstation receiver;
     private HomomorphicCiphertext ciphertext;
 
     public ReceiveChunk(MultiplicativeSubgroup group) {
         this.group = group;
     }
 
+    public ReceiveChunk(MultiplicativeSubgroup group, ConnectionSubstationInt connection) {
+        this.group = group;
+        receiver = connection;
+        sender = connection;
+        this.connection = connection;
+    }
+
     @Override
-    public BusomState next() {
+    public BusomState next() throws IOException {
         receiveAndCompute();
         sendC();
-        return new DecriptChunk(group, ciphertext);
+        return new DecriptChunk(group, ciphertext, connection);
     }
 
     protected void receiveAndCompute() {
-        SMSDatagram data;
+        List<SMSDatagram> datas;
         try {
-            data = receiver.receive();
+            datas = receiver.receive();
             GroupElement[] elements = new GroupElement[]{group.getNeuterElement(), group.getNeuterElement()};
             ciphertext = new ElGamalCiphertext(elements);
-            while (data instanceof CipherTextDatagram) {
-                CipherTextDatagram cipherTextDatagram = (CipherTextDatagram) data;
-                compute(cipherTextDatagram);
-                data = receiver.receive();
+            for (SMSDatagram data : datas) {
+                if (data instanceof CipherTextDatagram) {
+                    CipherTextDatagram cipherTextDatagram = (CipherTextDatagram) data;
+                    compute(cipherTextDatagram);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -50,7 +61,7 @@ public class ReceiveChunk implements BusomState {
         ciphertext = ciphertext.HomomorphicOperation(cipherTextDatagram.getCiphertext());
     }
 
-    protected void sendC() {
+    protected void sendC() throws IOException {
         sender.send(new CipherTextDatagram(ciphertext));
     }
 
@@ -58,7 +69,7 @@ public class ReceiveChunk implements BusomState {
         this.sender = sender;
     }
 
-    public void setReceiver(Receiver receiver) {
+    public void setReceiver(ReceiverSubstation receiver) {
         this.receiver = receiver;
     }
 
@@ -66,7 +77,9 @@ public class ReceiveChunk implements BusomState {
         return ciphertext;
     }
 
-    protected void setCipherText(ElGamalCiphertext ciphertext) {
+    public void setCipherText(HomomorphicCiphertext ciphertext) {
+        this.ciphertext = ciphertext;
     }
+
 }
 

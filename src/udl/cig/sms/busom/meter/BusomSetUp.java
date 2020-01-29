@@ -2,10 +2,12 @@ package udl.cig.sms.busom.meter;
 
 import cat.udl.cig.fields.GroupElement;
 import udl.cig.sms.busom.BusomState;
+import udl.cig.sms.connection.ConnectionMeterInt;
 import udl.cig.sms.connection.Sender;
 import udl.cig.sms.connection.datagram.NeighborhoodDatagram;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Random;
 
@@ -15,6 +17,7 @@ public class BusomSetUp implements BusomState {
     private final GroupElement generator;
     private final String certificate;
     private final LoadCurve loadCurve;
+    private ConnectionMeterInt connection;
     private BigInteger privateKey;
     private GroupElement publicKey;
     private Sender sender;
@@ -25,12 +28,18 @@ public class BusomSetUp implements BusomState {
         this.generator = loadCurve.getGroup().getGenerator();
     }
 
+    public BusomSetUp(String certificate, LoadCurve loadCurve, ConnectionMeterInt connection) {
+        this(certificate, loadCurve);
+        this.connection = connection;
+        sender = connection;
+    }
+
     @Override
-    public BusomState next() {
+    public BusomState next() throws IOException {
         generatePrivateKey();
         calculatePublicKey();
         sendPublicKey();
-        return new NeighborhoodSetUp(privateKey, loadCurve);
+        return new NeighborhoodSetUp(privateKey, loadCurve, connection);
     }
 
     protected void generatePrivateKey() {
@@ -45,7 +54,7 @@ public class BusomSetUp implements BusomState {
                 : generator.pow(privateKey);
     }
 
-    protected void sendPublicKey() {
+    protected void sendPublicKey() throws IOException {
         if (publicKey != null)
             sender.send(new NeighborhoodDatagram<>(publicKey, certificate));
     }

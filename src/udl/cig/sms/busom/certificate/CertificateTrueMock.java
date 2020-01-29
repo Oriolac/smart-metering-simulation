@@ -1,4 +1,4 @@
-package udl.cig.sms.busom;
+package udl.cig.sms.busom.certificate;
 
 import cat.udl.cig.fields.GroupElement;
 

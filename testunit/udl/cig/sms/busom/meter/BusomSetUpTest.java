@@ -5,9 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.busom.meter.doubles.SenderSpy;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,7 +25,7 @@ class BusomSetUpTest {
     }
 
     @Test
-    void next() {
+    void next() throws IOException {
         SenderSpy senderSpy = new SenderSpy();
         busomSetUp.setSender(senderSpy);
         BusomState nextState = busomSetUp.next();
@@ -53,7 +54,7 @@ class BusomSetUpTest {
     }
 
     @Test
-    void sendPublicKey() {
+    void sendPublicKey() throws IOException {
         SenderSpy sender = new SenderSpy();
         assertEquals(0, sender.getCount());
         busomSetUp.setSender(sender);

@@ -4,7 +4,7 @@ import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.GroupElement;
 import cat.udl.cig.fields.RingElement;
 import udl.cig.sms.connection.datagram.GroupElementDatagram;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.util.Arrays;
 

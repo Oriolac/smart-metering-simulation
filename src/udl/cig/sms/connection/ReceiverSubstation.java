@@ -3,8 +3,9 @@ package udl.cig.sms.connection;
 import udl.cig.sms.connection.datagram.SMSDatagram;
 
 import java.io.IOException;
+import java.util.List;
 
-public interface Sender {
+public interface ReceiverSubstation {
 
-    void send(SMSDatagram data) throws IOException;
+    List<SMSDatagram> receive() throws IOException;
 }

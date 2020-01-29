@@ -2,8 +2,9 @@ package udl.cig.sms.busom.substation;
 
 import cat.udl.cig.fields.MultiplicativeSubgroup;
 import udl.cig.sms.busom.BusomState;
-import udl.cig.sms.busom.CertificateValidation;
-import udl.cig.sms.connection.Receiver;
+import udl.cig.sms.busom.certificate.CertificateValidation;
+import udl.cig.sms.connection.ConnectionSubstationInt;
+import udl.cig.sms.connection.ReceiverSubstation;
 import udl.cig.sms.connection.Sender;
 import udl.cig.sms.connection.datagram.NeighborhoodDatagram;
 import udl.cig.sms.connection.datagram.SMSDatagram;
@@ -11,39 +12,51 @@ import udl.cig.sms.connection.datagram.SMSDatagram;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class BusomSubstationSetup implements BusomState {
 
     private final MultiplicativeSubgroup group;
-    private Receiver receiver;
+    private ConnectionSubstationInt connection;
+    private ReceiverSubstation receiver;
     private Sender sender;
     private List<NeighborhoodDatagram<String>> datagrams;
     private CertificateValidation<String> validation;
+    private static final Logger LOGGER = Logger.getAnonymousLogger();
 
-    public BusomSubstationSetup(MultiplicativeSubgroup group) {
+    protected BusomSubstationSetup(MultiplicativeSubgroup group) {
         this.group = group;
         datagrams = new ArrayList<>();
     }
 
+    public BusomSubstationSetup(MultiplicativeSubgroup group, ConnectionSubstationInt connection, CertificateValidation<String> validation) {
+        this.group = group;
+        datagrams = new ArrayList<>();
+        this.connection = connection;
+        this.sender = connection;
+        this.receiver = connection;
+        this.validation = validation;
+    }
+
     @Override
-    public BusomState next() {
+    public BusomState next() throws IOException {
         receivePublicKeys();
         sendPublicKey();
         return new ReceiveChunk(group);
     }
 
     @SuppressWarnings("unchecked cast")
-    protected void receivePublicKeys() {
-        SMSDatagram data;
-        try {
-            data = receiver.receive();
-            while (data instanceof NeighborhoodDatagram) {
+    protected void receivePublicKeys() throws IOException {
+        List<SMSDatagram> datas;
+        datas = receiver.receive();
+        for (SMSDatagram data : datas) {
+            if (data instanceof NeighborhoodDatagram) {
                 NeighborhoodDatagram<String> neighbourData = (NeighborhoodDatagram<String>) data;
                 receivePublicMeterKey(neighbourData);
-                data = receiver.receive();
+            } else {
+                LOGGER.log(Level.WARNING, "Not permitted data type.");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -53,7 +66,7 @@ public class BusomSubstationSetup implements BusomState {
     }
 
 
-    protected void sendPublicKey() {
+    protected void sendPublicKey() throws IOException {
         for (NeighborhoodDatagram<String> data : datagrams) {
             sender.send(data);
         }
@@ -63,7 +76,7 @@ public class BusomSubstationSetup implements BusomState {
         this.validation = validation;
     }
 
-    public void setReceiver(Receiver receiver) {
+    public void setReceiver(ReceiverSubstation receiver) {
         this.receiver = receiver;
     }
 

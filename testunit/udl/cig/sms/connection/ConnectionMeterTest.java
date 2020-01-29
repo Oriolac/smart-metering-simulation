@@ -1,27 +1,52 @@
 package udl.cig.sms.connection;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
+import udl.cig.sms.connection.datagram.CipherTextDatagram;
+import udl.cig.sms.connection.datagram.EndOfDatagram;
+import udl.cig.sms.connection.datagram.SMSDatagram;
+import udl.cig.sms.data.LoadCurve;
 
-import java.io.File;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
+import java.io.InputStream;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ConnectionMeterTest {
 
-    @Test
-    void tomlToAddressTest() throws IOException {
-        new ServerSocket(5000, 1, InetAddress.getByName("localhost"));
-        assertNotNull(ConnectionMeter.tomlToSocket(new File("./data/test/substation.toml")));
+
+    private LoadCurve loadCurve;
+    private ConnectionMeter connectionMeter;
+    private DataOutputStream outputWriter;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        loadCurve = LoadCurve.P192();
+        byte[] bytes = new byte[1];
+        InputStream input = Mockito.mock(InputStream.class);
+        Mockito.when(input.read(Mockito.any(byte[].class), Mockito.anyInt(), Mockito.anyInt()))
+                .then((Answer<Integer>) invocationOnMock -> {
+            Object[] args = invocationOnMock.getArguments();
+            return (int) args[2];
+        });
+        DataInputStream inputReader = new DataInputStream(input);
+        outputWriter = Mockito.mock(DataOutputStream.class);
+        connectionMeter = new ConnectionMeter(inputReader, outputWriter, loadCurve);
     }
 
     @Test
-    void receive() {
+    void receive() throws IOException {
+        SMSDatagram data = connectionMeter.receive();
+        assertTrue(data instanceof CipherTextDatagram);
     }
 
     @Test
-    void send() {
+    void send() throws IOException {
+        connectionMeter.send(new EndOfDatagram());
+        Mockito.verify(outputWriter).write(Mockito.eq(new EndOfDatagram().toByteArray()));
     }
 }

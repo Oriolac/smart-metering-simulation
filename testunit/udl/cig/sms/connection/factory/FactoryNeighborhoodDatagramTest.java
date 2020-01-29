@@ -3,7 +3,7 @@ package udl.cig.sms.connection.factory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.connection.datagram.NeighborhoodDatagram;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
 

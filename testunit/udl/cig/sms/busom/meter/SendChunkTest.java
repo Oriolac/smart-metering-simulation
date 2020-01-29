@@ -3,15 +3,17 @@ package udl.cig.sms.busom.meter;
 import cat.udl.cig.cryptography.cryptosystems.HomomorphicCypher;
 import cat.udl.cig.cryptography.cryptosystems.ciphertexts.HomomorphicCiphertext;
 import cat.udl.cig.fields.Group;
+import cat.udl.cig.fields.GroupElement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.busom.NullMessageException;
 import udl.cig.sms.busom.data.MeterKey;
 import udl.cig.sms.busom.meter.doubles.SenderSpy;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,7 +34,7 @@ class SendChunkTest {
     }
 
     @Test
-    void next() throws NullMessageException {
+    void next() throws NullMessageException, IOException {
         assertThrows(NullMessageException.class, () -> sendChunk.next());
         sendChunk.setMessage(message);
         SenderSpy sender = new SenderSpy();
@@ -51,7 +53,7 @@ class SendChunkTest {
     }
 
     @Test
-    void sendCypherText() {
+    void sendCypherText() throws IOException {
         SenderSpy sender = new SenderSpy();
         CypherSpy cypher = new CypherSpy();
         sendChunk.setMessage(message);
@@ -70,23 +72,18 @@ class SendChunkTest {
             this.count = 0;
         }
 
-        @Override
-        public HomomorphicCiphertext encrypt(Object o) {
-            count++;
-            return null;
-        }
 
         public int getCount() {
             return count;
         }
 
         @Override
-        public Object getPublicKey() {
+        public GroupElement getPublicKey() {
             return null;
         }
 
         @Override
-        public Object getGenerator() {
+        public GroupElement getGenerator() {
             return null;
         }
 
@@ -96,7 +93,13 @@ class SendChunkTest {
         }
 
         @Override
-        public HomomorphicCiphertext encrypt(Object o, BigInteger bigInteger) {
+        public HomomorphicCiphertext encrypt(GroupElement message) {
+            count++;
+            return null;
+        }
+
+        @Override
+        public HomomorphicCiphertext encrypt(GroupElement groupElement, BigInteger bigInteger) {
             return null;
         }
     }

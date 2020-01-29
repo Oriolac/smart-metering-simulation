@@ -2,12 +2,13 @@ package udl.cig.sms.busom.meter;
 
 import cat.udl.cig.fields.GroupElement;
 import udl.cig.sms.busom.BusomState;
-import udl.cig.sms.busom.CertificateValidation;
+import udl.cig.sms.busom.certificate.CertificateValidation;
 import udl.cig.sms.busom.data.MeterKey;
-import udl.cig.sms.connection.Receiver;
+import udl.cig.sms.connection.ConnectionMeterInt;
+import udl.cig.sms.connection.ReceiverMeter;
 import udl.cig.sms.connection.datagram.NeighborhoodDatagram;
 import udl.cig.sms.connection.datagram.SMSDatagram;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -17,9 +18,10 @@ public class NeighborhoodSetUp implements BusomState {
 
     private final BigInteger privateKey;
     private final LoadCurve loadCurve;
+    private ConnectionMeterInt connection;
     private GroupElement generalKey;
     private GroupElement generator;
-    private Receiver receiver;
+    private ReceiverMeter receiverMeter;
     private CertificateValidation<String> validation;
 
     protected NeighborhoodSetUp(BigInteger privateKey, LoadCurve loadCurve) {
@@ -28,34 +30,36 @@ public class NeighborhoodSetUp implements BusomState {
         this.generator = loadCurve.getGroup().getGenerator();
     }
 
+    protected NeighborhoodSetUp(BigInteger privateKey, LoadCurve loadCurve, ConnectionMeterInt connection) {
+        this(privateKey, loadCurve);
+        this.connection = connection;
+        this.receiverMeter = connection;
+    }
+
     @Override
-    public BusomState next() {
+    public BusomState next() throws IOException {
         receivePublicKeysAndCertificates();
         MeterKey meterKey = new MeterKey(privateKey, generalKey);
-        return new SendChunk(meterKey, loadCurve);
+        return new SendChunk(meterKey, loadCurve, connection);
     }
 
 
-    protected void receivePublicKeysAndCertificates() {
+    protected void receivePublicKeysAndCertificates() throws IOException {
         generalKey = generator.getGroup().getNeuterElement();
         SMSDatagram data;
-        try {
-            data = receiver.receive();
-            while (data instanceof NeighborhoodDatagram) {
-                //noinspection unchecked cast
-                NeighborhoodDatagram<String> dataN = (NeighborhoodDatagram<String>) data;
-                if (dataN.validate(this.validation))
-                    generalKey = generalKey.multiply(dataN.getPublicKey());
-                data = receiver.receive();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        data = receiverMeter.receive();
+        while (data instanceof NeighborhoodDatagram) {
+            //noinspection unchecked cast
+            NeighborhoodDatagram<String> dataN = (NeighborhoodDatagram<String>) data;
+            if (dataN.validate(this.validation))
+                generalKey = generalKey.multiply(dataN.getPublicKey());
+            data = receiverMeter.receive();
         }
     }
 
 
-    public void setReceiver(Receiver receiver) {
-        this.receiver = receiver;
+    public void setReceiverMeter(ReceiverMeter receiverMeter) {
+        this.receiverMeter = receiverMeter;
     }
 
     protected GroupElement getGeneralKey() {

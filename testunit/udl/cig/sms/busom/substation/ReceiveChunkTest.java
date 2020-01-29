@@ -11,17 +11,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.busom.meter.doubles.SenderSpy;
-import udl.cig.sms.connection.Receiver;
+import udl.cig.sms.connection.ReceiverSubstation;
 import udl.cig.sms.connection.datagram.CipherTextDatagram;
-import udl.cig.sms.connection.datagram.EndOfDatagram;
 import udl.cig.sms.connection.datagram.SMSDatagram;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -44,7 +45,7 @@ class ReceiveChunkTest {
     }
 
     @Test
-    void next() {
+    void next() throws IOException {
         BusomState nextState = currentState.next();
         assertTrue(nextState instanceof DecriptChunk);
     }
@@ -52,7 +53,7 @@ class ReceiveChunkTest {
     @Test
     void receiveAndCompute() {
         currentState.receiveAndCompute();
-        assertEquals(4, receiver.getCount());
+        assertEquals(1, receiver.getCount());
         ElGamalCiphertext ciphertext = (ElGamalCiphertext) currentState.getCiphertext();
         ElGamalCiphertext expected = new ElGamalCiphertext(receiver.getPoints("6209844826947604790038975056267208146258025268519512417642",
                 "2994524308329009013576298176683420492475513562601889388197", "3322243116407084751555570864568066673271311194669141092600",
@@ -61,7 +62,7 @@ class ReceiveChunkTest {
     }
 
     @Test
-    void sendC() {
+    void sendC() throws IOException {
         currentState.setSender(senderSpy);
         ElGamalCiphertext ciphertext = new ElGamalCiphertext(receiver.getPoints("6209844826947604790038975056267208146258025268519512417642",
                 "2994524308329009013576298176683420492475513562601889388197", "3322243116407084751555570864568066673271311194669141092600",
@@ -71,7 +72,7 @@ class ReceiveChunkTest {
         assertEquals(1, senderSpy.getCount());
     }
 
-    protected static class ReceiverSpy implements Receiver {
+    protected static class ReceiverSpy implements ReceiverSubstation {
 
 
         private final PrimeField field;
@@ -123,11 +124,9 @@ class ReceiveChunkTest {
         }
 
         @Override
-        public SMSDatagram receive() {
+        public List<SMSDatagram> receive() {
             count++;
-            if (count < 4)
-                return new CipherTextDatagram(ciphertexts.get(count));
-            return new EndOfDatagram(); //TODO : @sergisi missing number of smart meters.
+            return ciphertexts.values().stream().map(CipherTextDatagram::new).collect(Collectors.toList());
         }
 
         public int getCount() {

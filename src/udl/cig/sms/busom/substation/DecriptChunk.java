@@ -6,46 +6,63 @@ import cat.udl.cig.fields.MultiplicativeSubgroup;
 import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
 import cat.udl.cig.operations.wrapper.PollardsLambda;
 import udl.cig.sms.busom.BusomState;
-import udl.cig.sms.connection.Receiver;
+import udl.cig.sms.connection.ConnectionSubstationInt;
+import udl.cig.sms.connection.ReceiverSubstation;
 import udl.cig.sms.connection.datagram.GroupElementDatagram;
 import udl.cig.sms.connection.datagram.SMSDatagram;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DecriptChunk implements BusomState {
 
     private final HomomorphicCiphertext ciphertext;
+    private ConnectionSubstationInt connection;
     private LogarithmAlgorithm logarithm;
     private MultiplicativeSubgroup group;
     private GroupElement partialDecryption;
-    private Receiver receiver;
+    private ReceiverSubstation receiver;
+    private static final Logger LOGGER = Logger.getAnonymousLogger();
 
     public DecriptChunk(MultiplicativeSubgroup group, HomomorphicCiphertext ciphertext) {
         this.group = group;
         partialDecryption = group.getNeuterElement();
         this.ciphertext = ciphertext;
+        // TODO : When PollardsLambda is working, change the next line to it
         logarithm = new PollardsLambda(group.getGenerator());
     }
 
-    @Override
-    public BusomState next() {
-        receiveAndCompute();
-        return new ReceiveChunk(group);
+    public DecriptChunk(MultiplicativeSubgroup group,
+                        HomomorphicCiphertext ciphertext, ConnectionSubstationInt connection) {
+        this.group = group;
+        partialDecryption = group.getNeuterElement();
+        this.ciphertext = ciphertext;
+        // TODO : When PollardsLambda is working, change the next line to it
+        logarithm = new PollardsLambda(group.getGenerator());
+        this.connection = connection;
+        receiver = connection;
     }
 
-    protected void receiveAndCompute() {
-        SMSDatagram data;
-        try {
-            data = receiver.receive();
-            while (data instanceof GroupElementDatagram) {
+    @Override
+    public BusomState next() throws IOException {
+        receiveAndCompute();
+        return new ReceiveChunk(group, connection);
+    }
+
+    protected void receiveAndCompute() throws IOException {
+        List<SMSDatagram> datas;
+        datas = receiver.receive();
+        for(SMSDatagram data : datas) {
+            if (data instanceof GroupElementDatagram) {
                 GroupElementDatagram groupElementDatagram = (GroupElementDatagram) data;
                 compute(groupElementDatagram);
-                data = receiver.receive();
+            } else {
+                LOGGER.log(Level.WARNING, "Not permitted data type.");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         GroupElement d = (GroupElement) ciphertext.getParts()[1];
         partialDecryption = partialDecryption.inverse().multiply(d);
@@ -71,7 +88,7 @@ public class DecriptChunk implements BusomState {
         return partialDecryption;
     }
 
-    public void setReceiver(Receiver receiver) {
+    public void setReceiver(ReceiverSubstation receiver) {
         this.receiver = receiver;
     }
 }

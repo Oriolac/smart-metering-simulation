@@ -6,14 +6,15 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.busom.CertificateFalseMock;
-import udl.cig.sms.busom.CertificateTrueMock;
-import udl.cig.sms.connection.Receiver;
+import udl.cig.sms.busom.certificate.CertificateTrueMock;
+import udl.cig.sms.connection.ReceiverMeter;
 import udl.cig.sms.connection.datagram.EndOfDatagram;
 import udl.cig.sms.connection.datagram.NeighborhoodDatagram;
 import udl.cig.sms.connection.datagram.SMSDatagram;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Random;
 
@@ -41,9 +42,9 @@ class NeighborhoodSetUpTest {
     }
 
     @Test
-    void next() {
+    void next() throws IOException {
         neighborhoodSetUp.setValidation(new CertificateTrueMock<>());
-        neighborhoodSetUp.setReceiver(new ReceiverSpy(loadCurve.getGroup()));
+        neighborhoodSetUp.setReceiverMeter(new ReceiverMeterSpy(loadCurve.getGroup()));
         BusomState nextState = neighborhoodSetUp.next();
         assertTrue(nextState instanceof SendChunk);
         SendChunk state = (SendChunk) nextState;
@@ -51,33 +52,33 @@ class NeighborhoodSetUpTest {
     }
 
     @Test
-    void receivePublicKeysAndCorrectCertificates() {
+    void receivePublicKeysAndCorrectCertificates() throws IOException {
         CertificateTrueMock<String> validation = new CertificateTrueMock<>();
         neighborhoodSetUp.setValidation(validation);
-        ReceiverSpy receiver = new ReceiverSpy(loadCurve.getGroup());
-        neighborhoodSetUp.setReceiver(receiver);
+        ReceiverMeterSpy receiver = new ReceiverMeterSpy(loadCurve.getGroup());
+        neighborhoodSetUp.setReceiverMeter(receiver);
         neighborhoodSetUp.receivePublicKeysAndCertificates();
         assertEquals(loadCurve.getGroup().getGenerator().pow(BigInteger.valueOf(6)), neighborhoodSetUp.getGeneralKey());
         assertEquals(4, receiver.getCount());
     }
 
     @Test
-    void receivePublicKeysAndFalseCertificates() {
+    void receivePublicKeysAndFalseCertificates() throws IOException {
         CertificateFalseMock<String> validation = new CertificateFalseMock<>();
         neighborhoodSetUp.setValidation(validation);
-        ReceiverSpy receiver = new ReceiverSpy(loadCurve.getGroup());
-        neighborhoodSetUp.setReceiver(receiver);
+        ReceiverMeterSpy receiver = new ReceiverMeterSpy(loadCurve.getGroup());
+        neighborhoodSetUp.setReceiverMeter(receiver);
         neighborhoodSetUp.receivePublicKeysAndCertificates();
         assertEquals(loadCurve.getGroup().getNeuterElement(), neighborhoodSetUp.getGeneralKey());
         assertEquals(4, receiver.getCount());
     }
 
-    public static class ReceiverSpy implements Receiver {
+    public static class ReceiverMeterSpy implements ReceiverMeter {
 
         private final GeneralECPoint generator;
         private int count;
 
-        public ReceiverSpy(ECPrimeOrderSubgroup group) {
+        public ReceiverMeterSpy(ECPrimeOrderSubgroup group) {
             generator = group.getGenerator();
             this.count = 0;
         }

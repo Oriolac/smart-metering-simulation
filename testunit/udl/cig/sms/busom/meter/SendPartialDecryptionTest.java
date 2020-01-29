@@ -6,12 +6,13 @@ import org.junit.jupiter.api.Test;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.busom.data.MeterKey;
 import udl.cig.sms.busom.meter.doubles.SenderSpy;
-import udl.cig.sms.connection.Receiver;
+import udl.cig.sms.connection.ReceiverMeter;
 import udl.cig.sms.connection.datagram.GroupElementDatagram;
 import udl.cig.sms.connection.datagram.SMSDatagram;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,7 +24,7 @@ class SendPartialDecryptionTest {
     BigInteger privateKey;
     BigInteger noise;
     LoadCurve loadCurve;
-    ReceiverSpy receiver;
+    ReceiverMeterSpy receiver;
     GroupElement generator;
     SenderSpy sender;
 
@@ -35,14 +36,14 @@ class SendPartialDecryptionTest {
         MeterKey meterKey = new MeterKey(privateKey, loadCurve.getGroup().getRandomElement());
         currentState = new SendPartialDecryption(meterKey, noise, loadCurve);
         generator = loadCurve.getGroup().getGenerator();
-        receiver = new ReceiverSpy(generator);
-        currentState.setReceiver(receiver);
+        receiver = new ReceiverMeterSpy(generator);
+        currentState.setReceiverMeter(receiver);
         sender = new SenderSpy();
         currentState.setSender(sender);
     }
 
     @Test
-    void next() {
+    void next() throws IOException {
         BusomState nextState = currentState.next();
         assertTrue(nextState instanceof SendChunk);
     }
@@ -55,17 +56,17 @@ class SendPartialDecryptionTest {
     }
 
     @Test
-    void sendDecryption() {
+    void sendDecryption() throws IOException {
         currentState.sendDecryption();
         assertEquals(1, sender.getCount());
     }
 
-    static class ReceiverSpy implements Receiver {
+    static class ReceiverMeterSpy implements ReceiverMeter {
 
         private final GroupElement element;
         private int count;
 
-        protected ReceiverSpy(GroupElement element) {
+        protected ReceiverMeterSpy(GroupElement element) {
             this.element = element;
             count = 0;
         }

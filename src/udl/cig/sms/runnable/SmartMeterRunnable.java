@@ -3,8 +3,7 @@ package udl.cig.sms.runnable;
 import cat.udl.cig.exceptions.NotImplementedException;
 import javafx.util.Pair;
 import udl.cig.sms.crypt.Cypher;
-import udl.cig.sms.crypt.LoadCurve;
-import udl.cig.sms.meter.states.KeyEstablishment;
+import udl.cig.sms.data.LoadCurve;
 import udl.cig.sms.meter.states.State;
 
 import java.io.File;
@@ -20,7 +19,7 @@ public class SmartMeterRunnable {
 
 
     public static void main(String[] args) {
-        state = new KeyEstablishment(loadCurve);
+        //state = new KeyEstablishment(loadCurve);
         /*while (true) {
             //select(pkg);
             //state.next(pkg);

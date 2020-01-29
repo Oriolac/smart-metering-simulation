@@ -4,7 +4,7 @@ import cat.udl.cig.cryptography.cryptosystems.ciphertexts.ElGamalCiphertext;
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.RingElement;
 import udl.cig.sms.connection.datagram.CipherTextDatagram;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.util.Arrays;
 

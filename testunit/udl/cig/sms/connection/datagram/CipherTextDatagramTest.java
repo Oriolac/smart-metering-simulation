@@ -5,7 +5,7 @@ import cat.udl.cig.ecc.GeneralECPoint;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.connection.factory.FactoryCipherTextDatagram;
-import udl.cig.sms.crypt.LoadCurve;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
 

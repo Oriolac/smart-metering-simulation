@@ -7,4 +7,5 @@ public interface FactorySMSDatagram {
     SMSDatagram buildDatagram(byte[] bytes);
 
     int getByteSize();
+
 }

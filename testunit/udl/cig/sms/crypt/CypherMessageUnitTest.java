@@ -4,6 +4,7 @@ import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
 import java.math.BigInteger;
