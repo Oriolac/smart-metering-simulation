@@ -15,14 +15,14 @@ public class FactoryGroupElementDatagram implements FactorySMSDatagram {
     private final LoadCurve loadCurve;
 
     public FactoryGroupElementDatagram(LoadCurve loadCurve) {
-        LENGTH_CURVE = loadCurve.getCurve().getCardinalityFactors().get(0).bitLength();
+        LENGTH_CURVE = loadCurve.getCurve().getCardinalityFactors().get(0).bitLength() / 8 + 1;
         this.loadCurve = loadCurve;
     }
 
     @Override
     public GroupElementDatagram buildDatagram(byte[] bytes) {
-        RingElement cx = fromBytes(bytes, 0, LENGTH_CURVE / 8);
-        RingElement cy = fromBytes(bytes, LENGTH_CURVE / 8, LENGTH_CURVE * 2 / 8);
+        RingElement cx = fromBytes(bytes, 0, LENGTH_CURVE);
+        RingElement cy = fromBytes(bytes, LENGTH_CURVE, LENGTH_CURVE * 2);
         GroupElement groupElement = new GeneralECPoint(loadCurve.getCurve(), cx, cy);
         return new GroupElementDatagram(groupElement);
     }
@@ -33,6 +33,6 @@ public class FactoryGroupElementDatagram implements FactorySMSDatagram {
 
     @Override
     public int getByteSize() {
-        return (LENGTH_CURVE * NUM_RING_ELEMENTS) / 8;
+        return LENGTH_CURVE * NUM_RING_ELEMENTS;
     }
 }

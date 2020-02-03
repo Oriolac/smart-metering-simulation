@@ -30,14 +30,14 @@ class FactoryGroupElementDatagramTest {
         byte[] bytes = new byte[factory.getByteSize()];
         byte[] x = loadCurve.getGroup().getGenerator().getIntValue().toByteArray();
         byte[] y = loadCurve.getGroup().getGenerator().getY().getIntValue().toByteArray();
-        System.arraycopy(x, 0, bytes, 0, x.length);
-        System.arraycopy(y, 0, bytes, 192 / 8, y.length);
+        System.arraycopy(x, 0, bytes, bytes.length / 2 - x.length, x.length);
+        System.arraycopy(y, 0, bytes, bytes.length - y.length, y.length);
         return bytes;
     }
 
 
     @Test
     void getByteSize() {
-        assertEquals(192 * 2/8, factory.getByteSize());
+        assertEquals(200 * 2/8, factory.getByteSize());
     }
 }

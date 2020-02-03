@@ -38,13 +38,13 @@ class FactoryCipherTextDatagramTest {
         byte[] bytes = new byte[factory.getByteSize()/2];
         byte[] x = loadCurve.getGroup().getGenerator().getIntValue().toByteArray();
         byte[] y = loadCurve.getGroup().getGenerator().getY().getIntValue().toByteArray();
-        System.arraycopy(x, 0, bytes, 0, x.length);
-        System.arraycopy(y, 0, bytes, 192 / 8, y.length);
+        System.arraycopy(x, 0, bytes, bytes.length / 2 - x.length, x.length);
+        System.arraycopy(y, 0, bytes, bytes.length - y.length, y.length);
         return bytes;
     }
 
     @Test
     void getByteSize() {
-        assertEquals(192 * 4 / 8, factory.getByteSize());
+        assertEquals((192 + 8) * 4 / 8, factory.getByteSize());
     }
 }

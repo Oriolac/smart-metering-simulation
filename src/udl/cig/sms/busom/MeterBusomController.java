@@ -1,8 +1,6 @@
 package udl.cig.sms.busom;
 
-import udl.cig.sms.busom.certificate.CertificateTrueMock;
 import udl.cig.sms.busom.meter.BusomSetUp;
-import udl.cig.sms.busom.meter.NeighborhoodSetUp;
 import udl.cig.sms.busom.meter.SendChunk;
 import udl.cig.sms.connection.ConnectionMeterInt;
 import udl.cig.sms.data.LoadCurve;
@@ -18,9 +16,16 @@ public class MeterBusomController implements MeterBusomControllerInt {
     public MeterBusomController(String certificate, LoadCurve loadCurve, ConnectionMeterInt connection)
             throws IOException, NullMessageException {
         this.state = new BusomSetUp(certificate, loadCurve, connection);
+        this.state = state.next().next();
+    }
+
+    protected MeterBusomController(LoadCurve loadCurve, ConnectionMeterInt connection) throws IOException, NullMessageException {
+        this.state = new BusomSetUp("", loadCurve, connection);
         this.state = state.next();
-        ((NeighborhoodSetUp) this.state).setValidation(new CertificateTrueMock<>());
-        this.state.next();
+    }
+
+    protected void meterSetUp() throws IOException, NullMessageException {
+        this.state = state.next();
     }
 
     @Override

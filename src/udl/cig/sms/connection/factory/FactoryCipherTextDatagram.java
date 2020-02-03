@@ -15,16 +15,16 @@ public class FactoryCipherTextDatagram implements FactorySMSDatagram {
     private final LoadCurve loadCurve;
 
     public FactoryCipherTextDatagram(LoadCurve loadCurve) {
-        LENGTH_CURVE = loadCurve.getCurve().getCardinalityFactors().get(0).bitLength();
+        LENGTH_CURVE = loadCurve.getCurve().getCardinalityFactors().get(0).bitLength() / 8 + 1;
         this.loadCurve = loadCurve;
     }
 
     @Override
     public CipherTextDatagram buildDatagram(byte[] bytes) {
-        RingElement cx = fromBytes(bytes, 0, LENGTH_CURVE / 8);
-        RingElement cy = fromBytes(bytes, LENGTH_CURVE / 8, LENGTH_CURVE / 8 * 2);
-        RingElement dx = fromBytes(bytes, LENGTH_CURVE / 8 * 2, LENGTH_CURVE / 8 * 3);
-        RingElement dy = fromBytes(bytes, LENGTH_CURVE / 8 * 3, LENGTH_CURVE / 8 * 4);
+        RingElement cx = fromBytes(bytes, 0, LENGTH_CURVE);
+        RingElement cy = fromBytes(bytes, LENGTH_CURVE, LENGTH_CURVE * 2);
+        RingElement dx = fromBytes(bytes, LENGTH_CURVE * 2, LENGTH_CURVE * 3);
+        RingElement dy = fromBytes(bytes, LENGTH_CURVE * 3, LENGTH_CURVE * 4);
         GeneralECPoint c = new GeneralECPoint(loadCurve.getCurve(), cx, cy);
         GeneralECPoint d = new GeneralECPoint(loadCurve.getCurve(), dx, dy);
         ElGamalCiphertext ciphertext = new ElGamalCiphertext(new GeneralECPoint[]{c, d});
@@ -37,6 +37,6 @@ public class FactoryCipherTextDatagram implements FactorySMSDatagram {
 
     @Override
     public int getByteSize() {
-        return (LENGTH_CURVE * NUM_POINTS) / 8;
+        return LENGTH_CURVE * NUM_POINTS;
     }
 }

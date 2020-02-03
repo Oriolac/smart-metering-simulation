@@ -22,26 +22,15 @@ class FactoryNeighborhoodDatagramTest {
 
     @Test
     void buildDatagram() {
-        byte[] bytes = new byte[factory.getByteSize()];
-        byte[] bGenerator = generatorToBytes();
-        System.arraycopy(bGenerator, 0, bytes, 0, bGenerator.length);
-        String emptyString = "";
-        System.arraycopy(emptyString.getBytes(), 0, bytes, bGenerator.length, emptyString.getBytes().length);
-        assertEquals(new NeighborhoodDatagram<>(loadCurve.getGroup().getGenerator(), ""),
+        NeighborhoodDatagram<String> data = new NeighborhoodDatagram<>(loadCurve.getGroup().getGenerator(), "");
+        byte[] bytes = data.toByteArray();
+        System.arraycopy(bytes, 1, bytes, 0, bytes.length - 1);
+        assertEquals(data,
                 factory.buildDatagram(bytes));
-    }
-
-    static byte[] generatorToBytes() {
-        byte[] bytes = new byte[factory.getByteSize()];
-        byte[] x = loadCurve.getGroup().getGenerator().getIntValue().toByteArray();
-        byte[] y = loadCurve.getGroup().getGenerator().getY().getIntValue().toByteArray();
-        System.arraycopy(x, 0, bytes, 0, x.length);
-        System.arraycopy(y, 0, bytes, 192 / 8, y.length);
-        return bytes;
     }
 
     @Test
     void getByteSize() {
-        assertEquals(50, factory.getByteSize());
+        assertEquals(66, factory.getByteSize());
     }
 }

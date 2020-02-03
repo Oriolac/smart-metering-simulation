@@ -19,14 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ConnectionMeterTest {
 
 
-    private LoadCurve loadCurve;
     private ConnectionMeter connectionMeter;
     private DataOutputStream outputWriter;
 
     @BeforeEach
     void setUp() throws IOException {
-        loadCurve = LoadCurve.P192();
-        byte[] bytes = new byte[1];
+        LoadCurve loadCurve = LoadCurve.P192();
         InputStream input = Mockito.mock(InputStream.class);
         Mockito.when(input.read(Mockito.any(byte[].class), Mockito.anyInt(), Mockito.anyInt()))
                 .then((Answer<Integer>) invocationOnMock -> {

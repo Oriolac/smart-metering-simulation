@@ -33,7 +33,7 @@ public class ConnectionSubstation implements ConnectionSubstationInt {
         this.socketList = acceptSockets();
     }
 
-    protected ConnectionSubstation(ServerSocket serverSocket, int numberOfMeters, LoadCurve loadCurve) throws IOException {
+    public ConnectionSubstation(ServerSocket serverSocket, int numberOfMeters, LoadCurve loadCurve) throws IOException {
         this.serverSocket = serverSocket;
         this.loadCurve = loadCurve;
         this.factories = FactoryConstructor.constructFactories(loadCurve);

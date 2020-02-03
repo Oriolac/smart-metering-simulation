@@ -9,6 +9,7 @@ import udl.cig.sms.connection.ConnectionSubstationInt;
 import udl.cig.sms.connection.ReceiverSubstation;
 import udl.cig.sms.connection.Sender;
 import udl.cig.sms.connection.datagram.CipherTextDatagram;
+import udl.cig.sms.connection.datagram.GroupElementDatagram;
 import udl.cig.sms.connection.datagram.SMSDatagram;
 
 import java.io.IOException;
@@ -62,7 +63,7 @@ public class ReceiveChunk implements BusomState {
     }
 
     protected void sendC() throws IOException {
-        sender.send(new CipherTextDatagram(ciphertext));
+        sender.send(new GroupElementDatagram(ciphertext.getParts()[0]));
     }
 
     public void setSender(Sender sender) {

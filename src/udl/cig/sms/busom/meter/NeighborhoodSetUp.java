@@ -2,6 +2,7 @@ package udl.cig.sms.busom.meter;
 
 import cat.udl.cig.fields.GroupElement;
 import udl.cig.sms.busom.BusomState;
+import udl.cig.sms.busom.certificate.CertificateTrueMock;
 import udl.cig.sms.busom.certificate.CertificateValidation;
 import udl.cig.sms.busom.data.MeterKey;
 import udl.cig.sms.connection.ConnectionMeterInt;
@@ -28,6 +29,7 @@ public class NeighborhoodSetUp implements BusomState {
         this.privateKey = privateKey;
         this.loadCurve = loadCurve;
         this.generator = loadCurve.getGroup().getGenerator();
+        this.validation = new CertificateTrueMock<>();
     }
 
     protected NeighborhoodSetUp(BigInteger privateKey, LoadCurve loadCurve, ConnectionMeterInt connection) {

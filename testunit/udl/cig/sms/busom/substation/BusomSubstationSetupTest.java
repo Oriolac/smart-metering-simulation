@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.busom.certificate.CertificateTrueMock;
-import udl.cig.sms.busom.certificate.CertificateValidation;
 import udl.cig.sms.busom.meter.doubles.SenderSpy;
 import udl.cig.sms.connection.ReceiverSubstation;
 import udl.cig.sms.connection.datagram.NeighborhoodDatagram;
@@ -45,22 +44,21 @@ class BusomSubstationSetupTest {
 
     @Test
     void receiveAndComputePublicKey() throws IOException {
-        //TODO: Falta lo del Certificate
         substationSetup.receivePublicKeys();
         assertEquals(1, receiverSpy.getCount());
     }
 
     @Test
     void sendPublicKey() throws IOException {
-        int numberOfDatagrams = 3;
+        int numberOfNHDatagrams = 3;
         SenderSpy senderSpy = new SenderSpy();
         substationSetup.setSender(senderSpy);
         List<NeighborhoodDatagram<String>> datagrams = new ArrayList<>();
-        for (int i = 0; i < numberOfDatagrams; i++)
+        for (int i = 0; i < numberOfNHDatagrams; i++)
             datagrams.add(new NeighborhoodDatagram<>(loadCurve.getGroup().getGenerator(), ""));
         substationSetup.setDatagrams(datagrams);
         substationSetup.sendPublicKey();
-        assertEquals(numberOfDatagrams, senderSpy.getCount());
+        assertEquals(numberOfNHDatagrams + 1, senderSpy.getCount());
     }
 
     static class ReceiverSpy implements ReceiverSubstation {
@@ -87,23 +85,6 @@ class BusomSubstationSetupTest {
         }
     }
 
-    static class CertificateValSpy<T> implements CertificateValidation<T> {
 
-        int count;
-
-        protected CertificateValSpy() {
-            count = 0;
-        }
-
-        @Override
-        public boolean validateCertificate(GroupElement element, T certificate) {
-            count++;
-            return true;
-        }
-
-        protected int getCount() {
-            return count;
-        }
-    }
 
 }

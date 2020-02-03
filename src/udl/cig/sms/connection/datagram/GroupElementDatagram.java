@@ -1,6 +1,7 @@
 package udl.cig.sms.connection.datagram;
 
 import cat.udl.cig.fields.GroupElement;
+import udl.cig.sms.connection.Datagrams;
 
 import java.util.Objects;
 
@@ -18,7 +19,11 @@ public class GroupElementDatagram implements SMSDatagram {
 
     @Override
     public byte[] toByteArray() {
-        return new byte[0];
+        byte[] c = element.toBytes();
+        byte[] res = new byte[c.length + 1];
+        res[0] = (byte) Datagrams.GROUP_ELEMENT_DATAGRAM.ordinal();
+        System.arraycopy(c, 0, res, 1, c.length);
+        return res;
     }
 
     @Override

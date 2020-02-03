@@ -2,6 +2,7 @@ package udl.cig.sms.connection.datagram;
 
 import cat.udl.cig.fields.GroupElement;
 import udl.cig.sms.busom.certificate.CertificateValidation;
+import udl.cig.sms.connection.Datagrams;
 
 import java.util.Objects;
 
@@ -9,6 +10,7 @@ public class NeighborhoodDatagram<T> implements SMSDatagram {
 
     private final T certificate;
     private final GroupElement publicKey;
+    static private final int LENGTH_BYTES_CERTIFICATE = 8 * Character.BYTES;
 
     public NeighborhoodDatagram(GroupElement publicKey, T certificate) {
         this.publicKey = publicKey;
@@ -17,7 +19,11 @@ public class NeighborhoodDatagram<T> implements SMSDatagram {
 
     @Override
     public byte[] toByteArray() {
-        return new byte[0];
+        byte[] element = publicKey.toBytes();
+        byte[] res = new byte[1 + element.length + LENGTH_BYTES_CERTIFICATE];
+        res[0] = (byte) Datagrams.NEIGHBORHOOD_DATAGRAM.ordinal();
+        System.arraycopy(element, 0, res, 1, element.length);
+        return res;
     }
 
     public T getCertificate() {
