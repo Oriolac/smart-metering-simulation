@@ -1,4 +1,4 @@
-package udl.cig.sms.meter.states;
+package udl.cig.sms.protocol;
 
 import udl.cig.sms.busom.NullMessageException;
 

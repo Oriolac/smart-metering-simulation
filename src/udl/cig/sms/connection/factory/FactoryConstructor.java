@@ -15,6 +15,7 @@ public class FactoryConstructor {
         factories[Datagrams.END_OF_DATAGRAM.ordinal()] = new FactoryEndOfDatagram();
         factories[Datagrams.GROUP_ELEMENT_DATAGRAM.ordinal()] = new FactoryGroupElementDatagram(loadcurve);
         factories[Datagrams.NEIGHBORHOOD_DATAGRAM.ordinal()] = new FactoryNeighborhoodDatagram(loadcurve);
+        factories[Datagrams.BIG_INTEGER_DATAGRAM.ordinal()] = new FactoryBigIntegerDatagram();
         return factories;
     }
 

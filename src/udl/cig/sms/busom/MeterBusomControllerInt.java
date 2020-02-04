@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface MeterBusomControllerInt {
 
-
+    void start() throws NullMessageException, IOException;
     void sendMessage(List<BigInteger> messages) throws IOException, NullMessageException;
 }

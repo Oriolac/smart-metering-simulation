@@ -13,9 +13,12 @@ public class MeterBusomController implements MeterBusomControllerInt {
 
     private BusomState state;
 
-    public MeterBusomController(String certificate, LoadCurve loadCurve, ConnectionMeterInt connection)
-            throws IOException, NullMessageException {
+    public MeterBusomController(String certificate, LoadCurve loadCurve, ConnectionMeterInt connection) {
         this.state = new BusomSetUp(certificate, loadCurve, connection);
+    }
+
+    @Override
+    public void start() throws NullMessageException, IOException {
         this.state = state.next().next();
     }
 

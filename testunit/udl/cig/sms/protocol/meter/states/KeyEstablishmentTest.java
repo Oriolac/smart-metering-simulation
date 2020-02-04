@@ -1,4 +1,4 @@
-package udl.cig.sms.meter.states;
+package udl.cig.sms.protocol.meter.states;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,7 +6,9 @@ import udl.cig.sms.busom.MeterBusomControllerInt;
 import udl.cig.sms.busom.NullMessageException;
 import udl.cig.sms.connection.ConnectionMeterInt;
 import udl.cig.sms.connection.datagram.SMSDatagram;
+import udl.cig.sms.consumption.ConsumptionRandom;
 import udl.cig.sms.data.LoadCurve;
+import udl.cig.sms.protocol.meter.factories.FactoryMeterState;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -20,13 +22,16 @@ class KeyEstablishmentTest {
     private KeyEstablishment keyEstablishment;
     private ConnectionMeterMock connection;
     private MeterBusomControllerMock controller;
+    private FactoryMeterState factory;
 
     @BeforeEach
-    void setUp() throws IOException, NullMessageException {
+    void setUp() {
         loadCurve = LoadCurve.P192();
         connection = new ConnectionMeterMock();
         controller = new MeterBusomControllerMock();
-        keyEstablishment = new KeyEstablishment(loadCurve, connection, controller);
+        factory = new FactoryMeterState(loadCurve, connection, new ConsumptionRandom(), "");
+        keyEstablishment = factory.makeKeyEstablishment();
+        keyEstablishment.setMeterBusom(controller);
     }
 
     @Test
@@ -44,7 +49,7 @@ class KeyEstablishmentTest {
     @Test
     void next() throws IOException, NullMessageException {
         keyEstablishment.next();
-        assertEquals(1, controller.getCount());
+        assertEquals(2, controller.getCount());
     }
 
     public static class MeterBusomControllerMock implements MeterBusomControllerInt {
@@ -56,7 +61,12 @@ class KeyEstablishmentTest {
         }
 
         @Override
-        public void sendMessage(List<BigInteger> messages) throws IOException, NullMessageException {
+        public void start() {
+            count++;
+        }
+
+        @Override
+        public void sendMessage(List<BigInteger> messages) {
             count++;
         }
 
