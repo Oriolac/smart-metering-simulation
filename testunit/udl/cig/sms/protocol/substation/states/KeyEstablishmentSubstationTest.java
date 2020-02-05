@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class KeyEstablishmentSubstationTest {
 
     private FactorySubstationState factory;
-    private State state;
+    private KeyEstablishmentSubstation state;
     private final BigInteger SUM = BigInteger.TEN;
-    private final BigInteger EXPECTED_PRIVATE_KEY = LoadCurve.P192().getField().toElement(SUM).inverse().getIntValue();
+    private final BigInteger EXPECTED_PRIVATE_KEY = LoadCurve.P192().getField().toElement(SUM).opposite().getIntValue();
 
     @BeforeEach
     void setUp() throws IOException, NullMessageException {
@@ -31,13 +31,14 @@ class KeyEstablishmentSubstationTest {
         ConnectionSubstation connection = Mockito.mock(ConnectionSubstation.class);
         factory = new FactorySubstationState(LoadCurve.P192(), connection);
         state = factory.makeKeyEstablishment();
+        state.setController(controller);
     }
 
     @Test
     void next() throws IOException, NullMessageException {
-        state = state.next();
-        assertTrue(state instanceof ConsumptionTransmissionSubstation);
-        ConsumptionTransmissionSubstation currentState = (ConsumptionTransmissionSubstation) state;
+        State nextState = state.next();
+        assertTrue(nextState instanceof ConsumptionTransmissionSubstation);
+        ConsumptionTransmissionSubstation currentState = (ConsumptionTransmissionSubstation) nextState;
         assertEquals(EXPECTED_PRIVATE_KEY, currentState.getPrivateKey());
     }
 }

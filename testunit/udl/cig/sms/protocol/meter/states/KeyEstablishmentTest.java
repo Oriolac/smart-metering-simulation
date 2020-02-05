@@ -16,7 +16,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class KeyEstablishmentTest {
+public class KeyEstablishmentTest {
 
     private LoadCurve loadCurve;
     private KeyEstablishment keyEstablishment;

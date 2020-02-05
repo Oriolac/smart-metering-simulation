@@ -14,16 +14,15 @@ public class SubstationBusomController implements SubstationBusomControllerInt {
     private final int numberOfChunks;
     private BusomState state;
 
-    public SubstationBusomController(LoadCurve loadCurve, ConnectionSubstationInt connection)
-            throws IOException, NullMessageException {
+    public SubstationBusomController(LoadCurve loadCurve, ConnectionSubstationInt connection) {
         this.state = new BusomSubstationSetup(loadCurve.getGroup(), connection);
-        this.state = state.next();
         int bits = loadCurve.getField().getSize().bitLength();
         this.numberOfChunks =  bits / 13 + ((bits % 13 == 0) ? 0 : 1);
     }
 
     @Override
     public BigInteger receiveSecretKey() throws IOException, NullMessageException {
+        this.state = state.next();
         BigInteger message = BigInteger.ZERO;
         for (int i = 0; i < this.numberOfChunks; ++i) {
             BusomState currentState = this.state.next();
