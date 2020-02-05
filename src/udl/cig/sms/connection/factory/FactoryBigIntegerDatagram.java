@@ -16,6 +16,6 @@ public class FactoryBigIntegerDatagram implements FactorySMSDatagram {
 
     @Override
     public int getByteSize() {
-        return NUM_PACKAGE + BIG_INTEGER_SIZE;
+        return BIG_INTEGER_SIZE;
     }
 }

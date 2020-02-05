@@ -27,7 +27,7 @@ public class SmartMeterRunnable {
         factory = new FactoryMeterState(loadCurve, new ConnectionMeter(substation, loadCurve),
                 new ConsumptionRandom(), "");
         state = factory.makeKeyEstablishment();
-        while (true) {
+        for(int i = 0; i < 10; i++){
             state = state.next();
         }
     }

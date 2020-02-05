@@ -19,6 +19,6 @@ class FactoryBigIntegerDatagramTest {
 
     @Test
     void getByteSize() {
-        assertEquals(4, new FactoryBigIntegerDatagram().getByteSize());
+        assertEquals(3, new FactoryBigIntegerDatagram().getByteSize());
     }
 }

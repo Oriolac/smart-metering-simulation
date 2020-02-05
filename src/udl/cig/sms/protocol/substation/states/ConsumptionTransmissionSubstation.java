@@ -22,7 +22,7 @@ public class ConsumptionTransmissionSubstation implements State {
     private Decypher decipher;
     private FactorySubstationState factorySubstationState;
     private BigInteger privateKey;
-    private final int NUM_BYTES = 3;
+    private final int NUM_BITS = 13;
 
     public ConsumptionTransmissionSubstation(FactorySubstationState factorySubstationState, BigInteger privateKey) {
         this.factorySubstationState = factorySubstationState;
@@ -32,15 +32,19 @@ public class ConsumptionTransmissionSubstation implements State {
 
     @Override
     public State next() throws IOException, NullMessageException {
-        BigInteger t = new BigInteger(NUM_BYTES * 8, new SecureRandom());
+        BigInteger t = new BigInteger(NUM_BITS, new SecureRandom());
+        System.out.println("Temporal big integer.");
         factorySubstationState.getConnection().send(new BigIntegerDatagram(t));
+        System.out.println("Sended t");
         List<SMSDatagram> datas = factorySubstationState.getConnection().receive();
+        System.out.println("Retrieved data");
         if(datas.stream().allMatch(data -> data instanceof GroupElementDatagram)) {
             List<GeneralECPoint> cyphered = new ArrayList<>();
             for (SMSDatagram elem : datas) {
                 GroupElement element = ((GroupElementDatagram) elem).getElement();
                 cyphered.add((GeneralECPoint) element);
             }
+            System.out.println("Printing decyphered: ");
             System.out.println(decipher.decrypt(cyphered, t));
             //TODO : This needs to be changed to send it to the station.
             return this;

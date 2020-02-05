@@ -26,7 +26,8 @@ public class KeyEstablishmentSubstation implements State {
     @Override
     public State next() throws IOException, NullMessageException {
         BigInteger privateKey = controller.receiveSecretKey();
-        privateKey = factory.getLoadCurve().getField().toElement(privateKey).opposite().getIntValue();
+        BigInteger order = factory.getLoadCurve().getGroup().getSize();
+        privateKey = privateKey.negate().add(order).remainder(order);
         return factory.makeConsumptionTransmission(privateKey);
     }
 }
