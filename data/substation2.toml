@@ -1,0 +1,3 @@
+ip = 'localhost'
+port = 5050
+meters = 1
