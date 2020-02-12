@@ -22,7 +22,7 @@ class KeyEstablishmentSubstationTest {
     private FactorySubstationState factory;
     private KeyEstablishmentSubstation state;
     private final BigInteger SUM = BigInteger.TEN;
-    private final BigInteger EXPECTED_PRIVATE_KEY = LoadCurve.P192().getField().toElement(SUM).opposite().getIntValue();
+    private BigInteger EXPECTED_PRIVATE_KEY;
 
     @BeforeEach
     void setUp() throws IOException, NullMessageException {
@@ -30,6 +30,8 @@ class KeyEstablishmentSubstationTest {
         Mockito.when(controller.receiveSecretKey()).then((Answer<BigInteger>) invoc -> SUM);
         ConnectionSubstation connection = Mockito.mock(ConnectionSubstation.class);
         factory = new FactorySubstationState(LoadCurve.P192(), connection);
+        BigInteger order = factory.getLoadCurve().getGroup().getSize();
+        EXPECTED_PRIVATE_KEY = SUM.negate().add(order).remainder(order);
         state = factory.makeKeyEstablishment();
         state.setController(controller);
     }
