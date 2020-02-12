@@ -2,7 +2,8 @@ package udl.cig.sms.crypt;
 
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeFieldElement;
-import cat.udl.cig.operations.wrapper.BruteForce;
+import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
+import cat.udl.cig.operations.wrapper.PollardsLambda;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.data.LoadCurve;
@@ -46,7 +47,7 @@ public class DecipherMessageUnitTest implements HashTest {
     @Test
     public void decryptUsingMockLambda() {
         GeneralECPoint ci;
-        BruteForce lambda = new BruteForce(dec.getGroup().getGenerator());
+        LogarithmAlgorithm lambda = new PollardsLambda(dec.getGroup().getGenerator());
         dec.setLambda(lambda);
 
         ci = cyp.encrypt(mis.get(0), t);

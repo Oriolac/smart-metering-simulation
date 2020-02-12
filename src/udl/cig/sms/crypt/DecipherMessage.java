@@ -59,7 +59,7 @@ public class DecipherMessage implements Decypher, Hash {
         return this.field;
     }
 
-    protected void setLambda(LogarithmAlgorithm lambda) {
+    public void setLambda(LogarithmAlgorithm lambda) {
         this.lambda = lambda;
     }
 

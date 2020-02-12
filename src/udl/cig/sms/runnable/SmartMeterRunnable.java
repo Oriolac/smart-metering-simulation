@@ -1,7 +1,5 @@
 package udl.cig.sms.runnable;
 
-import cat.udl.cig.exceptions.NotImplementedException;
-import javafx.util.Pair;
 import udl.cig.sms.busom.NullMessageException;
 import udl.cig.sms.connection.ConnectionMeter;
 import udl.cig.sms.consumption.ConsumptionRandom;
@@ -11,29 +9,38 @@ import udl.cig.sms.protocol.meter.factories.FactoryMeterState;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.util.List;
 
-public class SmartMeterRunnable {
+public class SmartMeterRunnable implements Runnable {
 
-    //TODO parse parameters for files.
-    private static State state;
     private static final LoadCurve loadCurve = new LoadCurve(new File("data/p192.toml"));
-    private static final File substation = new File("data/substation.toml");
+    private final File substation;
 
+    public SmartMeterRunnable() {
+        substation = new File("data/substation.toml");
+    }
 
-    public static void main(String[] args) throws IOException, NullMessageException {
+    public SmartMeterRunnable(File file) {
+        this.substation = file;
+    }
+
+    public static void main(String[] args) {
+        new SmartMeterRunnable().run();
+    }
+
+    @Override
+    public void run() {
         FactoryMeterState factory;
-        factory = new FactoryMeterState(loadCurve, new ConnectionMeter(substation, loadCurve),
-                new ConsumptionRandom(), "");
-        state = factory.makeKeyEstablishment();
-        for(int i = 0; i < 10; i++){
-            state = state.next();
+        try {
+            factory = new FactoryMeterState(loadCurve, new ConnectionMeter(substation, loadCurve),
+                    new ConsumptionRandom(), "");
+            State state = factory.makeKeyEstablishment();
+            for (int i = 0; i < 10; i++) {
+                state = state.next();
+            }
+        } catch (IOException | NullMessageException e) {
+            e.printStackTrace();
         }
     }
 
-    private static void send(List<Pair<BigInteger, Integer>> privateKey) {
-        throw new NotImplementedException();
-    }
 
 }
