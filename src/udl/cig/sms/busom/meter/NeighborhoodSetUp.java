@@ -14,6 +14,10 @@ import udl.cig.sms.data.LoadCurve;
 import java.io.IOException;
 import java.math.BigInteger;
 
+/**
+ * Sets up the parametrs of the neighborhood, like the
+ * general key.
+ */
 public class NeighborhoodSetUp implements BusomState {
 
 
@@ -25,6 +29,12 @@ public class NeighborhoodSetUp implements BusomState {
     private ReceiverMeter receiverMeter;
     private CertificateValidation<String> validation;
 
+    /**
+     * Sets up the Neighborhood set up
+     *
+     * @param privateKey Private key of the meter
+     * @param loadCurve  curve to be used to encrypt and decrypt
+     */
     protected NeighborhoodSetUp(BigInteger privateKey, LoadCurve loadCurve) {
         this.privateKey = privateKey;
         this.loadCurve = loadCurve;
@@ -32,12 +42,25 @@ public class NeighborhoodSetUp implements BusomState {
         this.validation = new CertificateTrueMock<>();
     }
 
+    /**
+     * Sets up the Neighborhood set up
+     *
+     * @param privateKey Private key of the meter
+     * @param loadCurve  curve to be used to encrypt and decrypt
+     * @param connection connection to communicate to the substation
+     */
     protected NeighborhoodSetUp(BigInteger privateKey, LoadCurve loadCurve, ConnectionMeterInt connection) {
         this(privateKey, loadCurve);
         this.connection = connection;
         this.receiverMeter = connection;
     }
 
+    /**
+     * Next state of the protocol.
+     *
+     * @return next state given a preset of conditions
+     * @throws IOException, if connection has failed.
+     */
     @Override
     public BusomState next() throws IOException {
         receivePublicKeysAndCertificates();
@@ -45,7 +68,12 @@ public class NeighborhoodSetUp implements BusomState {
         return new SendChunk(meterKey, loadCurve, connection);
     }
 
-
+    /**
+     * Receives the public keys and certificates. Adds all the public keys to
+     * generate the general Key
+     *
+     * @throws IOException If connection is closed, or have some other troubles.
+     */
     protected void receivePublicKeysAndCertificates() throws IOException {
         generalKey = generator.getGroup().getNeuterElement();
         SMSDatagram data;
@@ -59,15 +87,30 @@ public class NeighborhoodSetUp implements BusomState {
         }
     }
 
-
+    /**
+     * Sets Receiver for tests
+     *
+     * @param receiverMeter receiverMeter to be set
+     */
     public void setReceiverMeter(ReceiverMeter receiverMeter) {
         this.receiverMeter = receiverMeter;
     }
 
+    /**
+     * Used for tests, it sets the generalKey
+     *
+     * @return the general Key of the meters
+     */
     protected GroupElement getGeneralKey() {
         return this.generalKey;
     }
 
+    /**
+     * Sets class to validate the certificate. Used in tests.
+     *
+     * @param validation class containing one method to validate the
+     *                   group Element and certificate.
+     */
     public void setValidation(CertificateValidation<String> validation) {
         this.validation = validation;
     }
