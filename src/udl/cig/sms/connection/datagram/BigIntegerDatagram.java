@@ -5,6 +5,9 @@ import udl.cig.sms.connection.Datagrams;
 import java.math.BigInteger;
 import java.util.Objects;
 
+/**
+ * SMSDatagram that contains a BigInteger
+ */
 public class BigIntegerDatagram implements SMSDatagram {
 
     private final BigInteger temporal;
@@ -13,7 +16,9 @@ public class BigIntegerDatagram implements SMSDatagram {
         this.temporal = temporal;
     }
 
-
+    /**
+     * @return byte[] that it's the content of the datagram with the type
+     */
     @Override
     public byte[] toByteArray() {
         byte[] bytes = new byte[4];
@@ -23,6 +28,9 @@ public class BigIntegerDatagram implements SMSDatagram {
         return bytes;
     }
 
+    /**
+     * @return the BigInteger
+     */
     public BigInteger getTemporal() {
         return temporal;
     }
