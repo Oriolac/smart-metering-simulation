@@ -5,7 +5,7 @@ import java.security.SecureRandom;
 
 public class ConsumptionRandom implements ConsumptionReader {
 
-    private static final int LENGTH_OF_CONSUMPTION = 8;
+    private static final int LENGTH_OF_CONSUMPTION = 6;
 
     @Override
     public BigInteger read() {

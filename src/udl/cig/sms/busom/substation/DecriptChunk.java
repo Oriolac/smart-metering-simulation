@@ -32,7 +32,6 @@ public class DecriptChunk implements BusomState {
         this.group = group;
         partialDecryption = group.getNeuterElement();
         this.ciphertext = ciphertext;
-        // TODO : When PollardsLambda is working, change the next line to it
         logarithm = new PollardsLambda(group.getGenerator());
     }
 
@@ -41,7 +40,6 @@ public class DecriptChunk implements BusomState {
         this.group = group;
         partialDecryption = group.getNeuterElement();
         this.ciphertext = ciphertext;
-        // TODO : When PollardsLambda is working, change the next line to it
         logarithm = new PollardsLambda(group.getGenerator());
         this.connection = connection;
         receiver = connection;
@@ -64,7 +62,7 @@ public class DecriptChunk implements BusomState {
                 LOGGER.log(Level.WARNING, "Not permitted data type.");
             }
         }
-        GroupElement d = (GroupElement) ciphertext.getParts()[1];
+        GroupElement d = ciphertext.getParts()[1];
         partialDecryption = partialDecryption.inverse().multiply(d);
     }
 

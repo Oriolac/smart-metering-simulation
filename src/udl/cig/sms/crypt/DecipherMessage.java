@@ -21,13 +21,14 @@ public class DecipherMessage implements Decypher, Hash {
     private final PrimeField field;
     final private BigInteger privateKey;
     private LogarithmAlgorithm lambda;
+    private static final BigInteger ORDER = BigInteger.TWO.pow(8);
 
 
     public DecipherMessage(LoadCurve loadCurve, BigInteger privateKey) {
         this.curve = loadCurve.getCurve();
         this.field = loadCurve.getField();
         this.grup = loadCurve.getGroup();
-        lambda = new PollardsLambda(grup.getGenerator());
+        lambda = new BruteForce(grup.getGenerator(), ORDER);
         this.privateKey = privateKey;
     }
 
