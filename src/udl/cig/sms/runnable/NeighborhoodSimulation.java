@@ -2,8 +2,12 @@ package udl.cig.sms.runnable;
 
 import java.io.File;
 
+/**
+ * Makes a runnable simulation of a neighborhood. It needs the number of meters
+ */
 public class NeighborhoodSimulation {
 
+    //TODO make the number of meters extracted from the file.
     private static final int NUM_METERS = 3;
     private static final File substation = new File("./data/substation3.toml");
 
