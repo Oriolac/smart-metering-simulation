@@ -16,7 +16,7 @@ public class SmartMeterRunnable implements Runnable {
     private final File substation;
 
     public SmartMeterRunnable() {
-        substation = new File("data/substation.toml");
+        substation = new File("data/substation1.toml");
     }
 
     public SmartMeterRunnable(File file) {

@@ -17,7 +17,7 @@ public class SubstationRunnable implements Runnable {
     private final File substation;
 
     public SubstationRunnable() {
-        substation = new File("data/substation.toml");
+        substation = new File("data/substation1.toml");
     }
 
     public SubstationRunnable(File file) {

@@ -47,9 +47,6 @@ public class DecipherMessageUnitTest implements HashTest {
     @Test
     public void decryptUsingMockLambda() {
         GeneralECPoint ci;
-        LogarithmAlgorithm lambda = new PollardsLambda(dec.getGroup().getGenerator());
-        dec.setLambda(lambda);
-
         ci = cyp.encrypt(mis.get(0), t);
         cis.add(ci);
         assertEquals(Optional.of(dec.getGroup().getGenerator().pow(BigInteger.valueOf(4L))), dec.getBeta(cis, t));
