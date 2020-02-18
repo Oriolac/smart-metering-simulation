@@ -7,8 +7,15 @@ import udl.cig.sms.data.LoadCurve;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Initialize the different constructors of the datagrams.
+ */
 public class FactoryConstructor {
 
+    /**
+     * @param loadcurve to get the information of the ECC
+     * @return the array of FactorySMSDatagram that contains all the Factories involved in the project.
+     */
     public static FactorySMSDatagram[] constructFactories(LoadCurve loadcurve) {
         FactorySMSDatagram[] factories = new FactorySMSDatagram[Datagrams.values().length];
         factories[Datagrams.CIPHER_TEXT_DATAGRAM.ordinal()] = new FactoryCipherTextDatagram(loadcurve);
@@ -19,6 +26,12 @@ public class FactoryConstructor {
         return factories;
     }
 
+    /**
+     * @param in needed to read the bytes of the datagram
+     * @param factories array that construct all the SMSDatagram needed
+     * @return SMSDatagram built from the bytes of the input
+     * @throws IOException in case that the reads more than it has to.
+     */
     public static SMSDatagram buildDatagramFrom(InputStream in, FactorySMSDatagram[] factories) throws IOException {
         byte[] bytes = new byte[1];
         if(in.read(bytes) < bytes.length)

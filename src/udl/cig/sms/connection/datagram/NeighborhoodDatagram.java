@@ -6,17 +6,27 @@ import udl.cig.sms.connection.Datagrams;
 
 import java.util.Objects;
 
+/**
+ * @param <T> Certificate
+ */
 public class NeighborhoodDatagram<T> implements SMSDatagram {
 
     private final T certificate;
     private final GroupElement publicKey;
     static private final int LENGTH_BYTES_CERTIFICATE = 8 * Character.BYTES;
 
+    /**
+     * @param publicKey y
+     * @param certificate String
+     */
     public NeighborhoodDatagram(GroupElement publicKey, T certificate) {
         this.publicKey = publicKey;
         this.certificate = certificate;
     }
 
+    /**
+     * @return byte[] that it's the content of the datagram with the type
+     */
     @Override
     public byte[] toByteArray() {
         byte[] element = publicKey.toBytes();
@@ -26,14 +36,24 @@ public class NeighborhoodDatagram<T> implements SMSDatagram {
         return res;
     }
 
+    /**
+     * @return the certificate
+     */
     public T getCertificate() {
         return certificate;
     }
 
+    /**
+     * @return the public key y
+     */
     public GroupElement getPublicKey() {
         return publicKey;
     }
 
+    /**
+     * @param validation the system of validation
+     * @return true if the certificate is validate, else false
+     */
     public boolean validate(CertificateValidation<T> validation) {
         return validation.validateCertificate(publicKey, certificate);
     }

@@ -14,6 +14,9 @@ import java.net.Socket;
 
 import static udl.cig.sms.connection.factory.FactoryConstructor.constructFactories;
 
+/**
+ * The meter's connection
+ */
 public class ConnectionMeter implements ConnectionMeterInt {
 
     private final DataOutputStream out;
@@ -21,6 +24,11 @@ public class ConnectionMeter implements ConnectionMeterInt {
     private Socket socket;
     private FactorySMSDatagram[] factories;
 
+    /**
+     * @param file of the configuration of the port and meters
+     * @param loadcurve get the information of the ECC
+     * @throws IOException in case IO fails
+     */
     public ConnectionMeter(File file, LoadCurve loadcurve) throws IOException {
         socket = LoadSocket.tomlToSocket(file);
         in = new DataInputStream(socket.getInputStream());
@@ -28,6 +36,11 @@ public class ConnectionMeter implements ConnectionMeterInt {
         factories = constructFactories(loadcurve);
     }
 
+    /**
+     * @param in to receive the data
+     * @param out to send the data
+     * @param loadCurve to have all the information of the ECC
+     */
     protected ConnectionMeter(DataInputStream in, DataOutputStream out, LoadCurve loadCurve) {
         this.in = in;
         this.out = out;
@@ -35,18 +48,28 @@ public class ConnectionMeter implements ConnectionMeterInt {
     }
 
 
-
+    /**
+     * @return the SMSDatagram that receives
+     * @throws IOException in case cannot read as it has to be
+     */
     @Override
     public SMSDatagram receive() throws IOException {
         return FactoryConstructor.buildDatagramFrom(in, factories);
     }
 
+    /**
+     * @param data: the data that we would like to send
+     * @throws IOException in case it does not send correctly the datagram
+     */
     @Override
     public void send(SMSDatagram data) throws IOException {
         byte[] bytes = data.toByteArray();
         out.write(bytes);
     }
 
+    /**
+     * @return the socket of the connection
+     */
     public Socket getSocket() {
         return socket;
     }

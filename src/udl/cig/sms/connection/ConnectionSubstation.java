@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Implementation of the substation's connection using TCP.
+ */
 public class ConnectionSubstation implements ConnectionSubstationInt {
 
 
@@ -25,6 +28,11 @@ public class ConnectionSubstation implements ConnectionSubstationInt {
     private final List<Socket> socketList;
     private final FactorySMSDatagram[] factories;
 
+    /**
+     * @param file to get the information of the port that must be on.
+     * @param loadCurve to get the information of the ECC.
+     * @throws IOException in case the socket is unavailable.
+     */
     public ConnectionSubstation(File file, LoadCurve loadCurve) throws IOException {
         this.serverSocket = LoadSocket.tomlToServerSocket(file);
         this.loadCurve = loadCurve;
@@ -33,6 +41,12 @@ public class ConnectionSubstation implements ConnectionSubstationInt {
         this.socketList = acceptSockets();
     }
 
+    /**
+     * @param serverSocket socket of the server
+     * @param numberOfMeters capacity of the substation
+     * @param loadCurve to get the information of the ECC
+     * @throws IOException in case the server cannot accept the sockets.
+     */
     public ConnectionSubstation(ServerSocket serverSocket, int numberOfMeters, LoadCurve loadCurve) throws IOException {
         this.serverSocket = serverSocket;
         this.loadCurve = loadCurve;
@@ -49,6 +63,10 @@ public class ConnectionSubstation implements ConnectionSubstationInt {
         return result;
     }
 
+    /**
+     * @return the list of SMSDatagrams received, one per socket
+     * @throws IOException in case we cannot read the socket.
+     */
     @Override
     public List<SMSDatagram> receive() throws IOException {
         List<SMSDatagram> datas = new ArrayList<>();
@@ -60,6 +78,10 @@ public class ConnectionSubstation implements ConnectionSubstationInt {
         return datas;
     }
 
+    /**
+     * @param data: the data that we would like to send
+     * @throws IOException in case IO fails
+     */
     @Override
     public void send(SMSDatagram data) throws IOException {
         for(Socket socket : socketList) {
@@ -68,6 +90,9 @@ public class ConnectionSubstation implements ConnectionSubstationInt {
         }
     }
 
+    /**
+     * @return the number of meters that it is declared.
+     */
     @Override
     public int getNumberOfMeters() {
         return numberOfMeters;

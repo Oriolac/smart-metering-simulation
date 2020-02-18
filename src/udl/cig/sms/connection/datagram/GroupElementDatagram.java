@@ -5,18 +5,30 @@ import udl.cig.sms.connection.Datagrams;
 
 import java.util.Objects;
 
+/**
+ * SMSDatagram that contains a GroupElement
+ */
 public class GroupElementDatagram implements SMSDatagram {
 
     private final GroupElement element;
 
+    /**
+     * @param element content of the datagram
+     */
     public GroupElementDatagram(GroupElement element) {
         this.element = element;
     }
 
+    /**
+     * @return the element of the datagram's content
+     */
     public GroupElement getElement() {
         return element;
     }
 
+    /**
+     * @return byte[] that it's only the type because it has no content
+     */
     @Override
     public byte[] toByteArray() {
         byte[] c = element.toBytes();

@@ -5,6 +5,9 @@ import udl.cig.sms.connection.Datagrams;
 
 import java.util.Objects;
 
+/**
+ * SMSDatagram that contains the CipherText
+ */
 public class CipherTextDatagram implements SMSDatagram {
 
     private final HomomorphicCiphertext ciphertext;
@@ -17,6 +20,9 @@ public class CipherTextDatagram implements SMSDatagram {
         return ciphertext;
     }
 
+    /**
+     * @return byte[] that it's the content of the datagram with the type
+     */
     @Override
     public byte[] toByteArray() {
         byte[] c = ciphertext.getParts()[0].toBytes();

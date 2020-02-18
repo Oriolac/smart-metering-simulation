@@ -9,6 +9,9 @@ import udl.cig.sms.data.LoadCurve;
 import udl.cig.sms.protocol.meter.states.ConsumptionTransmission;
 import udl.cig.sms.protocol.meter.states.KeyEstablishment;
 
+/**
+ * Factory of the states of the meter in smart metering protocol
+ */
 public class FactoryMeterState {
 
     private final LoadCurve loadCurve;
@@ -16,6 +19,12 @@ public class FactoryMeterState {
     private final ConsumptionReader consumption;
     private String certificate;
 
+    /**
+     * @param loadCurve which has all the information of the ECC
+     * @param connection which manages the connection with the substation
+     * @param consumption which reads all the consumption of the meter
+     * @param certificate of the smart meter
+     */
     public FactoryMeterState(LoadCurve loadCurve, ConnectionMeterInt connection,
                              ConsumptionReader consumption, String certificate) {
         this.loadCurve = loadCurve;
@@ -24,30 +33,52 @@ public class FactoryMeterState {
         this.certificate = certificate;
     }
 
+    /**
+     * @param privateKey or si, private key of current smart meter
+     * @return the consumption transmition state of the meter in order to send the consumption
+     */
     public ConsumptionTransmission makeConsumptionTransmission(PrimeFieldElement privateKey) {
         return new ConsumptionTransmission(this, privateKey);
     }
 
+    /**
+     * @return the key establishment state of the meter in order to set the keys
+     */
     public KeyEstablishment makeKeyEstablishment() {
         return new KeyEstablishment(this);
     }
 
+    /**
+     * @return the meter's controller of the busom protocol
+     */
     public MeterBusomControllerInt makeMeterBusomController() {
         return new MeterBusomController(certificate, loadCurve, connection);
     }
 
+    /**
+     * @return the certificiate
+     */
     public String getCertificate() {
         return certificate;
     }
 
+    /**
+     * @return the information of the ECC
+     */
     public LoadCurve getLoadCurve() {
         return loadCurve;
     }
 
+    /**
+     * @return the connection controller
+     */
     public ConnectionMeterInt getConnection() {
         return connection;
     }
 
+    /**
+     * @return the consumption reader
+     */
     public ConsumptionReader getConsumption() {
         return consumption;
     }
