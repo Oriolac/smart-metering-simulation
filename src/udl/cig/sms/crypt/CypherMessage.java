@@ -9,6 +9,9 @@ import udl.cig.sms.data.LoadCurve;
 
 import java.math.BigInteger;
 
+/**
+ * Implements Cypher, uses Hash
+ */
 public class CypherMessage implements Cypher, Hash {
 
     private final PrimeField field;
@@ -16,12 +19,19 @@ public class CypherMessage implements Cypher, Hash {
     private final ECPrimeOrderSubgroup grup;
     final private PrimeFieldElement privateKey;
 
+    /**
+     * Genenerates a cypherMessage
+     *
+     * @param loadCurve  curve to be used for encrypts
+     * @param privateKey private key to be used for encrypts
+     */
     public CypherMessage(LoadCurve loadCurve, BigInteger privateKey) {
         this.curve = loadCurve.getCurve();
         this.grup = loadCurve.getGroup();
         this.field = loadCurve.getField();
         this.privateKey = field.toElement(privateKey);
     }
+
 
     @Override
     public GeneralECPoint encrypt(BigInteger message, BigInteger t) {
@@ -30,21 +40,32 @@ public class CypherMessage implements Cypher, Hash {
     }
 
 
-
+    /**
+     * @return curve
+     */
     @Override
     public GeneralEC getCurve() {
         return this.curve;
     }
 
+    /**
+     * @return field
+     */
     @Override
     public PrimeField getField() {
         return this.field;
     }
 
+    /**
+     * @return ECPrimeOrderSubgroup
+     */
     public ECPrimeOrderSubgroup getGroup() {
         return this.grup;
     }
 
+    /**
+     * @return privateKey as a BigInteger
+     */
     public BigInteger getKey() {
         return privateKey.getIntValue();
     }

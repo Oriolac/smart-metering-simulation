@@ -30,6 +30,13 @@ public class DecipherMessage implements Decypher, Hash {
         this.privateKey = privateKey;
     }
 
+    /**
+     * decrypts the sum of the messages, given a t to hash
+     *
+     * @param messageC list of messages to be summed
+     * @param time     random number to be hashed to a point
+     * @return number if decription works, else it fails
+     */
     @Override
     public Optional<BigInteger> decrypt(List<GeneralECPoint> messageC, BigInteger time) {
         Optional<GeneralECPoint> d = getBeta(messageC, time);
@@ -49,19 +56,31 @@ public class DecipherMessage implements Decypher, Hash {
         return this.grup;
     }
 
+    /**
+     * @return curve
+     */
     @Override
     public GeneralEC getCurve() {
         return this.curve;
     }
 
+    /**
+     * @return field
+     */
     @Override
     public PrimeField getField() {
         return this.field;
     }
 
+    /**
+     * Sets lambda parameter (it's needed for decrypt and automated testing)
+     *
+     * @param lambda lambda to be set
+     */
     public void setLambda(LogarithmAlgorithm lambda) {
         this.lambda = lambda;
     }
+
 
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -76,6 +95,9 @@ public class DecipherMessage implements Decypher, Hash {
         return Objects.hash(privateKey, lambda);
     }
 
+    /**
+     * @return gets the algorithm to decrypt
+     */
     public LogarithmAlgorithm getLambda() {
         return lambda;
     }
