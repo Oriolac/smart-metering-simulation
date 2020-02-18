@@ -13,12 +13,20 @@ import udl.cig.sms.protocol.meter.factories.FactoryMeterState;
 
 import java.io.IOException;
 
+/**
+ * Meter state that represents the consumption transmission.
+ */
 public class ConsumptionTransmission implements State {
 
     private FactoryMeterState factory;
     private final PrimeFieldElement privateKey;
     private final Cypher cypher;
 
+    /**
+     * @param factory    Factory that has the information of the ECC and connection and
+     *                   creates the different states.
+     * @param privateKey or s0 which is the private key of the smart metering protocol
+     */
     public ConsumptionTransmission(FactoryMeterState factory,
                                    PrimeFieldElement privateKey) {
         this.factory = factory;
@@ -26,6 +34,11 @@ public class ConsumptionTransmission implements State {
         cypher = new CypherMessage(factory.getLoadCurve(), this.privateKey.getIntValue());
     }
 
+    /**
+     * @return the next state
+     * @throws IOException in case that IO fails
+     * @throws NullMessageException in case the message is null
+     */
     @Override
     public State next() throws IOException, NullMessageException {
         System.out.println("Getting t");

@@ -11,18 +11,28 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Meter state that represents the Key Establishment of the protocol
+ */
 public class KeyEstablishment implements State {
 
     private MeterBusomControllerInt meterBusom;
     private PrimeFieldElement privateKey;
     private FactoryMeterState factory;
 
+    /**
+     * @param factory Factory that has the information of the ECC and connection and
+     *                creates the different states.
+     */
     public KeyEstablishment(FactoryMeterState factory) {
         this.factory = factory;
         privateKey = generatePrivateKey();
         meterBusom = factory.makeMeterBusomController();
     }
 
+    /**
+     * @return a list of BigIntegers (sij) that are the chunks of the private key.
+     */
     protected List<BigInteger> generateChunksOfPrivateKey() {
         BigInteger divisor = BigInteger.TWO;
         divisor = divisor.pow(13);
@@ -41,14 +51,25 @@ public class KeyEstablishment implements State {
         return factory.getLoadCurve().getField().getRandomElement();
     }
 
+    /**
+     * @param privateKey or si, the private key of each smart meter.
+     */
     public void setPrivateKey(PrimeFieldElement privateKey) {
         this.privateKey = privateKey;
     }
 
+    /**
+     * @return the private key of each smart meter
+     */
     public PrimeFieldElement getPrivateKey() {
         return privateKey;
     }
 
+    /**
+     * @return the next state, which is ConsumptionTransmission
+     * @throws IOException in case the IO fails.
+     * @throws NullMessageException in case the message is null.
+     */
     @Override
     public ConsumptionTransmission next() throws IOException, NullMessageException {
         meterBusom.start();
@@ -56,6 +77,9 @@ public class KeyEstablishment implements State {
         return factory.makeConsumptionTransmission(privateKey);
     }
 
+    /**
+     * @param meterBusom The meter controller of the busom protocol.
+     */
     protected void setMeterBusom(MeterBusomControllerInt meterBusom) {
         this.meterBusom = meterBusom;
     }
