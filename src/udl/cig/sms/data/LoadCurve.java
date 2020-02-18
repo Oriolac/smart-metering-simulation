@@ -12,6 +12,10 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
+
+/**
+ * Loads curve from a TOML file
+ */
 public class LoadCurve {
 
     final static int A = -3;
@@ -19,6 +23,11 @@ public class LoadCurve {
     private PrimeField field;
     private GeneralEC curve;
 
+    /**
+     * Loads toml file
+     *
+     * @param file TOML file containing curve
+     */
     public LoadCurve(File file) {
         Toml toml = new Toml().read(file);
         BigInteger module = new BigInteger(toml.getString("p"));
@@ -53,18 +62,33 @@ public class LoadCurve {
                 .replaceAll("\\s", "");
     }
 
+    /**
+     * @return group
+     */
     public ECPrimeOrderSubgroup getGroup() {
         return grup;
     }
 
+    /**
+     * @return field
+     */
     public PrimeField getField() {
         return field;
     }
 
+    /**
+     * @return curve
+     */
     public GeneralEC getCurve() {
         return curve;
     }
 
+    /**
+     * Loads p-192 curve. As it's widely used for tests and production,
+     * we give it a special method to load it
+     *
+     * @return LoadCurve of p-192
+     */
     public static LoadCurve P192() {
         return new LoadCurve(new File("./data/p192.toml"));
     }
