@@ -32,7 +32,7 @@ class BusomControllersTest {
         loadCurve = new LoadCurve(new File("./data/p192.toml"));
         setUpSockets();
         meterContrs = new ArrayList<>();
-        for(ConnectionMeter meter : connectionMeters) {
+        for (ConnectionMeter meter : connectionMeters) {
             meterContrs.add(new MeterBusomController(loadCurve, meter));
         }
         substContr = new SubstationBusomController(loadCurve, connectionSubstation);
@@ -53,7 +53,7 @@ class BusomControllersTest {
         ServerSocket server = LoadSocket.tomlToServerSocket(fileSubst);
         int numberOfMeters = LoadSocket.getNumberOfMeters(fileSubst);
         connectionMeters = new ArrayList<>();
-        for(int i = 0; i < numberOfMeters; i++)
+        for (int i = 0; i < numberOfMeters; i++)
             connectionMeters.add(new ConnectionMeter(fileSubst, loadCurve));
         connectionSubstation = new ConnectionSubstation(server, numberOfMeters, loadCurve);
     }
