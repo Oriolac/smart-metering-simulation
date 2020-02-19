@@ -8,6 +8,7 @@ import udl.cig.sms.protocol.substation.factories.FactorySubstationState;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 
 public class SubstationRunnable implements Runnable {
 
@@ -31,12 +32,21 @@ public class SubstationRunnable implements Runnable {
     @Override
     public void run() {
         FactorySubstationState factory;
+        long then, now;
         try {
             factory = new FactorySubstationState(loadCurve,
                     new ConnectionSubstation(substation, loadCurve));
             state = factory.makeKeyEstablishment();
+            then = Instant.now().toEpochMilli();
+            state = state.next();
+            now = Instant.now().toEpochMilli();
+            System.out.println("SM-KE: " + (now - then));
+            then = now;
             for (int i = 0; i < 10; i++) {
                 state = state.next();
+                now = Instant.now().toEpochMilli();
+                System.out.println("SM-CT: " + (now - then));
+                then = now;
             }
         } catch (IOException | NullMessageException e) {
             e.printStackTrace();

@@ -41,9 +41,7 @@ public class ConsumptionTransmission implements State {
      */
     @Override
     public State next() throws IOException, NullMessageException {
-        System.out.println("Getting t");
         SMSDatagram data = factory.getConnection().receive();
-        System.out.println("Received t");
         if (data instanceof BigIntegerDatagram) {
             GeneralECPoint cypherMessage;
             cypherMessage = cypher.encrypt(factory.getConsumption().read(),

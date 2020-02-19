@@ -55,7 +55,6 @@ public class ConsumptionTransmissionSubstation implements State {
                 cyphered.add((GeneralECPoint) element);
             }
             //TODO: System.out.println
-            System.out.println("Printing decyphered: ");
             System.out.println(decipher.decrypt(cyphered, t));
             return this;
         }

@@ -21,20 +21,21 @@ public class DecipherMessage implements Decypher, Hash {
     private final PrimeField field;
     final private BigInteger privateKey;
     private LogarithmAlgorithm lambda;
-    private static final BigInteger ORDER = BigInteger.TWO.pow(8);
+    private static final BigInteger ORDER = BigInteger.TWO.pow(20);
 
 
     public DecipherMessage(LoadCurve loadCurve, BigInteger privateKey) {
         this.curve = loadCurve.getCurve();
         this.field = loadCurve.getField();
         this.grup = loadCurve.getGroup();
-        lambda = new BruteForce(grup.getGenerator(), ORDER);
+        lambda = new BruteForce(grup.getGenerator());
         this.privateKey = privateKey;
     }
 
     @Override
     public Optional<BigInteger> decrypt(List<GeneralECPoint> messageC, BigInteger time) {
         Optional<GeneralECPoint> d = getBeta(messageC, time);
+        System.out.println("d: " + d);
         return d.flatMap(lambda::algorithm);
     }
 

@@ -6,6 +6,8 @@ import udl.cig.sms.consumption.ConsumptionRandom;
 import udl.cig.sms.data.LoadCurve;
 import udl.cig.sms.protocol.State;
 import udl.cig.sms.protocol.meter.factories.FactoryMeterState;
+import udl.cig.sms.protocol.meter.states.ConsumptionTransmission;
+import udl.cig.sms.protocol.meter.states.KeyEstablishment;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +36,7 @@ public class SmartMeterRunnable implements Runnable {
             factory = new FactoryMeterState(loadCurve, new ConnectionMeter(substation, loadCurve),
                     new ConsumptionRandom(), "");
             State state = factory.makeKeyEstablishment();
+            state = state.next();
             for (int i = 0; i < 10; i++) {
                 state = state.next();
             }
