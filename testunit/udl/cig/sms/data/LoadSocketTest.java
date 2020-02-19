@@ -24,12 +24,6 @@ class LoadSocketTest {
     }
 
     @Test
-    void tomlToAddressTest() throws IOException {
-        new ServerSocket(5000, 1, InetAddress.getByName("localhost"));
-        assertNotNull(tomlToSocket(file));
-    }
-
-    @Test
     void tomlToServerSocket() throws IOException {
         assertNotNull(LoadSocket.tomlToServerSocket(file2));
     }

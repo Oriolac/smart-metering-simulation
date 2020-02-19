@@ -40,6 +40,7 @@ public class SmartMeterRunnable implements Runnable {
             for (int i = 0; i < 10; i++) {
                 state = state.next();
             }
+            factory.closeConnection();
         } catch (IOException | NullMessageException e) {
             e.printStackTrace();
         }

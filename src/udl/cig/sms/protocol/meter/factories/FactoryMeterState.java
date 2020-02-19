@@ -9,6 +9,8 @@ import udl.cig.sms.data.LoadCurve;
 import udl.cig.sms.protocol.meter.states.ConsumptionTransmission;
 import udl.cig.sms.protocol.meter.states.KeyEstablishment;
 
+import java.io.IOException;
+
 /**
  * Factory of the states of the meter in smart metering protocol
  */
@@ -84,4 +86,7 @@ public class FactoryMeterState {
     }
 
 
+    public void closeConnection() throws IOException {
+        connection.close();
+    }
 }

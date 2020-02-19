@@ -86,5 +86,10 @@ public class KeyEstablishmentTest {
         public void send(SMSDatagram data) throws IOException {
             throw new IOException("Unreachable exception");
         }
+
+        @Override
+        public void close() throws IOException {
+
+        }
     }
 }

@@ -48,6 +48,7 @@ public class SubstationRunnable implements Runnable {
                 System.out.println("SM-CT: " + (now - then));
                 then = now;
             }
+            //TODO: closeConnection()
         } catch (IOException | NullMessageException e) {
             e.printStackTrace();
         }
