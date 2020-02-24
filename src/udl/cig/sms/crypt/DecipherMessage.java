@@ -6,6 +6,7 @@ import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeField;
 import cat.udl.cig.operations.wrapper.BruteForce;
 import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
+import cat.udl.cig.operations.wrapper.PollardsLambda;
 import udl.cig.sms.data.LoadCurve;
 
 import java.math.BigInteger;
@@ -20,6 +21,7 @@ public class DecipherMessage implements Decypher, Hash {
     private final PrimeField field;
     final private BigInteger privateKey;
     private LogarithmAlgorithm lambda;
+    private static final BigInteger ORDER = BigInteger.TWO.pow(20);
 
 
     public DecipherMessage(LoadCurve loadCurve, BigInteger privateKey) {
@@ -40,6 +42,7 @@ public class DecipherMessage implements Decypher, Hash {
     @Override
     public Optional<BigInteger> decrypt(List<GeneralECPoint> messageC, BigInteger time) {
         Optional<GeneralECPoint> d = getBeta(messageC, time);
+        System.out.println("d: " + d);
         return d.flatMap(lambda::algorithm);
     }
 
@@ -100,5 +103,9 @@ public class DecipherMessage implements Decypher, Hash {
      */
     public LogarithmAlgorithm getLambda() {
         return lambda;
+    }
+
+    protected BigInteger getPrivateKey() {
+        return privateKey;
     }
 }

@@ -25,7 +25,7 @@ public class SubstationRunnable implements Runnable {
      * Generates SubstationRunnable with default file.
      */
     public SubstationRunnable() {
-        substation = new File("data/substation.toml");
+        substation = new File("data/substation1.toml");
     }
 
     /**
@@ -65,6 +65,7 @@ public class SubstationRunnable implements Runnable {
                 System.out.println("SSt-CT: " + (now - then));
                 then = now;
             }
+            //TODO: closeConnection()
         } catch (IOException | NullMessageException e) {
             e.printStackTrace();
         }

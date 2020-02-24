@@ -25,7 +25,7 @@ class ConnectionMeterSubstation {
 
     @BeforeAll
     static void setUp() throws IOException {
-        fileSubst = new File("./data/test/substation2.toml");
+        fileSubst = new File("./data/test/substation4.toml");
         loadCurve = new LoadCurve(new File("./data/p192.toml"));
 
         ServerSocket server = LoadSocket.tomlToServerSocket(fileSubst);

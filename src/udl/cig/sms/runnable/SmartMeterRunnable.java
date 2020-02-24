@@ -6,6 +6,8 @@ import udl.cig.sms.consumption.ConsumptionRandom;
 import udl.cig.sms.data.LoadCurve;
 import udl.cig.sms.protocol.State;
 import udl.cig.sms.protocol.meter.factories.FactoryMeterState;
+import udl.cig.sms.protocol.meter.states.ConsumptionTransmission;
+import udl.cig.sms.protocol.meter.states.KeyEstablishment;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +26,7 @@ public class SmartMeterRunnable implements Runnable {
      * Generates a SMR with the predefined substation
      */
     public SmartMeterRunnable() {
-        substation = new File("data/substation.toml");
+        substation = new File("data/substation1.toml");
     }
 
     /**
@@ -64,6 +66,7 @@ public class SmartMeterRunnable implements Runnable {
                 System.out.println("SM-CT: " + (now - then));
                 then = now;
             }
+            factory.closeConnection();
         } catch (IOException | NullMessageException e) {
             e.printStackTrace();
         }

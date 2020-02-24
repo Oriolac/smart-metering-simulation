@@ -73,4 +73,9 @@ public class ConnectionMeter implements ConnectionMeterInt {
     public Socket getSocket() {
         return socket;
     }
+
+    @Override
+    public void close() throws IOException {
+        socket.close();
+    }
 }

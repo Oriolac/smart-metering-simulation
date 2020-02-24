@@ -12,6 +12,7 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.*;
 
+import static java.math.BigInteger.valueOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DecipherMessageUnitTest implements HashTest {
@@ -27,7 +28,7 @@ public class DecipherMessageUnitTest implements HashTest {
     void setUp() {
         BigInteger si;
         BigInteger s0 = BigInteger.ZERO;
-        mis = new ArrayList<>(Collections.singletonList(BigInteger.valueOf(4)));
+        mis = new ArrayList<>(Collections.singletonList(valueOf(4)));
         cis = new LinkedList<>();
         BigInteger order = loadCurve.getGroup().getSize();
         si = generateSi().getIntValue();
@@ -47,17 +48,26 @@ public class DecipherMessageUnitTest implements HashTest {
     @Test
     public void decryptUsingMockLambda() {
         GeneralECPoint ci;
-        LogarithmAlgorithm lambda = new PollardsLambda(dec.getGroup().getGenerator());
-        dec.setLambda(lambda);
-
         ci = cyp.encrypt(mis.get(0), t);
         cis.add(ci);
-        assertEquals(Optional.of(dec.getGroup().getGenerator().pow(BigInteger.valueOf(4L))), dec.getBeta(cis, t));
+        assertEquals(Optional.of(dec.getGroup().getGenerator().pow(valueOf(4L))), dec.getBeta(cis, t));
         Optional<BigInteger> m = dec.decrypt(cis, t);
         Optional<BigInteger> mExpected = mis.stream().reduce(BigInteger::add);
         assertEquals(mExpected, m);
     }
 
+    @Test
+    public void getBeta() {
+        List<GeneralECPoint> points = new ArrayList<>();
+        GeneralECPoint generator = loadCurve.getGroup().getGenerator();
+        BigInteger time = BigInteger.ONE;
+        List<Long> misint = new ArrayList<>(List.of(56L, 60L));
+        List<GeneralECPoint> cis = new ArrayList<>();
+        misint.forEach(x -> cis.add(cyp.encrypt(BigInteger.valueOf(x), time)));
+        Optional<GeneralECPoint> CExpected = cis.stream().reduce(GeneralECPoint::multiply);
+        assertEquals(CExpected.map((c -> c.multiply(dec.hash(time).pow(dec.getPrivateKey())))),
+                dec.getBeta(cis, time));
+    }
 
     private PrimeFieldElement generateSi() {
         return loadCurve.getField().getRandomElement();

@@ -19,14 +19,8 @@ class LoadSocketTest {
 
     @BeforeAll
     static void setUp() {
-        file = new File("./data/test/substation.toml");
+        file = new File("./data/test/substation1.toml");
         file2 = new File("./data/test/substation2.toml");
-    }
-
-    @Test
-    void tomlToAddressTest() throws IOException {
-        new ServerSocket(5000, 1, InetAddress.getByName("localhost"));
-        assertNotNull(tomlToSocket(file));
     }
 
     @Test

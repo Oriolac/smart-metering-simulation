@@ -9,7 +9,9 @@ import java.security.SecureRandom;
  */
 public class ConsumptionRandom implements ConsumptionReader {
 
+
     private static final int LENGTH_OF_CONSUMPTION = 7;
+
 
     /**
      * Reads the consumption.
