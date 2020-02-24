@@ -7,6 +7,7 @@ import udl.cig.sms.data.LoadCurve;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -71,10 +72,15 @@ public class MeterBusomController implements MeterBusomControllerInt {
      */
     @Override
     public void sendMessage(List<BigInteger> messages) throws IOException, NullMessageException {
+        long now, then;
         SendChunk currentState = (SendChunk) this.state;
+        then = Instant.now().toEpochMilli();
         for (BigInteger message : messages) {
             currentState.setMessage(message);
             currentState = (SendChunk) currentState.next().next();
+            now = Instant.now().toEpochMilli();
+            System.out.println("SM-BS-MS: " + (now - then));
+            then = now;
         }
     }
 

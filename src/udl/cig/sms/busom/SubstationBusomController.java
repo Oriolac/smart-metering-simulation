@@ -7,6 +7,7 @@ import udl.cig.sms.data.LoadCurve;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.Optional;
 
 /**
@@ -40,6 +41,8 @@ public class SubstationBusomController implements SubstationBusomControllerInt {
     public BigInteger receiveSecretKey() throws IOException, NullMessageException {
         this.state = state.next();
         BigInteger message = BigInteger.ZERO;
+        long then, now;
+        then = Instant.now().toEpochMilli();
         for (int i = 0; i < this.numberOfChunks; ++i) {
             BusomState currentState = this.state.next();
             this.state = currentState.next();
@@ -48,6 +51,9 @@ public class SubstationBusomController implements SubstationBusomControllerInt {
                 throw new NullMessageException();
             }
             message = message.add(currentMessage.get().multiply(BigInteger.TWO.pow(13 * i)));
+            now = Instant.now().toEpochMilli();
+            System.out.println("SSt-BS-MS: " + (now - then));
+            then = now;
         }
         return message;
     }

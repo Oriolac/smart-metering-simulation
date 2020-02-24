@@ -27,7 +27,6 @@ public class KeyEstablishment implements State {
     public KeyEstablishment(FactoryMeterState factory) {
         this.factory = factory;
         privateKey = generatePrivateKey();
-        System.out.println("si: " + privateKey);
         meterBusom = factory.makeMeterBusomController();
     }
 

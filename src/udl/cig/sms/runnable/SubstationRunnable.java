@@ -59,7 +59,7 @@ public class SubstationRunnable implements Runnable {
             now = Instant.now().toEpochMilli();
             System.out.println("SSt-KE: " + (now - then));
             then = now;
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 15; i++) {
                 state = state.next();
                 now = Instant.now().toEpochMilli();
                 System.out.println("SSt-CT: " + (now - then));
