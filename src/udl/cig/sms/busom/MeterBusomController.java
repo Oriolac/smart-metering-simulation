@@ -79,7 +79,7 @@ public class MeterBusomController implements MeterBusomControllerInt {
             currentState.setMessage(message);
             currentState = (SendChunk) currentState.next().next();
             now = Instant.now().toEpochMilli();
-            System.out.println("SM-BS-MS: " + (now - then));
+            System.out.println("SM-BS: " + (now - then));
             then = now;
         }
     }

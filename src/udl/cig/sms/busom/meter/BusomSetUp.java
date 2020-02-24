@@ -74,8 +74,8 @@ public class BusomSetUp implements BusomState {
         Random random = new Random();
         long key = random.nextLong();
         privateKey = BigInteger.valueOf(Math.abs(key));
-        //TODO: System.out.print privatekey
-        System.out.println("Private Key: " + privateKey.toString());
+
+
     }
 
     /**

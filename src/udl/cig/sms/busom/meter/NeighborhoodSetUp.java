@@ -65,8 +65,6 @@ public class NeighborhoodSetUp implements BusomState {
     public BusomState next() throws IOException {
         receivePublicKeysAndCertificates();
         MeterKey meterKey = new MeterKey(privateKey, generalKey);
-        //TODO: Print GeneralKey
-        System.out.println("y: " + this.generalKey.toString());
         return new SendChunk(meterKey, loadCurve, connection);
     }
 

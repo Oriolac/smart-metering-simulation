@@ -54,9 +54,7 @@ public class ConsumptionTransmissionSubstation implements State {
                 GroupElement element = ((GroupElementDatagram) elem).getElement();
                 cyphered.add((GeneralECPoint) element);
             }
-            //TODO: System.out.println
-            System.out.println("Decyphered: " + decipher.decrypt(cyphered, t));
-            return this;
+           return this;
         }
         return new KeyEstablishmentSubstation(factorySubstationState);
     }

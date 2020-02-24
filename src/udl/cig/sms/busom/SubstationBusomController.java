@@ -52,7 +52,7 @@ public class SubstationBusomController implements SubstationBusomControllerInt {
             }
             message = message.add(currentMessage.get().multiply(BigInteger.TWO.pow(13 * i)));
             now = Instant.now().toEpochMilli();
-            System.out.println("SSt-BS-MS: " + (now - then));
+            System.out.println("SSt-BS: " + (now - then));
             then = now;
         }
         return message;
