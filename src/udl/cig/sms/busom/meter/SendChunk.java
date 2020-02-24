@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Random;
 
+/**
+ * Sends a chunk of a message to the substation
+ */
 public class SendChunk implements BusomState {
 
     private final GroupElement generator;
@@ -27,12 +30,25 @@ public class SendChunk implements BusomState {
     private HomomorphicCypher cypher;
     private ElGamalCiphertext ciphertext;
 
+    /**
+     * Constructs the sender
+     *
+     * @param meterKey  Parameter containing information to encrypt in this meter
+     * @param loadCurve Parameters of the ECC curve.
+     */
     protected SendChunk(MeterKey meterKey, LoadCurve loadCurve) {
         this.loadCurve = loadCurve;
         this.generator = loadCurve.getGroup().getGenerator();
         this.meterKey = meterKey;
     }
 
+    /**
+     * Constructs the sender
+     *
+     * @param meterKey   Parameter containing information to encrypt in this meter
+     * @param loadCurve  Parameters of the ECC curve.
+     * @param connection connection to the substation.
+     */
     protected SendChunk(MeterKey meterKey, LoadCurve loadCurve, ConnectionMeterInt connection) {
         this(meterKey, loadCurve);
         this.connection = connection;
@@ -40,6 +56,13 @@ public class SendChunk implements BusomState {
     }
 
 
+    /**
+     * Next state of the protocol.
+     *
+     * @return next state given a preset of conditions
+     * @throws NullMessageException, if the message to be sent is void
+     * @throws IOException,          if connection has failed.
+     */
     @Override
     public BusomState next() throws NullMessageException, IOException {
         BigInteger noise = SendChunk.generateNoise();
@@ -52,28 +75,59 @@ public class SendChunk implements BusomState {
         return new SendPartialDecryption(meterKey, noise, loadCurve, connection);
     }
 
+    /**
+     * Generates noise to secure encrytion
+     *
+     * @return noise
+     */
     static protected BigInteger generateNoise() {
         Random randomGen = new Random();
         long random = randomGen.nextLong();
         return BigInteger.valueOf(random);
     }
 
+    /**
+     * Sends cyphered text to the substation.
+     *
+     * @throws IOException if sender can't send
+     */
     protected void sendCypherText() throws IOException {
         sender.send(new CipherTextDatagram(ciphertext));
     }
 
+    /**
+     * Gets privateKey. Used for tests
+     *
+     * @return private key of the meter
+     */
     protected BigInteger getPrivateKey() {
         return meterKey.getPrivateKey();
     }
 
+    /**
+     * Sets message to be send. It's mandatory to be used before sending
+     * information to the substation, aka call next method.
+     *
+     * @param message to be sent.
+     */
     public void setMessage(BigInteger message) {
         this.message = message;
     }
 
+    /**
+     * Sets sender. Used for testing.
+     *
+     * @param sender mock of it.
+     */
     protected void setSender(Sender sender) {
         this.sender = sender;
     }
 
+    /**
+     * Sets cypher. Used for testing.
+     *
+     * @param cypher mock of it.
+     */
     protected void setCypher(HomomorphicCypher cypher) {
         this.cypher = cypher;
     }

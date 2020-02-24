@@ -10,6 +10,10 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 
+/**
+ * Makes a run of the normal pattern used for a Substation.
+ * In production, it can be executed by the substation.
+ */
 public class SubstationRunnable implements Runnable {
 
     //TODO parse parameters for files.
@@ -17,14 +21,27 @@ public class SubstationRunnable implements Runnable {
     private static final LoadCurve loadCurve = new LoadCurve(new File("data/p192.toml"));
     private final File substation;
 
+    /**
+     * Generates SubstationRunnable with default file.
+     */
     public SubstationRunnable() {
         substation = new File("data/substation1.toml");
     }
 
+    /**
+     * Generates SubstationRunnable with a file passed as a parameter
+     *
+     * @param file toml config file for substation.
+     */
     public SubstationRunnable(File file) {
         this.substation = file;
     }
 
+    /**
+     * Main -> Executes substationRunnable with default file
+     *
+     * @param args -- Not used
+     */
     public static void main(String[] args) {
         new SubstationRunnable().run();
     }
@@ -32,7 +49,7 @@ public class SubstationRunnable implements Runnable {
     @Override
     public void run() {
         FactorySubstationState factory;
-        long then, now;
+        long now, then;
         try {
             factory = new FactorySubstationState(loadCurve,
                     new ConnectionSubstation(substation, loadCurve));
@@ -40,12 +57,12 @@ public class SubstationRunnable implements Runnable {
             then = Instant.now().toEpochMilli();
             state = state.next();
             now = Instant.now().toEpochMilli();
-            System.out.println("SM-KE: " + (now - then));
+            System.out.println("SSt-KE: " + (now - then));
             then = now;
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 15; i++) {
                 state = state.next();
                 now = Instant.now().toEpochMilli();
-                System.out.println("SM-CT: " + (now - then));
+                System.out.println("SSt-CT: " + (now - then));
                 then = now;
             }
             //TODO: closeConnection()

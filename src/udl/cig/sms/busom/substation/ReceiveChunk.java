@@ -15,6 +15,9 @@ import udl.cig.sms.connection.datagram.SMSDatagram;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Receive chunk state of protocol
+ */
 public class ReceiveChunk implements BusomState {
 
     private final MultiplicativeSubgroup group;
@@ -23,10 +26,21 @@ public class ReceiveChunk implements BusomState {
     private ReceiverSubstation receiver;
     private HomomorphicCiphertext ciphertext;
 
+    /**
+     * Genereates a ReceiveChunk state. Used for testing.
+     *
+     * @param group Group used for encrypt and decrypt.
+     */
     public ReceiveChunk(MultiplicativeSubgroup group) {
         this.group = group;
     }
 
+    /**
+     * Generates a ReceiverChunk state.
+     *
+     * @param group      Group used for encrypt and decrypt.
+     * @param connection to all the meters.
+     */
     public ReceiveChunk(MultiplicativeSubgroup group, ConnectionSubstationInt connection) {
         this.group = group;
         receiver = connection;
@@ -34,13 +48,24 @@ public class ReceiveChunk implements BusomState {
         this.connection = connection;
     }
 
+    /**
+     * Consumes the messages and goes to the next stage of the protocol
+     *
+     * @return next state (it's always DecriptChunk).
+     * @throws IOException if connection fails.
+     */
     @Override
-    public BusomState next() throws IOException {
+    public DecriptChunk next() throws IOException {
         receiveAndCompute();
         sendC();
         return new DecriptChunk(group, ciphertext, connection);
     }
 
+    /**
+     * Receives and computes the encription of the first value.
+     * The computation is based on adding all the points of ElGamal, as then
+     * it can be used to decrypt without giving the information of xi.
+     */
     protected void receiveAndCompute() {
         List<SMSDatagram> datas;
         try {
@@ -58,26 +83,57 @@ public class ReceiveChunk implements BusomState {
         }
     }
 
+    /**
+     * Computes the adding of ci and di. ElGamalCipherText is the pair of values.
+     *
+     * @param cipherTextDatagram Pair of values to be added.
+     */
     private void compute(CipherTextDatagram cipherTextDatagram) {
         ciphertext = ciphertext.HomomorphicOperation(cipherTextDatagram.getCiphertext());
     }
 
+    /**
+     * Sends C to all the meters, where C = sum(ci)
+     *
+     * @throws IOException if connection fails.
+     */
     protected void sendC() throws IOException {
         sender.send(new GroupElementDatagram(ciphertext.getParts()[0]));
     }
 
+    /**
+     * Sets sender. Used for testing
+     *
+     * @param sender mock of sender
+     */
     public void setSender(Sender sender) {
         this.sender = sender;
     }
 
+    /**
+     * Sets the receiver. Used for testing.
+     *
+     * @param receiver mock of receiver.
+     */
     public void setReceiver(ReceiverSubstation receiver) {
         this.receiver = receiver;
     }
 
+    /**
+     * Gets actual ciphertext. As it can be calledonly after and before
+     * of receive and Compute, it can only return null or [C, D] as a Ciphertext
+     *
+     * @return [C, D] if computed, else null
+     */
     public HomomorphicCiphertext getCiphertext() {
         return ciphertext;
     }
 
+    /**
+     * Sets cipertext. Used for testing.
+     *
+     * @param ciphertext to be set.
+     */
     public void setCipherText(HomomorphicCiphertext ciphertext) {
         this.ciphertext = ciphertext;
     }

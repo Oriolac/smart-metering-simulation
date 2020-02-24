@@ -19,6 +19,9 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Decripts Chunk, requesting the data necessary to be computed.
+ */
 public class DecriptChunk implements BusomState {
 
     private final HomomorphicCiphertext ciphertext;
@@ -29,6 +32,12 @@ public class DecriptChunk implements BusomState {
     private ReceiverSubstation receiver;
     private static final Logger LOGGER = Logger.getAnonymousLogger();
 
+    /**
+     * Generates DecriptChunkState for testing.
+     *
+     * @param group      Group be needed to encrypt and decrypt.
+     * @param ciphertext [C, D], used to compute the adding of messages.
+     */
     public DecriptChunk(MultiplicativeSubgroup group, HomomorphicCiphertext ciphertext) {
         this.group = group;
         partialDecryption = group.getNeuterElement();
@@ -36,6 +45,13 @@ public class DecriptChunk implements BusomState {
         logarithm = new BruteForce(group.getGenerator());
     }
 
+    /**
+     * Generates DecriptChunkState.
+     *
+     * @param group      Group be needed to encrypt and decrypt.
+     * @param ciphertext [C, D], used to compute the adding of messages.
+     * @param connection to all the meters.
+     */
     public DecriptChunk(MultiplicativeSubgroup group,
                         HomomorphicCiphertext ciphertext, ConnectionSubstationInt connection) {
         this.group = group;
@@ -46,16 +62,28 @@ public class DecriptChunk implements BusomState {
         receiver = connection;
     }
 
+    /**
+     * Makes the next state. It also generates the message readed. Needs to be extracted by a get
+     * method.
+     *
+     * @return Next state. It's always ReceiveChunk.
+     * @throws IOException if connection fails.
+     */
     @Override
-    public BusomState next() throws IOException {
+    public ReceiveChunk next() throws IOException {
         receiveAndCompute();
         return new ReceiveChunk(group, connection);
     }
 
+    /**
+     * Receives and computes the sum of messages.
+     *
+     * @throws IOException if connection fails
+     */
     protected void receiveAndCompute() throws IOException {
         List<SMSDatagram> datas;
         datas = receiver.receive();
-        for(SMSDatagram data : datas) {
+        for (SMSDatagram data : datas) {
             if (data instanceof GroupElementDatagram) {
                 GroupElementDatagram groupElementDatagram = (GroupElementDatagram) data;
                 compute(groupElementDatagram);
@@ -67,26 +95,56 @@ public class DecriptChunk implements BusomState {
         partialDecryption = partialDecryption.inverse().multiply(d);
     }
 
+    /**
+     * Computes a partialDecription.
+     *
+     * @param groupElementDatagram to be computed.
+     */
     private void compute(GroupElementDatagram groupElementDatagram) {
         partialDecryption = partialDecryption.multiply(groupElementDatagram.getElement());
     }
 
+    /**
+     * Reads the sum of messages.
+     *
+     * @return Optional of the read message (it can fail)
+     */
     public Optional<BigInteger> readMessage() {
         return logarithm.algorithm(partialDecryption);
     }
 
+    /**
+     * Sets the partialDecription to the element D. Used for testing
+     *
+     * @param D to be used.
+     */
     protected void setPartialDecryption(GroupElement D) {
         this.partialDecryption = D;
     }
 
+    /**
+     * Sets the logarithm algorithm
+     *
+     * @param logarithm to be set.
+     */
     public void setLogarithm(LogarithmAlgorithm logarithm) {
         this.logarithm = logarithm;
     }
 
+    /**
+     * Gets the partialDecryption.
+     *
+     * @return partialDecryption
+     */
     protected GroupElement getPartialDecryption() {
         return partialDecryption;
     }
 
+    /**
+     * Sets a mock of receiver.
+     *
+     * @param receiver mock of receiver
+     */
     public void setReceiver(ReceiverSubstation receiver) {
         this.receiver = receiver;
     }
