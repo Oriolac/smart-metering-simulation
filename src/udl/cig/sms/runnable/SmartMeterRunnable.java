@@ -9,6 +9,7 @@ import udl.cig.sms.protocol.meter.factories.FactoryMeterState;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 
 /**
  * Makes a run of the normal pattern used for a SM. In production,
@@ -47,12 +48,21 @@ public class SmartMeterRunnable implements Runnable {
     @Override
     public void run() {
         FactoryMeterState factory;
+        long now, then;
         try {
             factory = new FactoryMeterState(loadCurve, new ConnectionMeter(substation, loadCurve),
                     new ConsumptionRandom(), "");
             State state = factory.makeKeyEstablishment();
+            then = Instant.now().toEpochMilli();
+            state = state.next();
+            now = Instant.now().toEpochMilli();
+            System.out.println("SM-KE: " + (now - then));
+            then = now;
             for (int i = 0; i < 10; i++) {
                 state = state.next();
+                now = Instant.now().toEpochMilli();
+                System.out.println("SM-CT: " + (now - then));
+                then = now;
             }
         } catch (IOException | NullMessageException e) {
             e.printStackTrace();
