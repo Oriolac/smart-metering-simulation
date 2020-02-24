@@ -82,4 +82,8 @@ public class DecipherMessage implements Decypher, Hash {
     public LogarithmAlgorithm getLambda() {
         return lambda;
     }
+
+    protected BigInteger getPrivateKey() {
+        return privateKey;
+    }
 }

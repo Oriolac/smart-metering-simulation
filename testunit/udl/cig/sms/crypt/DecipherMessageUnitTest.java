@@ -60,17 +60,14 @@ public class DecipherMessageUnitTest implements HashTest {
     public void getBeta() {
         List<GeneralECPoint> points = new ArrayList<>();
         GeneralECPoint generator = loadCurve.getGroup().getGenerator();
+        BigInteger time = BigInteger.ONE;
         List<Long> misint = new ArrayList<>(List.of(56L, 60L));
-        List<BigInteger> cis = new ArrayList<>();
-        //misint.forEach(x -> cis.add(cipher(x, generator)));
-        //dec.getBeta();
+        List<GeneralECPoint> cis = new ArrayList<>();
+        misint.forEach(x -> cis.add(cyp.encrypt(BigInteger.valueOf(x), time)));
+        Optional<GeneralECPoint> CExpected = cis.stream().reduce(GeneralECPoint::multiply);
+        assertEquals(CExpected.map((c -> c.multiply(dec.hash(time).pow(dec.getPrivateKey())))),
+                dec.getBeta(cis, time));
     }
-
-    private BigInteger cipher(Long x, GeneralECPoint generator, BigInteger si) {
-        //return generator.pow(x).multiply().pow()
-        return null;
-    }
-
 
     private PrimeFieldElement generateSi() {
         return loadCurve.getField().getRandomElement();
