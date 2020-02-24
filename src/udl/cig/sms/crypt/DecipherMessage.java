@@ -26,7 +26,7 @@ public class DecipherMessage implements Decypher, Hash {
         this.curve = loadCurve.getCurve();
         this.field = loadCurve.getField();
         this.grup = loadCurve.getGroup();
-        lambda = new BruteForce(grup.getGenerator());
+        lambda = new BruteForce(grup.getGenerator(), BigInteger.valueOf(2000));
         this.privateKey = privateKey;
     }
 

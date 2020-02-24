@@ -27,6 +27,7 @@ public class KeyEstablishment implements State {
     public KeyEstablishment(FactoryMeterState factory) {
         this.factory = factory;
         privateKey = generatePrivateKey();
+        System.out.println("si: " + privateKey);
         meterBusom = factory.makeMeterBusomController();
     }
 
@@ -34,8 +35,7 @@ public class KeyEstablishment implements State {
      * @return a list of BigIntegers (sij) that are the chunks of the private key.
      */
     protected List<BigInteger> generateChunksOfPrivateKey() {
-        BigInteger divisor = BigInteger.TWO;
-        divisor = divisor.pow(13);
+        BigInteger divisor = BigInteger.TWO.pow(13);
         List<BigInteger> result = new ArrayList<>();
         BigInteger[] tmp = privateKey.getIntValue().divideAndRemainder(divisor);
         int bits = factory.getLoadCurve().getField().getSize().bitLength();

@@ -35,14 +35,14 @@ public class KeyEstablishmentSubstation implements State {
 
     /**
      * @return the next state
-     * @throws IOException in case it fails the IO methods
+     * @throws IOException          in case it fails the IO methods
      * @throws NullMessageException in case the message is null
      */
     @Override
     public State next() throws IOException, NullMessageException {
-        BigInteger privateKey = controller.receiveSecretKey();
         BigInteger order = factory.getLoadCurve().getGroup().getSize();
-        privateKey = privateKey.negate().add(order).remainder(order);
+        BigInteger privateKey = controller.receiveSecretKey().remainder(order);
+        privateKey = order.subtract(privateKey);
         return factory.makeConsumptionTransmission(privateKey);
     }
 }
