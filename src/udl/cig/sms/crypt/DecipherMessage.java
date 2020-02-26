@@ -4,7 +4,7 @@ import cat.udl.cig.ecc.ECPrimeOrderSubgroup;
 import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeField;
-import cat.udl.cig.operations.wrapper.BruteForce;
+import cat.udl.cig.operations.wrapper.HashedAlgorithm;
 import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
 import udl.cig.sms.data.LoadCurve;
 
@@ -27,7 +27,7 @@ public class DecipherMessage implements Decypher, Hash {
         this.curve = loadCurve.getCurve();
         this.field = loadCurve.getField();
         this.grup = loadCurve.getGroup();
-        lambda = new BruteForce(grup.getGenerator(), BigInteger.valueOf(2000));
+        lambda = HashedAlgorithm.getHashedInstance();
         this.privateKey = privateKey;
     }
 

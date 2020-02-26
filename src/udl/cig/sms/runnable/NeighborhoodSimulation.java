@@ -1,5 +1,7 @@
 package udl.cig.sms.runnable;
 
+import cat.udl.cig.operations.wrapper.HashedAlgorithm;
+
 import java.io.File;
 
 /**
@@ -18,8 +20,10 @@ public class NeighborhoodSimulation {
             NUM_METERS = 3;
             substation = new File("./data/substation3.toml");
         }
+        //noinspection ResultOfMethodCallIgnored
+        HashedAlgorithm.getHashedInstance();
         new Thread(() -> new SubstationRunnable(substation).run()).start();
-        for(int i = 0; i < NUM_METERS; i++) {
+        for (int i = 0; i < NUM_METERS; i++) {
             new Thread(() -> new SmartMeterRunnable(substation).run()).start();
         }
     }

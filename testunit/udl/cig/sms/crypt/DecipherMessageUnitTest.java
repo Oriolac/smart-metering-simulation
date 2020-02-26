@@ -2,8 +2,6 @@ package udl.cig.sms.crypt;
 
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeFieldElement;
-import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
-import cat.udl.cig.operations.wrapper.PollardsLambda;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.data.LoadCurve;
@@ -47,11 +45,12 @@ public class DecipherMessageUnitTest implements HashTest {
 
     @Test
     public void decryptUsingMockLambda() {
-        GeneralECPoint ci;
-        ci = cyp.encrypt(mis.get(0), t);
+        assertEquals(loadCurve.getGroup().getGenerator(), dec.getLambda().getAlpha());
+        GeneralECPoint ci = cyp.encrypt(mis.get(0), t);
         cis.add(ci);
-        assertEquals(Optional.of(dec.getGroup().getGenerator().pow(valueOf(4L))), dec.getBeta(cis, t));
-        Optional<BigInteger> m = dec.decrypt(cis, t);
+        assertEquals(Optional.of(loadCurve.getGroup().getGenerator().pow(valueOf(4L))), dec.getBeta(cis, t));
+        Optional<BigInteger> m; //= dec.decrypt(cis, t);
+        m = dec.getLambda().algorithm(dec.getGroup().getGenerator().pow(valueOf(4L)));
         Optional<BigInteger> mExpected = mis.stream().reduce(BigInteger::add);
         assertEquals(mExpected, m);
     }

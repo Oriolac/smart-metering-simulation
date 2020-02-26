@@ -4,8 +4,8 @@ import cat.udl.cig.cryptography.cryptosystems.ciphertexts.HomomorphicCiphertext;
 import cat.udl.cig.fields.GroupElement;
 import cat.udl.cig.fields.MultiplicativeSubgroup;
 import cat.udl.cig.operations.wrapper.BruteForce;
+import cat.udl.cig.operations.wrapper.HashedAlgorithm;
 import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
-import cat.udl.cig.operations.wrapper.PollardsLambda;
 import udl.cig.sms.busom.BusomState;
 import udl.cig.sms.connection.ConnectionSubstationInt;
 import udl.cig.sms.connection.ReceiverSubstation;
@@ -57,7 +57,7 @@ public class DecriptChunk implements BusomState {
         this.group = group;
         partialDecryption = group.getNeuterElement();
         this.ciphertext = ciphertext;
-        logarithm = new PollardsLambda(group.getGenerator());
+        logarithm = HashedAlgorithm.getHashedInstance();
         this.connection = connection;
         receiver = connection;
     }
