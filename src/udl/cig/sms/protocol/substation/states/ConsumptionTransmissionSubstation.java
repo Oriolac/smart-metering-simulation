@@ -30,7 +30,7 @@ public class ConsumptionTransmissionSubstation implements State {
     /**
      * @param factorySubstationState Factory that has the information of the ECC and connection and
      *                               creates the different states.
-     * @param privateKey or s0 which is the private key of the smart metering protocol
+     * @param privateKey             or s0 which is the private key of the smart metering protocol
      */
     public ConsumptionTransmissionSubstation(FactorySubstationState factorySubstationState, BigInteger privateKey) {
         this.factorySubstationState = factorySubstationState;
@@ -40,7 +40,7 @@ public class ConsumptionTransmissionSubstation implements State {
 
     /**
      * @return the next state
-     * @throws IOException in case that the IO fails
+     * @throws IOException          in case that the IO fails
      * @throws NullMessageException in case that the message is null
      */
     @Override
@@ -48,13 +48,14 @@ public class ConsumptionTransmissionSubstation implements State {
         BigInteger t = new BigInteger(NUM_BITS, new SecureRandom());
         factorySubstationState.getConnection().send(new BigIntegerDatagram(t));
         List<SMSDatagram> datas = factorySubstationState.getConnection().receive();
-        if(datas.stream().allMatch(data -> data instanceof GroupElementDatagram)) {
+        if (datas.stream().allMatch(data -> data instanceof GroupElementDatagram)) {
             List<GeneralECPoint> cyphered = new ArrayList<>();
             for (SMSDatagram elem : datas) {
                 GroupElement element = ((GroupElementDatagram) elem).getElement();
                 cyphered.add((GeneralECPoint) element);
             }
-           return this;
+            System.out.println("Decyphered: " + decipher.decrypt(cyphered, t));
+            return this;
         }
         return new KeyEstablishmentSubstation(factorySubstationState);
     }

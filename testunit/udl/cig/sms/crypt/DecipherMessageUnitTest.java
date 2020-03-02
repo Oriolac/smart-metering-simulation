@@ -2,6 +2,7 @@ package udl.cig.sms.crypt;
 
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeFieldElement;
+import cat.udl.cig.operations.wrapper.HashedAlgorithm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.data.LoadCurve;
@@ -33,6 +34,8 @@ public class DecipherMessageUnitTest implements HashTest {
         s0 = s0.add(si).remainder(order);
 
         s0 = s0.negate().add(order).remainder(order);
+        HashedAlgorithm.loadHashedInstance(loadCurve.getGroup().getGenerator(), BigInteger.valueOf(1024 * 1024),
+                BigInteger.valueOf(32));
         dec = new DecipherMessage(loadCurve, s0);
         cyp = new CypherMessage(loadCurve, si);
     }

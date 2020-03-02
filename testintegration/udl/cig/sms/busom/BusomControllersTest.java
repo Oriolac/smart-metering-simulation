@@ -1,5 +1,6 @@
 package udl.cig.sms.busom;
 
+import cat.udl.cig.operations.wrapper.HashedAlgorithm;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.connection.ConnectionMeter;
@@ -30,13 +31,15 @@ class BusomControllersTest {
     static void setUp() throws IOException, NullMessageException {
         fileSubst = new File("./data/test/substation3.toml");
         loadCurve = new LoadCurve(new File("./data/p192.toml"));
+        HashedAlgorithm.loadHashedInstance(loadCurve.getGroup().getGenerator(), BigInteger.valueOf(1024 * 1024),
+                BigInteger.valueOf(32));
+
         setUpSockets();
         meterContrs = new ArrayList<>();
         for (ConnectionMeter meter : connectionMeters) {
             meterContrs.add(new MeterBusomController(loadCurve, meter));
         }
         substContr = new SubstationBusomController(loadCurve, connectionSubstation);
-        List<BigInteger> message;
     }
 
     private static List<BigInteger> getMessage() {

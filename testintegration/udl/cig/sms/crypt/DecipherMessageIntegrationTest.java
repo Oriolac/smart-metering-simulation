@@ -2,6 +2,7 @@ package udl.cig.sms.crypt;
 
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeFieldElement;
+import cat.udl.cig.operations.wrapper.PollardsLambda;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import udl.cig.sms.data.LoadCurve;
@@ -33,6 +34,7 @@ class DecipherMessageIntegrationTest {
         createSecretKeys();
         keyEstablishment();
         dec = new DecipherMessage(loadCurve, s0);
+        dec.setLambda(new PollardsLambda(loadCurve.getGroup().getGenerator()));
     }
 
     static void createSecretKeys() {
