@@ -1,10 +1,10 @@
-package sms.connection.factory;
+package cat.udl.cig.sms.connection.factory;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import udl.cig.sms.connection.datagram.GroupElementDatagram;
-import udl.cig.sms.connection.factory.FactoryGroupElementDatagram;
-import udl.cig.sms.data.LoadCurve;
+import cat.udl.cig.sms.connection.datagram.GroupElementDatagram;
+import cat.udl.cig.sms.connection.factory.FactoryGroupElementDatagram;
+import cat.udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
 

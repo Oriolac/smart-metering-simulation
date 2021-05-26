@@ -1,9 +1,8 @@
-package sms.connection.factory;
+package cat.udl.cig.sms.connection.factory;
 
+import cat.udl.cig.sms.connection.datagram.EndOfDatagram;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import udl.cig.sms.connection.datagram.EndOfDatagram;
-import udl.cig.sms.connection.factory.FactoryEndOfDatagram;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

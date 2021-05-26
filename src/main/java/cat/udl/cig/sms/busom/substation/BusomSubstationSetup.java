@@ -75,12 +75,9 @@ public class BusomSubstationSetup implements BusomState {
      */
     @SuppressWarnings("unchecked cast")
     protected void receivePublicKeys() throws IOException {
-        List<SMSDatagram> datas;
-        datas = receiver.receive();
-        for (SMSDatagram data : datas) {
+        for (SMSDatagram data : receiver.receive()) {
             if (data instanceof NeighborhoodDatagram) {
-                NeighborhoodDatagram<String> neighbourData = (NeighborhoodDatagram<String>) data;
-                receivePublicMeterKey(neighbourData);
+                receivePublicMeterKey((NeighborhoodDatagram<String>) data);
             } else {
                 LOGGER.log(Level.WARNING, "Not permitted data type.");
             }

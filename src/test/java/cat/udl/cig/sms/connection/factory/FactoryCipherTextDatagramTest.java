@@ -1,12 +1,11 @@
-package sms.connection.factory;
+package cat.udl.cig.sms.connection.factory;
 
 import cat.udl.cig.cryptography.cryptosystems.ciphertexts.ElGamalCiphertext;
 import cat.udl.cig.fields.GroupElement;
+import cat.udl.cig.sms.connection.datagram.CipherTextDatagram;
+import cat.udl.cig.sms.data.LoadCurve;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import udl.cig.sms.connection.datagram.CipherTextDatagram;
-import udl.cig.sms.connection.factory.FactoryCipherTextDatagram;
-import udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
 

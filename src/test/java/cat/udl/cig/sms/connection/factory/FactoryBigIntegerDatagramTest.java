@@ -1,8 +1,7 @@
-package sms.connection.factory;
+package cat.udl.cig.sms.connection.factory;
 
 import org.junit.jupiter.api.Test;
-import udl.cig.sms.connection.datagram.BigIntegerDatagram;
-import udl.cig.sms.connection.factory.FactoryBigIntegerDatagram;
+import cat.udl.cig.sms.connection.datagram.BigIntegerDatagram;
 
 import java.math.BigInteger;
 
