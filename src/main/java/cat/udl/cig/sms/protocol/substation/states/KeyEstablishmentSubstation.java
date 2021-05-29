@@ -15,7 +15,7 @@ public class KeyEstablishmentSubstation implements State {
 
 
     private SubstationBusomControllerInt controller;
-    private FactorySubstationState factory;
+    private final FactorySubstationState factory;
 
     /**
      * @param factory Factory that has the information of the ECC and connection and

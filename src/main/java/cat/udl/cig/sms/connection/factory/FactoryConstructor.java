@@ -27,18 +27,18 @@ public class FactoryConstructor {
     }
 
     /**
-     * @param in needed to read the bytes of the datagram
+     * @param in        needed to read the bytes of the datagram
      * @param factories array that construct all the SMSDatagram needed
      * @return SMSDatagram built from the bytes of the input
      * @throws IOException in case that the reads more than it has to.
      */
     public static SMSDatagram buildDatagramFrom(InputStream in, FactorySMSDatagram[] factories) throws IOException {
         byte[] bytes = new byte[1];
-        if(in.read(bytes) < bytes.length)
+        if (in.read(bytes) < bytes.length)
             throw new IOException();
         FactorySMSDatagram factory = factories[bytes[0]];
         bytes = new byte[factory.getByteSize()];
-        if(in.read(bytes) < bytes.length)
+        if (in.read(bytes) < bytes.length)
             throw new IOException();
         return factory.buildDatagram(bytes);
     }

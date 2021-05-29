@@ -22,10 +22,10 @@ public class ConnectionMeter implements ConnectionMeterInt {
     private final DataOutputStream out;
     private final DataInputStream in;
     private Socket socket;
-    private FactorySMSDatagram[] factories;
+    private final FactorySMSDatagram[] factories;
 
     /**
-     * @param file of the configuration of the port and meters
+     * @param file      of the configuration of the port and meters
      * @param loadcurve get the information of the ECC
      * @throws IOException in case IO fails
      */
@@ -37,8 +37,8 @@ public class ConnectionMeter implements ConnectionMeterInt {
     }
 
     /**
-     * @param in to receive the data
-     * @param out to send the data
+     * @param in        to receive the data
+     * @param out       to send the data
      * @param loadCurve to have all the information of the ECC
      */
     protected ConnectionMeter(DataInputStream in, DataOutputStream out, LoadCurve loadCurve) {

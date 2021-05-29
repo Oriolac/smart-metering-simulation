@@ -1,13 +1,13 @@
 package cat.udl.cig.sms.protocol.meter.factories;
 
 import cat.udl.cig.fields.PrimeFieldElement;
-import cat.udl.cig.sms.protocol.meter.states.KeyEstablishment;
 import cat.udl.cig.sms.busom.MeterBusomController;
 import cat.udl.cig.sms.busom.MeterBusomControllerInt;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
 import cat.udl.cig.sms.consumption.ConsumptionReader;
 import cat.udl.cig.sms.data.LoadCurve;
 import cat.udl.cig.sms.protocol.meter.states.ConsumptionTransmission;
+import cat.udl.cig.sms.protocol.meter.states.KeyEstablishment;
 
 import java.io.IOException;
 
@@ -19,11 +19,11 @@ public class FactoryMeterState {
     private final LoadCurve loadCurve;
     private final ConnectionMeterInt connection;
     private final ConsumptionReader consumption;
-    private String certificate;
+    private final String certificate;
 
     /**
-     * @param loadCurve which has all the information of the ECC
-     * @param connection which manages the connection with the substation
+     * @param loadCurve   which has all the information of the ECC
+     * @param connection  which manages the connection with the substation
      * @param consumption which reads all the consumption of the meter
      * @param certificate of the smart meter
      */

@@ -7,7 +7,7 @@ import cat.udl.cig.sms.connection.datagram.BigIntegerDatagram;
 import cat.udl.cig.sms.connection.datagram.GroupElementDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
 import cat.udl.cig.sms.crypt.Cypher;
-import cat.udl.cig.sms.crypt.CypherMessage;
+import cat.udl.cig.sms.crypt.CypherImpl;
 import cat.udl.cig.sms.protocol.State;
 import cat.udl.cig.sms.protocol.meter.factories.FactoryMeterState;
 
@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 public class ConsumptionTransmission implements State {
 
-    private FactoryMeterState factory;
+    private final FactoryMeterState factory;
     private final PrimeFieldElement privateKey;
     private final Cypher cypher;
 
@@ -31,12 +31,12 @@ public class ConsumptionTransmission implements State {
                                    PrimeFieldElement privateKey) {
         this.factory = factory;
         this.privateKey = privateKey;
-        cypher = new CypherMessage(factory.getLoadCurve(), this.privateKey.getIntValue());
+        cypher = new CypherImpl(factory.getLoadCurve(), this.privateKey.getIntValue());
     }
 
     /**
      * @return the next state
-     * @throws IOException in case that IO fails
+     * @throws IOException          in case that IO fails
      * @throws NullMessageException in case the message is null
      */
     @Override

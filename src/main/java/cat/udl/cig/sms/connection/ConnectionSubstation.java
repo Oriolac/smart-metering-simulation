@@ -29,7 +29,7 @@ public class ConnectionSubstation implements ConnectionSubstationInt {
     private final FactorySMSDatagram[] factories;
 
     /**
-     * @param file to get the information of the port that must be on.
+     * @param file      to get the information of the port that must be on.
      * @param loadCurve to get the information of the ECC.
      * @throws IOException in case the socket is unavailable.
      */
@@ -42,9 +42,9 @@ public class ConnectionSubstation implements ConnectionSubstationInt {
     }
 
     /**
-     * @param serverSocket socket of the server
+     * @param serverSocket   socket of the server
      * @param numberOfMeters capacity of the substation
-     * @param loadCurve to get the information of the ECC
+     * @param loadCurve      to get the information of the ECC
      * @throws IOException in case the server cannot accept the sockets.
      */
     public ConnectionSubstation(ServerSocket serverSocket, int numberOfMeters, LoadCurve loadCurve) throws IOException {
@@ -70,7 +70,7 @@ public class ConnectionSubstation implements ConnectionSubstationInt {
     @Override
     public List<SMSDatagram> receive() throws IOException {
         List<SMSDatagram> datas = new ArrayList<>();
-        for(Socket socket : socketList) {
+        for (Socket socket : socketList) {
             InputStream in = socket.getInputStream();
             SMSDatagram data = FactoryConstructor.buildDatagramFrom(in, factories);
             datas.add(data);
@@ -84,7 +84,7 @@ public class ConnectionSubstation implements ConnectionSubstationInt {
      */
     @Override
     public void send(SMSDatagram data) throws IOException {
-        for(Socket socket : socketList) {
+        for (Socket socket : socketList) {
             OutputStream out = socket.getOutputStream();
             out.write(data.toByteArray());
         }

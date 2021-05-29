@@ -3,10 +3,6 @@ package cat.udl.cig.sms.crypt;
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeFieldElement;
 import cat.udl.cig.operations.wrapper.HashedAlgorithm;
-import cat.udl.cig.sms.crypt.CypherMessage;
-import cat.udl.cig.sms.crypt.DecipherMessage;
-import cat.udl.cig.sms.crypt.Hash;
-import cat.udl.cig.sms.crypt.HashTest;
 import cat.udl.cig.sms.data.LoadCurve;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,11 +14,11 @@ import java.util.*;
 import static java.math.BigInteger.valueOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DecipherMessageUnitTest implements HashTest {
+public class DecipherImplUnitTest implements HashTest {
 
-    DecipherMessage dec;
+    DecipherImpl dec;
     final LoadCurve loadCurve = new LoadCurve(new File("./data/p192.toml"));
-    CypherMessage cyp;
+    CypherImpl cyp;
     List<BigInteger> mis;
     List<GeneralECPoint> cis;
     BigInteger t = BigInteger.TEN;
@@ -40,8 +36,8 @@ public class DecipherMessageUnitTest implements HashTest {
         s0 = s0.negate().add(order).remainder(order);
         HashedAlgorithm.loadHashedInstance(loadCurve.getGroup().getGenerator(), BigInteger.valueOf(1024 * 1024),
                 BigInteger.valueOf(32));
-        dec = new DecipherMessage(loadCurve, s0);
-        cyp = new CypherMessage(loadCurve, si);
+        dec = new DecipherImpl(loadCurve, s0);
+        cyp = new CypherImpl(loadCurve, si);
     }
 
 

@@ -6,8 +6,8 @@ import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.datagram.BigIntegerDatagram;
 import cat.udl.cig.sms.connection.datagram.GroupElementDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
-import cat.udl.cig.sms.crypt.DecipherMessage;
-import cat.udl.cig.sms.crypt.Decypher;
+import cat.udl.cig.sms.crypt.DecipherImpl;
+import cat.udl.cig.sms.crypt.Decipher;
 import cat.udl.cig.sms.protocol.State;
 import cat.udl.cig.sms.protocol.substation.factories.FactorySubstationState;
 
@@ -22,9 +22,9 @@ import java.util.List;
  */
 public class ConsumptionTransmissionSubstation implements State {
 
-    private Decypher decipher;
-    private FactorySubstationState factorySubstationState;
-    private BigInteger privateKey;
+    private Decipher decipher;
+    private final FactorySubstationState factorySubstationState;
+    private final BigInteger privateKey;
     private final int NUM_BITS = 13;
 
     /**
@@ -34,7 +34,7 @@ public class ConsumptionTransmissionSubstation implements State {
      */
     public ConsumptionTransmissionSubstation(FactorySubstationState factorySubstationState, BigInteger privateKey) {
         this.factorySubstationState = factorySubstationState;
-        decipher = new DecipherMessage(factorySubstationState.getLoadCurve(), privateKey);
+        decipher = new DecipherImpl(factorySubstationState.getLoadCurve(), privateKey);
         this.privateKey = privateKey;
     }
 
@@ -68,9 +68,9 @@ public class ConsumptionTransmissionSubstation implements State {
     }
 
     /**
-     * @param decypher Decypher of the private key
+     * @param decipher Decypher of the private key
      */
-    public void setDecypher(Decypher decypher) {
-        this.decipher = decypher;
+    public void setDecypher(Decipher decipher) {
+        this.decipher = decipher;
     }
 }

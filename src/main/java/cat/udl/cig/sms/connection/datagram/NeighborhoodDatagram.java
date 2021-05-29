@@ -16,7 +16,7 @@ public class NeighborhoodDatagram<T> implements SMSDatagram {
     static private final int LENGTH_BYTES_CERTIFICATE = 8 * Character.BYTES;
 
     /**
-     * @param publicKey y
+     * @param publicKey   y
      * @param certificate String
      */
     public NeighborhoodDatagram(GroupElement publicKey, T certificate) {

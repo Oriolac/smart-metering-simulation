@@ -11,7 +11,7 @@ public interface State {
 
     /**
      * @return the next state of the protocol
-     * @throws IOException in case that the IO fails
+     * @throws IOException          in case that the IO fails
      * @throws NullMessageException in case the message is empty
      */
     State next() throws IOException, NullMessageException;

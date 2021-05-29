@@ -18,7 +18,7 @@ public class KeyEstablishment implements State {
 
     private MeterBusomControllerInt meterBusom;
     private PrimeFieldElement privateKey;
-    private FactoryMeterState factory;
+    private final FactoryMeterState factory;
 
     /**
      * @param factory Factory that has the information of the ECC and connection and
@@ -66,7 +66,7 @@ public class KeyEstablishment implements State {
 
     /**
      * @return the next state, which is ConsumptionTransmission
-     * @throws IOException in case the IO fails.
+     * @throws IOException          in case the IO fails.
      * @throws NullMessageException in case the message is null.
      */
     @Override

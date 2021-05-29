@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * Decipher interface
  */
-public interface Decypher {
+public interface Decipher {
 
     /**
      * decrypts the sum of the messages, given a t to hash

@@ -12,7 +12,7 @@ import java.math.BigInteger;
 /**
  * Implements Cypher, uses Hash
  */
-public class CypherMessage implements Cypher, Hash {
+public class CypherImpl implements Cypher, Hash {
 
     private final PrimeField field;
     private final GeneralEC curve;
@@ -25,7 +25,7 @@ public class CypherMessage implements Cypher, Hash {
      * @param loadCurve  curve to be used for encrypts
      * @param privateKey private key to be used for encrypts
      */
-    public CypherMessage(LoadCurve loadCurve, BigInteger privateKey) {
+    public CypherImpl(LoadCurve loadCurve, BigInteger privateKey) {
         this.curve = loadCurve.getCurve();
         this.grup = loadCurve.getGroup();
         this.field = loadCurve.getField();

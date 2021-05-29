@@ -13,11 +13,11 @@ import java.math.BigInteger;
  */
 public class FactorySubstationState {
 
-    private LoadCurve loadCurve;
-    private ConnectionSubstationInt connection;
+    private final LoadCurve loadCurve;
+    private final ConnectionSubstationInt connection;
 
     /**
-     * @param loadCurve that contains the information of the ECC
+     * @param loadCurve  that contains the information of the ECC
      * @param connection that makes the connection with the smart meters
      */
     public FactorySubstationState(LoadCurve loadCurve, ConnectionSubstationInt connection) {

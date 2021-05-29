@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class DecipherMessage implements Decypher, Hash {
+public class DecipherImpl implements Decipher, Hash {
 
     private final ECPrimeOrderSubgroup grup;
     private final GeneralEC curve;
@@ -23,7 +23,7 @@ public class DecipherMessage implements Decypher, Hash {
     private static final BigInteger ORDER = BigInteger.TWO.pow(20);
 
 
-    public DecipherMessage(LoadCurve loadCurve, BigInteger privateKey) {
+    public DecipherImpl(LoadCurve loadCurve, BigInteger privateKey) {
         this.curve = loadCurve.getCurve();
         this.field = loadCurve.getField();
         this.grup = loadCurve.getGroup();
@@ -87,7 +87,7 @@ public class DecipherMessage implements Decypher, Hash {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DecipherMessage that = (DecipherMessage) o;
+        DecipherImpl that = (DecipherImpl) o;
         return Objects.equals(privateKey, that.privateKey) &&
                 Objects.equals(lambda, that.lambda);
     }

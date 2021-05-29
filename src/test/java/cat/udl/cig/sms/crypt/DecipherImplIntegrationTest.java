@@ -5,8 +5,6 @@ import cat.udl.cig.fields.PrimeFieldElement;
 import cat.udl.cig.operations.wrapper.PollardsLambda;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import cat.udl.cig.sms.crypt.CypherMessage;
-import cat.udl.cig.sms.crypt.DecipherMessage;
 import cat.udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
@@ -18,10 +16,10 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class DecipherMessageIntegrationTest {
+class DecipherImplIntegrationTest {
 
     static final int N = 3;
-    static DecipherMessage dec;
+    static DecipherImpl dec;
     static List<BigInteger> sis;
     static List<GeneralECPoint> cis;
     static BigInteger t = BigInteger.ONE;
@@ -35,7 +33,7 @@ class DecipherMessageIntegrationTest {
         loadCurve = new LoadCurve(new File("./data/p192.toml"));
         createSecretKeys();
         keyEstablishment();
-        dec = new DecipherMessage(loadCurve, s0);
+        dec = new DecipherImpl(loadCurve, s0);
         dec.setLambda(new PollardsLambda(loadCurve.getGroup().getGenerator()));
     }
 
@@ -51,7 +49,7 @@ class DecipherMessageIntegrationTest {
         order = loadCurve.getGroup().getSize();
         s0 = sis.stream().reduce(BigInteger::add).map(s0 -> s0.remainder(order)).get();
         cis = sis.stream()
-                .map((privateKey) -> new CypherMessage(loadCurve, privateKey))
+                .map((privateKey) -> new CypherImpl(loadCurve, privateKey))
                 .map((cyper) -> cyper.encrypt(message, t)).collect(Collectors.toList());
         s0 = s0.negate().add(order).remainder(order);
     }

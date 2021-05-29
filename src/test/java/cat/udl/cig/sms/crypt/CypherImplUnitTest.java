@@ -4,8 +4,6 @@ import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import cat.udl.cig.sms.crypt.CypherMessage;
-import cat.udl.cig.sms.crypt.Hash;
 import cat.udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
@@ -13,15 +11,15 @@ import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class CypherMessageUnitTest implements HashTest {
+class CypherImplUnitTest implements HashTest {
 
 
-    CypherMessage cyp;
+    CypherImpl cyp;
 
     @BeforeEach
     void before() {
         LoadCurve loadCurve = new LoadCurve(new File("./data/p192.toml"));
-        cyp = new CypherMessage(loadCurve, BigInteger.TEN);
+        cyp = new CypherImpl(loadCurve, BigInteger.TEN);
     }
 
 

@@ -9,10 +9,9 @@ import cat.udl.cig.sms.connection.ConnectionSubstation;
 import cat.udl.cig.sms.connection.datagram.BigIntegerDatagram;
 import cat.udl.cig.sms.connection.datagram.GroupElementDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
-import cat.udl.cig.sms.crypt.Decypher;
+import cat.udl.cig.sms.crypt.Decipher;
 import cat.udl.cig.sms.data.LoadCurve;
 import cat.udl.cig.sms.protocol.substation.factories.FactorySubstationState;
-import cat.udl.cig.sms.protocol.substation.states.ConsumptionTransmissionSubstation;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -34,7 +33,7 @@ class ConsumptionTransmissionSubstationTest {
 
     @BeforeEach
     void setUp() {
-        Decypher decipher = Mockito.mock(Decypher.class);
+        Decipher decipher = Mockito.mock(Decipher.class);
         Mockito.when(decipher.decrypt(Mockito.any(), Mockito.any(BigInteger.class)))
                 .then((Answer<Optional<BigInteger>>) invoc -> Optional.of(MESSAGE));
         connection = Mockito.mock(ConnectionSubstation.class);

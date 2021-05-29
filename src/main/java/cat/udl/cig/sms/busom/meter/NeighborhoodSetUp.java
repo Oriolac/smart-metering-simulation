@@ -25,7 +25,7 @@ public class NeighborhoodSetUp implements BusomState {
     private final LoadCurve loadCurve;
     private ConnectionMeterInt connection;
     private GroupElement generalKey;
-    private GroupElement generator;
+    private final GroupElement generator;
     private ReceiverMeter receiverMeter;
     private CertificateValidation<String> validation;
 

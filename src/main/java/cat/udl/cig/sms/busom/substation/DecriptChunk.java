@@ -27,7 +27,7 @@ public class DecriptChunk implements BusomState {
     private final HomomorphicCiphertext ciphertext;
     private ConnectionSubstationInt connection;
     private LogarithmAlgorithm logarithm;
-    private MultiplicativeSubgroup group;
+    private final MultiplicativeSubgroup group;
     private GroupElement partialDecryption;
     private ReceiverSubstation receiver;
     private static final Logger LOGGER = Logger.getAnonymousLogger();
