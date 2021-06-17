@@ -1,18 +1,14 @@
 package cat.udl.cig.sms.connection;
 
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
-import cat.udl.cig.sms.connection.factory.FactoryConstructor;
-import cat.udl.cig.sms.connection.factory.FactorySMSDatagram;
-import cat.udl.cig.sms.data.LoadCurve;
-import cat.udl.cig.sms.data.LoadSocket;
+import cat.udl.cig.sms.connection.serializer.SerializerRepository;
+import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
-
-import static cat.udl.cig.sms.connection.factory.FactoryConstructor.constructFactories;
 
 /**
  * The meter's connection
@@ -22,29 +18,30 @@ public class ConnectionMeter implements ConnectionMeterInt {
     private final DataOutputStream out;
     private final DataInputStream in;
     private Socket socket;
-    private final FactorySMSDatagram[] factories;
+    private final SerializerRepository serializerRepository
+            ;
 
     /**
      * @param file      of the configuration of the port and meters
      * @param loadcurve get the information of the ECC
      * @throws IOException in case IO fails
      */
-    public ConnectionMeter(File file, LoadCurve loadcurve) throws IOException {
-        socket = LoadSocket.tomlToSocket(file);
+    public ConnectionMeter(File file, CurveConfiguration loadcurve) throws IOException {
+        socket = SocketReader.tomlToSocket(file);
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
-        factories = constructFactories(loadcurve);
+        serializerRepository = SerializerRepository.getSerializerRepository(loadcurve);
     }
 
     /**
      * @param in        to receive the data
      * @param out       to send the data
-     * @param loadCurve to have all the information of the ECC
+     * @param curveConfiguration to have all the information of the ECC
      */
-    protected ConnectionMeter(DataInputStream in, DataOutputStream out, LoadCurve loadCurve) {
+    protected ConnectionMeter(DataInputStream in, DataOutputStream out, CurveConfiguration curveConfiguration) {
         this.in = in;
         this.out = out;
-        factories = constructFactories(loadCurve);
+        serializerRepository = SerializerRepository.getSerializerRepository(curveConfiguration);
     }
 
 
@@ -54,7 +51,7 @@ public class ConnectionMeter implements ConnectionMeterInt {
      */
     @Override
     public SMSDatagram receive() throws IOException {
-        return FactoryConstructor.buildDatagramFrom(in, factories);
+        return this.serializerRepository.buildDatagramFromInput(in);
     }
 
     /**

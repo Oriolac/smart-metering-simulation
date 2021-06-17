@@ -9,7 +9,7 @@ import cat.udl.cig.sms.connection.ConnectionMeterInt;
 import cat.udl.cig.sms.connection.ReceiverMeter;
 import cat.udl.cig.sms.connection.datagram.NeighborhoodDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
-import cat.udl.cig.sms.data.LoadCurve;
+import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -22,7 +22,7 @@ public class NeighborhoodSetUp implements BusomState {
 
 
     private final BigInteger privateKey;
-    private final LoadCurve loadCurve;
+    private final CurveConfiguration curveConfiguration;
     private ConnectionMeterInt connection;
     private GroupElement generalKey;
     private final GroupElement generator;
@@ -33,12 +33,12 @@ public class NeighborhoodSetUp implements BusomState {
      * Sets up the Neighborhood set up
      *
      * @param privateKey Private key of the meter
-     * @param loadCurve  curve to be used to encrypt and decrypt
+     * @param curveConfiguration  curve to be used to encrypt and decrypt
      */
-    protected NeighborhoodSetUp(BigInteger privateKey, LoadCurve loadCurve) {
+    protected NeighborhoodSetUp(BigInteger privateKey, CurveConfiguration curveConfiguration) {
         this.privateKey = privateKey;
-        this.loadCurve = loadCurve;
-        this.generator = loadCurve.getGroup().getGenerator();
+        this.curveConfiguration = curveConfiguration;
+        this.generator = curveConfiguration.getGroup().getGenerator();
         this.validation = new CertificateTrueMock<>();
     }
 
@@ -46,11 +46,11 @@ public class NeighborhoodSetUp implements BusomState {
      * Sets up the Neighborhood set up
      *
      * @param privateKey Private key of the meter
-     * @param loadCurve  curve to be used to encrypt and decrypt
+     * @param curveConfiguration  curve to be used to encrypt and decrypt
      * @param connection connection to communicate to the substation
      */
-    protected NeighborhoodSetUp(BigInteger privateKey, LoadCurve loadCurve, ConnectionMeterInt connection) {
-        this(privateKey, loadCurve);
+    protected NeighborhoodSetUp(BigInteger privateKey, CurveConfiguration curveConfiguration, ConnectionMeterInt connection) {
+        this(privateKey, curveConfiguration);
         this.connection = connection;
         this.receiverMeter = connection;
     }
@@ -65,7 +65,7 @@ public class NeighborhoodSetUp implements BusomState {
     public BusomState next() throws IOException {
         receivePublicKeysAndCertificates();
         MeterKey meterKey = new MeterKey(privateKey, generalKey);
-        return new SendChunk(meterKey, loadCurve, connection);
+        return new SendChunk(meterKey, curveConfiguration, connection);
     }
 
     /**

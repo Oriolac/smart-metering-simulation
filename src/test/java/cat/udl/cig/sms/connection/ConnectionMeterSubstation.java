@@ -2,12 +2,9 @@ package cat.udl.cig.sms.connection;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import cat.udl.cig.sms.connection.ConnectionMeter;
-import cat.udl.cig.sms.connection.ConnectionSubstation;
 import cat.udl.cig.sms.connection.datagram.EndOfDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
-import cat.udl.cig.sms.data.LoadCurve;
-import cat.udl.cig.sms.data.LoadSocket;
+import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,24 +20,24 @@ class ConnectionMeterSubstation {
     private static ConnectionSubstation connectionSubstation;
     private static List<ConnectionMeter> connectionMeters;
     private static File fileSubst;
-    private static LoadCurve loadCurve;
+    private static CurveConfiguration curveConfiguration;
 
     @BeforeAll
     static void setUp() throws IOException {
         fileSubst = new File("./data/test/substation4.toml");
-        loadCurve = new LoadCurve(new File("./data/p192.toml"));
+        curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
 
-        ServerSocket server = LoadSocket.tomlToServerSocket(fileSubst);
-        int numberOfMeters = LoadSocket.getNumberOfMeters(fileSubst);
+        ServerSocket server = SocketReader.tomlToServerSocket(fileSubst);
+        int numberOfMeters = SocketReader.getNumberOfMeters(fileSubst);
         connectionMeters = new ArrayList<>();
         for(int i = 0; i < numberOfMeters; i++)
-            connectionMeters.add(new ConnectionMeter(fileSubst, loadCurve));
-        connectionSubstation = new ConnectionSubstation(server, numberOfMeters, loadCurve);
+            connectionMeters.add(new ConnectionMeter(fileSubst, curveConfiguration));
+        connectionSubstation = new ConnectionSubstation(server, numberOfMeters, curveConfiguration);
     }
 
     @Test
     void IOExceptionTest() {
-        assertThrows(IOException.class, () -> new ConnectionSubstation(fileSubst, loadCurve));
+        assertThrows(IOException.class, () -> new ConnectionSubstation(fileSubst, curveConfiguration));
     }
 
     @Test

@@ -5,9 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import cat.udl.cig.sms.busom.meter.doubles.SenderSpy;
 import cat.udl.cig.sms.busom.BusomState;
-import cat.udl.cig.sms.busom.meter.BusomSetUp;
-import cat.udl.cig.sms.busom.meter.NeighborhoodSetUp;
-import cat.udl.cig.sms.data.LoadCurve;
+import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,12 +16,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class BusomSetUpTest {
 
     BusomSetUp busomSetUp;
-    LoadCurve loadCurve;
+    CurveConfiguration curveConfiguration;
 
     @BeforeEach
     void setUp() {
-        loadCurve = new LoadCurve(new File("./data/p192.toml"));
-        busomSetUp = new BusomSetUp("AESD-123456", loadCurve);
+        curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
+        busomSetUp = new BusomSetUp("AESD-123456", curveConfiguration);
     }
 
     @Test
@@ -52,7 +50,7 @@ class BusomSetUpTest {
         busomSetUp.calculatePublicKey();
         GroupElement publicKey = busomSetUp.getPublicKey();
         BigInteger privateKey = busomSetUp.getPrivateKey();
-        assertEquals(loadCurve.getGroup().getGenerator().pow(privateKey), publicKey);
+        assertEquals(curveConfiguration.getGroup().getGenerator().pow(privateKey), publicKey);
     }
 
     @Test

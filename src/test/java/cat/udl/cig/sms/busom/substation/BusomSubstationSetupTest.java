@@ -6,12 +6,10 @@ import org.junit.jupiter.api.Test;
 import cat.udl.cig.sms.busom.BusomState;
 import cat.udl.cig.sms.busom.certificate.CertificateTrueMock;
 import cat.udl.cig.sms.busom.meter.doubles.SenderSpy;
-import cat.udl.cig.sms.busom.substation.BusomSubstationSetup;
-import cat.udl.cig.sms.busom.substation.ReceiveChunk;
 import cat.udl.cig.sms.connection.ReceiverSubstation;
 import cat.udl.cig.sms.connection.datagram.NeighborhoodDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
-import cat.udl.cig.sms.data.LoadCurve;
+import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,15 +22,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BusomSubstationSetupTest {
 
     BusomSubstationSetup substationSetup;
-    LoadCurve loadCurve;
+    CurveConfiguration curveConfiguration;
     ReceiverSpy receiverSpy;
 
     @BeforeEach
     void setUp() {
-        loadCurve = new LoadCurve(new File("./data/p192.toml"));
-        substationSetup = new BusomSubstationSetup(loadCurve.getGroup());
+        curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
+        substationSetup = new BusomSubstationSetup(curveConfiguration.getGroup());
         substationSetup.setValidation(new CertificateTrueMock<>());
-        receiverSpy = new ReceiverSpy(loadCurve.getGroup().getGenerator());
+        receiverSpy = new ReceiverSpy(curveConfiguration.getGroup().getGenerator());
         substationSetup.setReceiver(receiverSpy);
     }
 
@@ -57,7 +55,7 @@ class BusomSubstationSetupTest {
         substationSetup.setSender(senderSpy);
         List<NeighborhoodDatagram<String>> datagrams = new ArrayList<>();
         for (int i = 0; i < numberOfNHDatagrams; i++)
-            datagrams.add(new NeighborhoodDatagram<>(loadCurve.getGroup().getGenerator(), ""));
+            datagrams.add(new NeighborhoodDatagram<>(curveConfiguration.getGroup().getGenerator(), ""));
         substationSetup.setDatagrams(datagrams);
         substationSetup.sendPublicKey();
         assertEquals(numberOfNHDatagrams + 1, senderSpy.getCount());

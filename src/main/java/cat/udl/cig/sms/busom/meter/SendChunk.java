@@ -3,6 +3,7 @@ package cat.udl.cig.sms.busom.meter;
 import cat.udl.cig.cryptography.cryptosystems.ElGamalCypher;
 import cat.udl.cig.cryptography.cryptosystems.HomomorphicCypher;
 import cat.udl.cig.cryptography.cryptosystems.ciphertexts.ElGamalCiphertext;
+import cat.udl.cig.cryptography.cryptosystems.ciphertexts.HomomorphicCiphertext;
 import cat.udl.cig.fields.GroupElement;
 import cat.udl.cig.sms.busom.BusomState;
 import cat.udl.cig.sms.busom.NullMessageException;
@@ -10,7 +11,7 @@ import cat.udl.cig.sms.busom.data.MeterKey;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
 import cat.udl.cig.sms.connection.Sender;
 import cat.udl.cig.sms.connection.datagram.CipherTextDatagram;
-import cat.udl.cig.sms.data.LoadCurve;
+import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -22,23 +23,23 @@ import java.util.Random;
 public class SendChunk implements BusomState {
 
     private final GroupElement generator;
-    private final LoadCurve loadCurve;
+    private final CurveConfiguration curveConfiguration;
     private final MeterKey meterKey;
     private ConnectionMeterInt connection;
     private BigInteger message;
     private Sender sender;
     private HomomorphicCypher cypher;
-    private ElGamalCiphertext ciphertext;
+    private HomomorphicCiphertext ciphertext;
 
     /**
      * Constructs the sender
      *
      * @param meterKey  Parameter containing information to encrypt in this meter
-     * @param loadCurve Parameters of the ECC curve.
+     * @param curveConfiguration Parameters of the ECC curve.
      */
-    protected SendChunk(MeterKey meterKey, LoadCurve loadCurve) {
-        this.loadCurve = loadCurve;
-        this.generator = loadCurve.getGroup().getGenerator();
+    protected SendChunk(MeterKey meterKey, CurveConfiguration curveConfiguration) {
+        this.curveConfiguration = curveConfiguration;
+        this.generator = curveConfiguration.getGroup().getGenerator();
         this.meterKey = meterKey;
     }
 
@@ -46,11 +47,11 @@ public class SendChunk implements BusomState {
      * Constructs the sender
      *
      * @param meterKey   Parameter containing information to encrypt in this meter
-     * @param loadCurve  Parameters of the ECC curve.
+     * @param curveConfiguration  Parameters of the ECC curve.
      * @param connection connection to the substation.
      */
-    protected SendChunk(MeterKey meterKey, LoadCurve loadCurve, ConnectionMeterInt connection) {
-        this(meterKey, loadCurve);
+    protected SendChunk(MeterKey meterKey, CurveConfiguration curveConfiguration, ConnectionMeterInt connection) {
+        this(meterKey, curveConfiguration);
         this.connection = connection;
         this.sender = connection;
     }
@@ -69,10 +70,10 @@ public class SendChunk implements BusomState {
         if (message == null)
             throw new NullMessageException();
         GroupElement point = this.generator.pow(message.add(noise));
-        cypher = new ElGamalCypher(loadCurve.getGroup(), generator, meterKey.getGeneralKey());
-        ciphertext = (ElGamalCiphertext) cypher.encrypt(point);
+        cypher = new ElGamalCypher(curveConfiguration.getGroup(), generator, meterKey.getGeneralKey());
+        ciphertext = cypher.encrypt(point);
         sendCypherText();
-        return new SendPartialDecryption(meterKey, noise, loadCurve, connection);
+        return new SendPartialDecryption(meterKey, noise, curveConfiguration, connection);
     }
 
     /**

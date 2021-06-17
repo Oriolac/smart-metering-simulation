@@ -10,12 +10,10 @@ import cat.udl.cig.operations.wrapper.BruteForce;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import cat.udl.cig.sms.busom.BusomState;
-import cat.udl.cig.sms.busom.substation.DecriptChunk;
-import cat.udl.cig.sms.busom.substation.ReceiveChunk;
 import cat.udl.cig.sms.connection.ReceiverSubstation;
 import cat.udl.cig.sms.connection.datagram.GroupElementDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
-import cat.udl.cig.sms.data.LoadCurve;
+import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,17 +30,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DecriptChunkTest {
 
     DecriptChunk currentState;
-    LoadCurve loadCurve;
+    CurveConfiguration curveConfiguration;
     ReceiverSpy receiverSpy;
 
     @BeforeEach
     void setUp() {
-        loadCurve = new LoadCurve(new File("./data/p192.toml"));
-        receiverSpy = new ReceiverSpy(loadCurve);
+        curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
+        receiverSpy = new ReceiverSpy(curveConfiguration);
         ElGamalCiphertext ciphertext = new ElGamalCiphertext(receiverSpy.getPoints("6209844826947604790038975056267208146258025268519512417642",
                 "2994524308329009013576298176683420492475513562601889388197", "3322243116407084751555570864568066673271311194669141092600",
                 "3196076688455990248772493899225500830789111078873298446819"));
-        currentState = new DecriptChunk(loadCurve.getGroup(), ciphertext);
+        currentState = new DecriptChunk(curveConfiguration.getGroup(), ciphertext);
         currentState.setReceiver(receiverSpy);
     }
 
@@ -56,18 +54,18 @@ class DecriptChunkTest {
     void receiveAndCompute() throws IOException {
         currentState.receiveAndCompute();
         assertEquals(1, receiverSpy.getCount());
-        assertEquals(loadCurve.getGroup().getGenerator().pow(BigInteger.valueOf(6L)),currentState.getPartialDecryption())
+        assertEquals(curveConfiguration.getGroup().getGenerator().pow(BigInteger.valueOf(6L)),currentState.getPartialDecryption())
         ;
     }
 
     @Test
     void readMessage() {
-        GeneralECPoint generator = loadCurve.getGroup().getGenerator();
+        GeneralECPoint generator = curveConfiguration.getGroup().getGenerator();
         BigInteger message = BigInteger.valueOf(6L);
         GeneralECPoint partialDecryption = generator.pow(message);
         currentState.setPartialDecryption(partialDecryption);
         assertEquals(Optional.of(message), currentState.readMessage());
-        currentState.setLogarithm(new BruteForce(loadCurve.getGroup().getGenerator()));
+        currentState.setLogarithm(new BruteForce(curveConfiguration.getGroup().getGenerator()));
         assertEquals(Optional.of(message), currentState.readMessage());
     }
 
@@ -79,11 +77,11 @@ class DecriptChunkTest {
         private HashMap<Integer, GroupElement> elements;
         private ECPrimeOrderSubgroup group;
 
-        protected ReceiverSpy(LoadCurve loadCurve) {
+        protected ReceiverSpy(CurveConfiguration curveConfiguration) {
             this.count = 0;
-            curve = loadCurve.getCurve();
-            group = loadCurve.getGroup();
-            field = loadCurve.getField();
+            curve = curveConfiguration.getCurve();
+            group = curveConfiguration.getGroup();
+            field = curveConfiguration.getField();
             elements = new HashMap<>();
             addGroupElements();
         }

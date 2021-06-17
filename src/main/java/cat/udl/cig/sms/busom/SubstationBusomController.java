@@ -3,7 +3,7 @@ package cat.udl.cig.sms.busom;
 import cat.udl.cig.sms.busom.substation.BusomSubstationSetup;
 import cat.udl.cig.sms.busom.substation.DecriptChunk;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
-import cat.udl.cig.sms.data.LoadCurve;
+import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -21,12 +21,12 @@ public class SubstationBusomController implements SubstationBusomControllerInt {
     /**
      * Generates a Substation Busom Controller.
      *
-     * @param loadCurve  loads the ECC curve used for the protocol
+     * @param curveConfiguration  loads the ECC curve used for the protocol
      * @param connection to all the meters
      */
-    public SubstationBusomController(LoadCurve loadCurve, ConnectionSubstationInt connection) {
-        this.state = new BusomSubstationSetup(loadCurve.getGroup(), connection);
-        int bits = loadCurve.getField().getSize().bitLength();
+    public SubstationBusomController(CurveConfiguration curveConfiguration, ConnectionSubstationInt connection) {
+        this.state = new BusomSubstationSetup(curveConfiguration.getGroup(), connection);
+        int bits = curveConfiguration.getField().getSize().bitLength();
         this.numberOfChunks = bits / 13 + ((bits % 13 == 0) ? 0 : 1);
     }
 

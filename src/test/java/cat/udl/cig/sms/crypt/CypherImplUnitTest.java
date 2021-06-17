@@ -4,7 +4,6 @@ import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import cat.udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -18,8 +17,8 @@ class CypherImplUnitTest implements HashTest {
 
     @BeforeEach
     void before() {
-        LoadCurve loadCurve = new LoadCurve(new File("./data/p192.toml"));
-        cyp = new CypherImpl(loadCurve, BigInteger.TEN);
+        CurveConfiguration curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
+        cyp = new CypherImpl(curveConfiguration, BigInteger.TEN);
     }
 
 

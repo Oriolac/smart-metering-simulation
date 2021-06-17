@@ -3,7 +3,7 @@ package cat.udl.cig.sms.busom;
 import cat.udl.cig.sms.busom.meter.BusomSetUp;
 import cat.udl.cig.sms.busom.meter.SendChunk;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
-import cat.udl.cig.sms.data.LoadCurve;
+import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -22,11 +22,11 @@ public class MeterBusomController implements MeterBusomControllerInt {
      * Generates a meter busom controller
      *
      * @param certificate certificate of the meter
-     * @param loadCurve   parameters of the ECC curve
+     * @param curveConfiguration   parameters of the ECC curve
      * @param connection  to the substation.
      */
-    public MeterBusomController(String certificate, LoadCurve loadCurve, ConnectionMeterInt connection) {
-        this.state = new BusomSetUp(certificate, loadCurve, connection);
+    public MeterBusomController(String certificate, CurveConfiguration curveConfiguration, ConnectionMeterInt connection) {
+        this.state = new BusomSetUp(certificate, curveConfiguration, connection);
     }
 
     /**
@@ -43,13 +43,13 @@ public class MeterBusomController implements MeterBusomControllerInt {
     /**
      * Generates a meter busom Controller. Used for testing
      *
-     * @param loadCurve  parameters of the ECC curve
+     * @param curveConfiguration  parameters of the ECC curve
      * @param connection to the substation.
      * @throws IOException          if connection fails.
      * @throws NullMessageException Never throws this exception
      */
-    public MeterBusomController(LoadCurve loadCurve, ConnectionMeterInt connection) throws IOException, NullMessageException {
-        this.state = new BusomSetUp("", loadCurve, connection);
+    public MeterBusomController(CurveConfiguration curveConfiguration, ConnectionMeterInt connection) throws IOException, NullMessageException {
+        this.state = new BusomSetUp("", curveConfiguration, connection);
         this.state = state.next();
     }
 

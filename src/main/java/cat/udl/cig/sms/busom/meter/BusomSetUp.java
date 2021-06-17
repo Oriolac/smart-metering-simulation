@@ -5,7 +5,7 @@ import cat.udl.cig.sms.busom.BusomState;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
 import cat.udl.cig.sms.connection.Sender;
 import cat.udl.cig.sms.connection.datagram.NeighborhoodDatagram;
-import cat.udl.cig.sms.data.LoadCurve;
+import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -19,7 +19,7 @@ public class BusomSetUp implements BusomState {
 
     private final GroupElement generator;
     private final String certificate;
-    private final LoadCurve loadCurve;
+    private final CurveConfiguration curveConfiguration;
     private ConnectionMeterInt connection;
     private BigInteger privateKey;
     private GroupElement publicKey;
@@ -29,25 +29,25 @@ public class BusomSetUp implements BusomState {
      * Sets up the state.
      *
      * @param certificate certificate to validate the point in the meter
-     * @param loadCurve   The curve and all the parameters needed to encrypt
+     * @param curveConfiguration   The curve and all the parameters needed to encrypt
      *                    and decrypt data.
      */
-    public BusomSetUp(String certificate, LoadCurve loadCurve) {
+    public BusomSetUp(String certificate, CurveConfiguration curveConfiguration) {
         this.certificate = certificate;
-        this.loadCurve = loadCurve;
-        this.generator = loadCurve.getGroup().getGenerator();
+        this.curveConfiguration = curveConfiguration;
+        this.generator = curveConfiguration.getGroup().getGenerator();
     }
 
     /**
      * Sets up the state.
      *
      * @param certificate certificate to validate the point in the meter
-     * @param loadCurve   The curve and all the parameters needed to encrypt
+     * @param curveConfiguration   The curve and all the parameters needed to encrypt
      *                    and decrypt data.
      * @param connection  connection to the substation.
      */
-    public BusomSetUp(String certificate, LoadCurve loadCurve, ConnectionMeterInt connection) {
-        this(certificate, loadCurve);
+    public BusomSetUp(String certificate, CurveConfiguration curveConfiguration, ConnectionMeterInt connection) {
+        this(certificate, curveConfiguration);
         this.connection = connection;
         sender = connection;
     }
@@ -64,7 +64,7 @@ public class BusomSetUp implements BusomState {
         generatePrivateKey();
         calculatePublicKey();
         sendPublicKey();
-        return new NeighborhoodSetUp(privateKey, loadCurve, connection);
+        return new NeighborhoodSetUp(privateKey, curveConfiguration, connection);
     }
 
     /**

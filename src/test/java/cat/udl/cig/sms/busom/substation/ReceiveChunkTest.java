@@ -11,12 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import cat.udl.cig.sms.busom.BusomState;
 import cat.udl.cig.sms.busom.meter.doubles.SenderSpy;
-import cat.udl.cig.sms.busom.substation.DecriptChunk;
-import cat.udl.cig.sms.busom.substation.ReceiveChunk;
 import cat.udl.cig.sms.connection.ReceiverSubstation;
 import cat.udl.cig.sms.connection.datagram.CipherTextDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
-import cat.udl.cig.sms.data.LoadCurve;
+import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,16 +29,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReceiveChunkTest {
 
-    LoadCurve loadCurve;
+    CurveConfiguration curveConfiguration;
     ReceiveChunk currentState;
     ReceiverSpy receiver;
     SenderSpy senderSpy;
 
     @BeforeEach
     void setUp() {
-        loadCurve = new LoadCurve(new File("./data/p192.toml"));
-        currentState = new ReceiveChunk(loadCurve.getGroup());
-        receiver = new ReceiverSpy(loadCurve);
+        curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
+        currentState = new ReceiveChunk(curveConfiguration.getGroup());
+        receiver = new ReceiverSpy(curveConfiguration);
         currentState.setReceiver(receiver);
         senderSpy = new SenderSpy();
         currentState.setSender(senderSpy);
@@ -83,12 +81,12 @@ class ReceiveChunkTest {
         private int count;
         private HashMap<Integer, HomomorphicCiphertext> ciphertexts;
 
-        protected ReceiverSpy(LoadCurve loadCurve) {
+        protected ReceiverSpy(CurveConfiguration curveConfiguration) {
             this.count = 0;
             ciphertexts = new HashMap<>();
-            curve = loadCurve.getCurve();
-            group = loadCurve.getGroup();
-            field = loadCurve.getField();
+            curve = curveConfiguration.getCurve();
+            group = curveConfiguration.getGroup();
+            field = curveConfiguration.getField();
             addCipherTexts();
         }
 

@@ -5,7 +5,6 @@ import cat.udl.cig.fields.PrimeFieldElement;
 import cat.udl.cig.operations.wrapper.PollardsLambda;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import cat.udl.cig.sms.data.LoadCurve;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -26,15 +25,15 @@ class DecipherImplIntegrationTest {
     static BigInteger message = new BigInteger("9");
     static BigInteger s0;
     static BigInteger order;
-    static LoadCurve loadCurve;
+    static CurveConfiguration curveConfiguration;
 
     @BeforeAll
     static void createDecipher() {
-        loadCurve = new LoadCurve(new File("./data/p192.toml"));
+        curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
         createSecretKeys();
         keyEstablishment();
-        dec = new DecipherImpl(loadCurve, s0);
-        dec.setLambda(new PollardsLambda(loadCurve.getGroup().getGenerator()));
+        dec = new DecipherImpl(curveConfiguration, s0);
+        dec.setLambda(new PollardsLambda(curveConfiguration.getGroup().getGenerator()));
     }
 
     static void createSecretKeys() {
@@ -46,10 +45,10 @@ class DecipherImplIntegrationTest {
 
     static void keyEstablishment() {
         cis = new LinkedList<>();
-        order = loadCurve.getGroup().getSize();
+        order = curveConfiguration.getGroup().getSize();
         s0 = sis.stream().reduce(BigInteger::add).map(s0 -> s0.remainder(order)).get();
         cis = sis.stream()
-                .map((privateKey) -> new CypherImpl(loadCurve, privateKey))
+                .map((privateKey) -> new CypherImpl(curveConfiguration, privateKey))
                 .map((cyper) -> cyper.encrypt(message, t)).collect(Collectors.toList());
         s0 = s0.negate().add(order).remainder(order);
     }
@@ -85,7 +84,7 @@ class DecipherImplIntegrationTest {
 
 
     static private PrimeFieldElement generateSi() {
-        return loadCurve.getField().getRandomElement();
+        return curveConfiguration.getField().getRandomElement();
 
     }
 }

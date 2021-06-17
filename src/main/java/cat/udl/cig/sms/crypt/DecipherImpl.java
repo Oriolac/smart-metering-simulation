@@ -6,7 +6,6 @@ import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeField;
 import cat.udl.cig.operations.wrapper.BruteForce;
 import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
-import cat.udl.cig.sms.data.LoadCurve;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -23,10 +22,10 @@ public class DecipherImpl implements Decipher, Hash {
     private static final BigInteger ORDER = BigInteger.TWO.pow(20);
 
 
-    public DecipherImpl(LoadCurve loadCurve, BigInteger privateKey) {
-        this.curve = loadCurve.getCurve();
-        this.field = loadCurve.getField();
-        this.grup = loadCurve.getGroup();
+    public DecipherImpl(CurveConfiguration curveConfiguration, BigInteger privateKey) {
+        this.curve = curveConfiguration.getCurve();
+        this.field = curveConfiguration.getField();
+        this.grup = curveConfiguration.getGroup();
         //lambda = HashedAlgorithm.getHashedInstance();
         lambda = new BruteForce(grup.getGenerator());
         this.privateKey = privateKey;

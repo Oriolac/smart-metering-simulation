@@ -3,7 +3,6 @@ package cat.udl.cig.sms.crypt;
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeFieldElement;
 import cat.udl.cig.operations.wrapper.HashedAlgorithm;
-import cat.udl.cig.sms.data.LoadCurve;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class DecipherImplUnitTest implements HashTest {
 
     DecipherImpl dec;
-    final LoadCurve loadCurve = new LoadCurve(new File("./data/p192.toml"));
+    final CurveConfiguration curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
     CypherImpl cyp;
     List<BigInteger> mis;
     List<GeneralECPoint> cis;
@@ -29,15 +28,15 @@ public class DecipherImplUnitTest implements HashTest {
         BigInteger s0 = BigInteger.ZERO;
         mis = new ArrayList<>(Collections.singletonList(valueOf(4)));
         cis = new LinkedList<>();
-        BigInteger order = loadCurve.getGroup().getSize();
+        BigInteger order = curveConfiguration.getGroup().getSize();
         si = generateSi().getIntValue();
         s0 = s0.add(si).remainder(order);
 
         s0 = s0.negate().add(order).remainder(order);
-        HashedAlgorithm.loadHashedInstance(loadCurve.getGroup().getGenerator(), BigInteger.valueOf(1024 * 1024),
+        HashedAlgorithm.loadHashedInstance(curveConfiguration.getGroup().getGenerator(), BigInteger.valueOf(1024 * 1024),
                 BigInteger.valueOf(32));
-        dec = new DecipherImpl(loadCurve, s0);
-        cyp = new CypherImpl(loadCurve, si);
+        dec = new DecipherImpl(curveConfiguration, s0);
+        cyp = new CypherImpl(curveConfiguration, si);
     }
 
 
@@ -48,10 +47,10 @@ public class DecipherImplUnitTest implements HashTest {
 
     @Test
     public void decryptUsingMockLambda() {
-        assertEquals(loadCurve.getGroup().getGenerator(), dec.getLambda().getAlpha());
+        assertEquals(curveConfiguration.getGroup().getGenerator(), dec.getLambda().getAlpha());
         GeneralECPoint ci = cyp.encrypt(mis.get(0), t);
         cis.add(ci);
-        assertEquals(Optional.of(loadCurve.getGroup().getGenerator().pow(valueOf(4L))), dec.getBeta(cis, t));
+        assertEquals(Optional.of(curveConfiguration.getGroup().getGenerator().pow(valueOf(4L))), dec.getBeta(cis, t));
         Optional<BigInteger> m; //= dec.decrypt(cis, t);
         m = dec.getLambda().algorithm(dec.getGroup().getGenerator().pow(valueOf(4L)));
         Optional<BigInteger> mExpected = mis.stream().reduce(BigInteger::add);
@@ -61,7 +60,7 @@ public class DecipherImplUnitTest implements HashTest {
     @Test
     public void getBeta() {
         List<GeneralECPoint> points = new ArrayList<>();
-        GeneralECPoint generator = loadCurve.getGroup().getGenerator();
+        GeneralECPoint generator = curveConfiguration.getGroup().getGenerator();
         BigInteger time = BigInteger.ONE;
         List<Long> misint = new ArrayList<>(List.of(56L, 60L));
         List<GeneralECPoint> cis = new ArrayList<>();
@@ -72,7 +71,7 @@ public class DecipherImplUnitTest implements HashTest {
     }
 
     private PrimeFieldElement generateSi() {
-        return loadCurve.getField().getRandomElement();
+        return curveConfiguration.getField().getRandomElement();
 
     }
 }

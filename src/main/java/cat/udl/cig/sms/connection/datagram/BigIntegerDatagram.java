@@ -10,10 +10,10 @@ import java.util.Objects;
  */
 public class BigIntegerDatagram implements SMSDatagram {
 
-    private final BigInteger temporal;
+    private final BigInteger bigInteger;
 
-    public BigIntegerDatagram(BigInteger temporal) {
-        this.temporal = temporal;
+    public BigIntegerDatagram(BigInteger bigInteger) {
+        this.bigInteger = bigInteger;
     }
 
     /**
@@ -23,7 +23,7 @@ public class BigIntegerDatagram implements SMSDatagram {
     public byte[] toByteArray() {
         byte[] bytes = new byte[4];
         bytes[0] = (byte) Datagrams.BIG_INTEGER_DATAGRAM.ordinal();
-        byte[] temp = this.temporal.toByteArray();
+        byte[] temp = this.bigInteger.toByteArray();
         System.arraycopy(temp, 0, bytes, bytes.length - temp.length, temp.length);
         return bytes;
     }
@@ -31,8 +31,8 @@ public class BigIntegerDatagram implements SMSDatagram {
     /**
      * @return the BigInteger
      */
-    public BigInteger getTemporal() {
-        return temporal;
+    public BigInteger getBigInteger() {
+        return bigInteger;
     }
 
     @Override
@@ -40,18 +40,18 @@ public class BigIntegerDatagram implements SMSDatagram {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BigIntegerDatagram that = (BigIntegerDatagram) o;
-        return Objects.equals(temporal, that.temporal);
+        return Objects.equals(bigInteger, that.bigInteger);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(temporal);
+        return Objects.hash(bigInteger);
     }
 
     @Override
     public String toString() {
         return "BigIntegerDatagram{" +
-                "temporal=" + temporal +
+                "temporal=" + bigInteger +
                 '}';
     }
 }

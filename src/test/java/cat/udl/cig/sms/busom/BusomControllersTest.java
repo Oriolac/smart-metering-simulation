@@ -3,13 +3,10 @@ package cat.udl.cig.sms.busom;
 import cat.udl.cig.operations.wrapper.HashedAlgorithm;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import cat.udl.cig.sms.busom.MeterBusomController;
-import cat.udl.cig.sms.busom.NullMessageException;
-import cat.udl.cig.sms.busom.SubstationBusomController;
 import cat.udl.cig.sms.connection.ConnectionMeter;
 import cat.udl.cig.sms.connection.ConnectionSubstation;
-import cat.udl.cig.sms.data.LoadCurve;
-import cat.udl.cig.sms.data.LoadSocket;
+import cat.udl.cig.sms.crypt.CurveConfiguration;
+import cat.udl.cig.sms.connection.SocketReader;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,21 +25,21 @@ class BusomControllersTest {
     private static ConnectionSubstation connectionSubstation;
     private static List<ConnectionMeter> connectionMeters;
     private static File fileSubst;
-    private static LoadCurve loadCurve;
+    private static CurveConfiguration curveConfiguration;
 
     @BeforeAll
     static void setUp() throws IOException, NullMessageException {
         fileSubst = new File("./data/test/substation3.toml");
-        loadCurve = new LoadCurve(new File("./data/p192.toml"));
-        HashedAlgorithm.loadHashedInstance(loadCurve.getGroup().getGenerator(), BigInteger.valueOf(1024 * 1024),
+        curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
+        HashedAlgorithm.loadHashedInstance(curveConfiguration.getGroup().getGenerator(), BigInteger.valueOf(1024 * 1024),
                 BigInteger.valueOf(32));
 
         setUpSockets();
         meterContrs = new ArrayList<>();
         for (ConnectionMeter meter : connectionMeters) {
-            meterContrs.add(new MeterBusomController(loadCurve, meter));
+            meterContrs.add(new MeterBusomController(curveConfiguration, meter));
         }
-        substContr = new SubstationBusomController(loadCurve, connectionSubstation);
+        substContr = new SubstationBusomController(curveConfiguration, connectionSubstation);
     }
 
     private static List<BigInteger> getMessage() {
@@ -56,12 +53,12 @@ class BusomControllersTest {
     }
 
     static void setUpSockets() throws IOException {
-        ServerSocket server = LoadSocket.tomlToServerSocket(fileSubst);
-        int numberOfMeters = LoadSocket.getNumberOfMeters(fileSubst);
+        ServerSocket server = SocketReader.tomlToServerSocket(fileSubst);
+        int numberOfMeters = SocketReader.getNumberOfMeters(fileSubst);
         connectionMeters = new ArrayList<>();
         for (int i = 0; i < numberOfMeters; i++)
-            connectionMeters.add(new ConnectionMeter(fileSubst, loadCurve));
-        connectionSubstation = new ConnectionSubstation(server, numberOfMeters, loadCurve);
+            connectionMeters.add(new ConnectionMeter(fileSubst, curveConfiguration));
+        connectionSubstation = new ConnectionSubstation(server, numberOfMeters, curveConfiguration);
     }
 
     @Test

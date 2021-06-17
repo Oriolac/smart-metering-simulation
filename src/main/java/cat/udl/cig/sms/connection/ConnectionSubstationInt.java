@@ -5,8 +5,4 @@ package cat.udl.cig.sms.connection;
  */
 public interface ConnectionSubstationInt extends ReceiverSubstation, Sender {
 
-    /**
-     * @return the number of meters that supports the server, our susbstation.
-     */
-    int getNumberOfMeters();
 }

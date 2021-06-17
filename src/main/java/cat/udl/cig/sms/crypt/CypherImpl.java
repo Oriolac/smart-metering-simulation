@@ -5,7 +5,6 @@ import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.PrimeField;
 import cat.udl.cig.fields.PrimeFieldElement;
-import cat.udl.cig.sms.data.LoadCurve;
 
 import java.math.BigInteger;
 
@@ -22,13 +21,13 @@ public class CypherImpl implements Cypher, Hash {
     /**
      * Genenerates a cypherMessage
      *
-     * @param loadCurve  curve to be used for encrypts
+     * @param curveConfiguration  curve to be used for encrypts
      * @param privateKey private key to be used for encrypts
      */
-    public CypherImpl(LoadCurve loadCurve, BigInteger privateKey) {
-        this.curve = loadCurve.getCurve();
-        this.grup = loadCurve.getGroup();
-        this.field = loadCurve.getField();
+    public CypherImpl(CurveConfiguration curveConfiguration, BigInteger privateKey) {
+        this.curve = curveConfiguration.getCurve();
+        this.grup = curveConfiguration.getGroup();
+        this.field = curveConfiguration.getField();
         this.privateKey = field.toElement(privateKey);
     }
 

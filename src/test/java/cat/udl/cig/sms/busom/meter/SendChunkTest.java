@@ -10,9 +10,7 @@ import cat.udl.cig.sms.busom.meter.doubles.SenderSpy;
 import cat.udl.cig.sms.busom.BusomState;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.busom.data.MeterKey;
-import cat.udl.cig.sms.busom.meter.SendChunk;
-import cat.udl.cig.sms.busom.meter.SendPartialDecryption;
-import cat.udl.cig.sms.data.LoadCurve;
+import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,14 +23,14 @@ class SendChunkTest {
     BigInteger privateKey;
     SendChunk sendChunk;
     static final BigInteger message = BigInteger.valueOf(13);
-    LoadCurve loadCurve;
+    CurveConfiguration curveConfiguration;
 
     @BeforeEach
     void setUp() {
-        loadCurve = new LoadCurve(new File("./data/p192.toml"));
+        curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
         privateKey = new BigInteger("1234567890");
-        MeterKey meterKey = new MeterKey(privateKey, loadCurve.getGroup().getRandomElement());
-        sendChunk = new SendChunk(meterKey, loadCurve);
+        MeterKey meterKey = new MeterKey(privateKey, curveConfiguration.getGroup().getRandomElement());
+        sendChunk = new SendChunk(meterKey, curveConfiguration);
     }
 
     @Test
