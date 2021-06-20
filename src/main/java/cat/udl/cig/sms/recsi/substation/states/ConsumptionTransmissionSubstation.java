@@ -11,11 +11,13 @@ import cat.udl.cig.sms.crypt.Decipher;
 import cat.udl.cig.sms.recsi.State;
 import cat.udl.cig.sms.recsi.substation.SubstationContext;
 
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Consumption Transmission State of the Substation
@@ -54,9 +56,13 @@ public class ConsumptionTransmissionSubstation implements State {
                 GroupElement element = ((GroupElementDatagram) elem).getElement();
                 cyphered.add((GeneralECPoint) element);
             }
-            return this;
+            Optional<BigInteger> message = decipher.decrypt(cyphered, t);
+            if (message.isEmpty())
+                return substationContext.makeKeyEstablishment();
+            return substationContext.makeConsumptionTransmission(privateKey, message.get());
+        } else {
+            return  substationContext.makeKeyEstablishment();
         }
-        return new KeyEstablishmentSubstation(substationContext);
     }
 
     /**

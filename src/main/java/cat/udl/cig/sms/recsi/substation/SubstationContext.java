@@ -1,20 +1,28 @@
 package cat.udl.cig.sms.recsi.substation;
 
+import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.busom.SubstationBusomController;
+import cat.udl.cig.sms.busom.SubstationBusomControllerInt;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
+import cat.udl.cig.sms.recsi.State;
+import cat.udl.cig.sms.recsi.StateContext;
 import cat.udl.cig.sms.recsi.substation.states.ConsumptionTransmissionSubstation;
 import cat.udl.cig.sms.recsi.substation.states.KeyEstablishmentSubstation;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Optional;
 
 /**
  * Factory that makes the management of the states and busom controller
  */
-public class SubstationContext {
+public class SubstationContext implements StateContext {
 
     private final CurveConfiguration curveConfiguration;
     private final ConnectionSubstationInt connection;
+    private BigInteger message;
+    private State state;
 
     /**
      * @param curveConfiguration  that contains the information of the ECC
@@ -23,11 +31,9 @@ public class SubstationContext {
     public SubstationContext(CurveConfiguration curveConfiguration, ConnectionSubstationInt connection) {
         this.curveConfiguration = curveConfiguration;
         this.connection = connection;
+        this.state = new KeyEstablishmentSubstation(this);
     }
 
-    /**
-     * @return the Key Establishment state in order to do the establishment of the keys
-     */
     public KeyEstablishmentSubstation makeKeyEstablishment() {
         return new KeyEstablishmentSubstation(this);
     }
@@ -38,6 +44,11 @@ public class SubstationContext {
      */
     public ConsumptionTransmissionSubstation makeConsumptionTransmission(BigInteger privateKey) {
         return new ConsumptionTransmissionSubstation(this, privateKey);
+    }
+
+    public State makeConsumptionTransmission(BigInteger privateKey, BigInteger message) {
+        this.message = message;
+        return this.makeConsumptionTransmission(privateKey);
     }
 
     /**
@@ -59,5 +70,32 @@ public class SubstationContext {
      */
     public ConnectionSubstationInt getConnection() {
         return connection;
+    }
+
+    @Override
+    public void startKeyEstablishment() throws IOException, NullMessageException {
+        if (!(state instanceof KeyEstablishmentSubstation))
+            throw new IllegalStateException();
+        this.state = state.next();
+    }
+
+    public Optional<BigInteger> getPrivateKey() {
+        Optional<BigInteger> privateKey = Optional.empty();
+        if (state instanceof ConsumptionTransmissionSubstation) {
+            privateKey = Optional.of(((ConsumptionTransmissionSubstation) state).getPrivateKey());
+        }
+        return privateKey;
+    }
+
+    public void setSubstationBusomControllerInt(SubstationBusomControllerInt controllerInt) {
+        ((KeyEstablishmentSubstation) state).setController(controllerInt);
+    }
+
+    @Override
+    public Optional<BigInteger> getMessage() throws IOException, NullMessageException {
+        if (!(state instanceof ConsumptionTransmissionSubstation))
+            return Optional.empty();
+        this.state = state.next();
+        return Optional.of(this.message);
     }
 }

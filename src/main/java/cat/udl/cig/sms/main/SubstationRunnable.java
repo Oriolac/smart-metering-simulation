@@ -3,12 +3,13 @@ package cat.udl.cig.sms.main;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.ConnectionSubstation;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
-import cat.udl.cig.sms.recsi.State;
 import cat.udl.cig.sms.recsi.substation.SubstationContext;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.time.Instant;
+import java.util.Optional;
 
 /**
  * Makes a run of the normal pattern used for a Substation.
@@ -16,15 +17,14 @@ import java.time.Instant;
  */
 public class SubstationRunnable implements Runnable {
 
-    private static State state;
     private static final CurveConfiguration CURVE_READER = new CurveConfiguration(new File("data/p192.toml"));
-    private final File substation;
+    private final File substationFile;
 
     /**
      * Generates SubstationRunnable with default file.
      */
     public SubstationRunnable() {
-        substation = new File("data/substation1.toml");
+        substationFile = new File("data/substation1.toml");
     }
 
     /**
@@ -33,7 +33,7 @@ public class SubstationRunnable implements Runnable {
      * @param file toml config file for substation.
      */
     public SubstationRunnable(File file) {
-        this.substation = file;
+        this.substationFile = file;
     }
 
     /**
@@ -47,21 +47,21 @@ public class SubstationRunnable implements Runnable {
 
     @Override
     public void run() {
-        SubstationContext factory;
+        SubstationContext substation;
         long now, then;
         try {
-            factory = new SubstationContext(CURVE_READER,
-                    new ConnectionSubstation(substation, CURVE_READER));
-            state = factory.makeKeyEstablishment();
+            substation = new SubstationContext(CURVE_READER,
+                    new ConnectionSubstation(substationFile, CURVE_READER));
             then = Instant.now().toEpochMilli();
-            state = state.next();
+            substation.startKeyEstablishment();
             now = Instant.now().toEpochMilli();
             System.out.println("SSt-KE: " + (now - then));
             then = now;
             for (int i = 0; i < 15; i++) {
-                state = state.next();
+                Optional<BigInteger> message = substation.getMessage();
                 now = Instant.now().toEpochMilli();
                 System.out.println("SSt-CT: " + (now - then));
+                message.ifPresent(bigInteger -> System.out.println("Message: " + bigInteger));
                 then = now;
             }
             //TODO: closeConnection()
