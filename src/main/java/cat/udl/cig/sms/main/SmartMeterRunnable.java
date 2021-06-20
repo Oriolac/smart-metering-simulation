@@ -6,7 +6,8 @@ import cat.udl.cig.sms.connection.ConnectionMeter;
 import cat.udl.cig.sms.consumption.ConsumptionRandom;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 import cat.udl.cig.sms.recsi.State;
-import cat.udl.cig.sms.recsi.meter.MeterContext;
+import cat.udl.cig.sms.recsi.meter.MeterStateContext;
+import cat.udl.cig.sms.recsi.meter.MeterStateContextInt;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,24 +49,23 @@ public class SmartMeterRunnable implements Runnable {
 
     @Override
     public void run() {
-        MeterContext factory;
+        MeterStateContextInt context;
         long now, then;
         try {
-            factory = new MeterContext(CURVE_READER, new ConnectionMeter(substation, CURVE_READER),
+            context = new MeterStateContext(CURVE_READER, new ConnectionMeter(substation, CURVE_READER),
                     new ConsumptionRandom(), "");
-            State state = factory.makeKeyEstablishment();
             then = Instant.now().toEpochMilli();
-            state = state.next();
+            context.establishKey();
             now = Instant.now().toEpochMilli();
             System.out.println("SM-KE: " + (now - then));
             then = now;
             for (int i = 0; i < 15; i++) {
-                state = state.next();
+                context.sendConsumption();
                 now = Instant.now().toEpochMilli();
                 System.out.println("SM-CT: " + (now - then));
                 then = now;
             }
-            factory.closeConnection();
+            context.closeConnection();
         } catch (IOException | NullMessageException e) {
             e.printStackTrace();
         }

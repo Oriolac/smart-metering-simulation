@@ -11,7 +11,7 @@ import cat.udl.cig.sms.connection.datagram.GroupElementDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
 import cat.udl.cig.sms.crypt.Decipher;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
-import cat.udl.cig.sms.recsi.substation.SubstationContext;
+import cat.udl.cig.sms.recsi.substation.SubstationContextSubstation;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -21,10 +21,10 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ConsumptionTransmissionSubstationTest {
+class ConsumptionTransmissionMeterSubstationTest {
 
 
-    private SubstationContext factory;
+    private SubstationContextSubstation factory;
     private ConsumptionTransmissionSubstation state;
     private final BigInteger SUM = BigInteger.TWO;
     private final BigInteger PRIVATE_KEY = CurveConfiguration.P192().getField().toElement(SUM).opposite().getIntValue();
@@ -37,7 +37,7 @@ class ConsumptionTransmissionSubstationTest {
         Mockito.when(decipher.decrypt(Mockito.any(), Mockito.any(BigInteger.class)))
                 .then((Answer<Optional<BigInteger>>) invoc -> Optional.of(MESSAGE));
         connection = Mockito.mock(ConnectionSubstation.class);
-        factory = new SubstationContext(CurveConfiguration.P192(), connection);
+        factory = new SubstationContextSubstation(CurveConfiguration.P192(), connection);
         state = factory.makeConsumptionTransmission(PRIVATE_KEY);
         state.setDecypher(decipher);
     }

@@ -3,7 +3,7 @@ package cat.udl.cig.sms.recsi.substation.states;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.busom.SubstationBusomControllerInt;
 import cat.udl.cig.sms.recsi.State;
-import cat.udl.cig.sms.recsi.substation.SubstationContext;
+import cat.udl.cig.sms.recsi.substation.SubstationContextSubstation;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -15,15 +15,15 @@ public class KeyEstablishmentSubstation implements State {
 
 
     private SubstationBusomControllerInt controller;
-    private final SubstationContext factory;
+    private final SubstationContextSubstation context;
 
     /**
-     * @param factory Factory that has the information of the ECC and connection and
+     * @param context Factory that has the information of the ECC and connection and
      *                creates the different states.
      */
-    public KeyEstablishmentSubstation(SubstationContext factory) {
-        this.factory = factory;
-        this.controller = factory.makeSubstationBusomController();
+    public KeyEstablishmentSubstation(SubstationContextSubstation context) {
+        this.context = context;
+        this.controller = context.makeSubstationBusomController();
     }
 
     /**
@@ -40,9 +40,9 @@ public class KeyEstablishmentSubstation implements State {
      */
     @Override
     public State next() throws IOException, NullMessageException {
-        BigInteger order = factory.getLoadCurve().getGroup().getSize();
+        BigInteger order = context.getLoadCurve().getGroup().getSize();
         BigInteger privateKey = controller.receiveSecretKey().remainder(order);
         privateKey = order.subtract(privateKey);
-        return factory.makeConsumptionTransmission(privateKey);
+        return context.makeConsumptionTransmission(privateKey);
     }
 }

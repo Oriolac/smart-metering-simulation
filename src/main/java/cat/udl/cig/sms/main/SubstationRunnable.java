@@ -3,7 +3,7 @@ package cat.udl.cig.sms.main;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.ConnectionSubstation;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
-import cat.udl.cig.sms.recsi.substation.SubstationContext;
+import cat.udl.cig.sms.recsi.substation.SubstationContextSubstation;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,10 +47,10 @@ public class SubstationRunnable implements Runnable {
 
     @Override
     public void run() {
-        SubstationContext substation;
+        SubstationContextSubstation substation;
         long now, then;
         try {
-            substation = new SubstationContext(CURVE_READER,
+            substation = new SubstationContextSubstation(CURVE_READER,
                     new ConnectionSubstation(substationFile, CURVE_READER));
             then = Instant.now().toEpochMilli();
             substation.startKeyEstablishment();

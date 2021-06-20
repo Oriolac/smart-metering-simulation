@@ -12,36 +12,36 @@ import cat.udl.cig.sms.connection.datagram.EndOfDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
 import cat.udl.cig.sms.consumption.ConsumptionReader;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
-import cat.udl.cig.sms.recsi.meter.MeterContext;
+import cat.udl.cig.sms.recsi.meter.MeterStateContext;
 
 import java.io.IOException;
 import java.math.BigInteger;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ConsumptionTransmissionTest {
+class ConsumptionTransmissionMeterTest {
 
 
     private ConnectionMeterInt connectionMeter;
     private ConsumptionReader consumptionReader;
-    private MeterContext factory;
+    private MeterStateContext factory;
     private PrimeFieldElement privateKey;
-    private ConsumptionTransmission consumptTrans;
+    private ConsumptionTransmissionMeter consumptTrans;
 
     @BeforeEach
     void setUp() {
         connectionMeter = Mockito.mock(ConnectionMeterInt.class);
         consumptionReader = Mockito.mock(ConsumptionReader.class);
         Mockito.when(consumptionReader.read()).then((Answer<BigInteger>) invoc -> BigInteger.ONE);
-        factory = new MeterContext(CurveConfiguration.P192(), connectionMeter, consumptionReader,"");
+        factory = new MeterStateContext(CurveConfiguration.P192(), connectionMeter, consumptionReader,"");
         privateKey = CurveConfiguration.P192().getField().toElement(BigInteger.ONE);
-        consumptTrans = new ConsumptionTransmission(factory, privateKey);
+        consumptTrans = new ConsumptionTransmissionMeter(factory, privateKey);
     }
 
     @Test
     void correctNext() throws IOException, NullMessageException {
         Mockito.when(connectionMeter.receive()).then((Answer<BigIntegerDatagram>) invocationOnMock -> new BigIntegerDatagram(BigInteger.ONE));
-        assertTrue(consumptTrans.next() instanceof ConsumptionTransmission);
+        assertTrue(consumptTrans.next() instanceof ConsumptionTransmissionMeter);
         Mockito.verify(connectionMeter, Mockito.times(1))
                 .send(Mockito.any(SMSDatagram.class));
     }
@@ -49,7 +49,7 @@ class ConsumptionTransmissionTest {
     @Test
     void badNext() throws IOException, NullMessageException {
         Mockito.when(connectionMeter.receive()).then((Answer<SMSDatagram>) invocationOnMock -> new EndOfDatagram());
-        assertTrue(consumptTrans.next() instanceof KeyEstablishment);
+        assertTrue(consumptTrans.next() instanceof KeyEstablishmentMeter);
         Mockito.verify(connectionMeter, Mockito.times(0))
                 .send(Mockito.any(SMSDatagram.class));
     }

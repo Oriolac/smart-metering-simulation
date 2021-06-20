@@ -3,23 +3,26 @@ package cat.udl.cig.sms.recsi.meter;
 import cat.udl.cig.fields.PrimeFieldElement;
 import cat.udl.cig.sms.busom.MeterBusomController;
 import cat.udl.cig.sms.busom.MeterBusomControllerInt;
+import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
 import cat.udl.cig.sms.consumption.ConsumptionReader;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
-import cat.udl.cig.sms.recsi.meter.states.ConsumptionTransmission;
-import cat.udl.cig.sms.recsi.meter.states.KeyEstablishment;
+import cat.udl.cig.sms.recsi.State;
+import cat.udl.cig.sms.recsi.meter.states.ConsumptionTransmissionMeter;
+import cat.udl.cig.sms.recsi.meter.states.KeyEstablishmentMeter;
 
 import java.io.IOException;
 
 /**
  * Factory of the states of the meter in smart metering protocol
  */
-public class MeterContext {
+public class MeterStateContext implements MeterStateContextInt {
 
     private final CurveConfiguration curveConfiguration;
     private final ConnectionMeterInt connection;
     private final ConsumptionReader consumption;
     private final String certificate;
+    private State state;
 
     /**
      * @param curveConfiguration   which has all the information of the ECC
@@ -27,27 +30,28 @@ public class MeterContext {
      * @param consumption which reads all the consumption of the meter
      * @param certificate of the smart meter
      */
-    public MeterContext(CurveConfiguration curveConfiguration, ConnectionMeterInt connection,
-                        ConsumptionReader consumption, String certificate) {
+    public MeterStateContext(CurveConfiguration curveConfiguration, ConnectionMeterInt connection,
+                             ConsumptionReader consumption, String certificate) {
         this.curveConfiguration = curveConfiguration;
         this.connection = connection;
         this.consumption = consumption;
         this.certificate = certificate;
+        this.state = new KeyEstablishmentMeter(this);
     }
 
     /**
      * @param privateKey or si, private key of current smart meter
      * @return the consumption transmition state of the meter in order to send the consumption
      */
-    public ConsumptionTransmission makeConsumptionTransmission(PrimeFieldElement privateKey) {
-        return new ConsumptionTransmission(this, privateKey);
+    public ConsumptionTransmissionMeter makeConsumptionTransmission(PrimeFieldElement privateKey) {
+        return new ConsumptionTransmissionMeter(this, privateKey);
     }
 
     /**
      * @return the key establishment state of the meter in order to set the keys
      */
-    public KeyEstablishment makeKeyEstablishment() {
-        return new KeyEstablishment(this);
+    public KeyEstablishmentMeter makeKeyEstablishment() {
+        return new KeyEstablishmentMeter(this);
     }
 
     /**
@@ -88,5 +92,21 @@ public class MeterContext {
 
     public void closeConnection() throws IOException {
         connection.close();
+    }
+
+    @Override
+    public void establishKey() throws IOException, NullMessageException {
+        if (!(state instanceof KeyEstablishmentMeter)) {
+            throw new IllegalStateException();
+        }
+        state = state.next();
+    }
+
+    @Override
+    public void sendConsumption() throws IOException, NullMessageException {
+        if (!(state instanceof ConsumptionTransmissionMeter)) {
+            throw new IllegalStateException();
+        }
+        state = state.next();
     }
 }

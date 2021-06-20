@@ -9,17 +9,16 @@ import cat.udl.cig.sms.connection.datagram.SMSDatagram;
 import cat.udl.cig.sms.crypt.Cypher;
 import cat.udl.cig.sms.crypt.CypherImpl;
 import cat.udl.cig.sms.recsi.State;
-import cat.udl.cig.sms.recsi.meter.MeterContext;
+import cat.udl.cig.sms.recsi.meter.MeterStateContext;
 
 import java.io.IOException;
 
 /**
  * Meter state that represents the consumption transmission.
  */
-public class ConsumptionTransmission implements State {
+public class ConsumptionTransmissionMeter implements State {
 
-    private final MeterContext factory;
-    private final PrimeFieldElement privateKey;
+    private final MeterStateContext factory;
     private final Cypher cypher;
 
     /**
@@ -27,11 +26,10 @@ public class ConsumptionTransmission implements State {
      *                   creates the different states.
      * @param privateKey or s0 which is the private key of the smart metering protocol
      */
-    public ConsumptionTransmission(MeterContext factory,
-                                   PrimeFieldElement privateKey) {
+    public ConsumptionTransmissionMeter(MeterStateContext factory,
+                                        PrimeFieldElement privateKey) {
         this.factory = factory;
-        this.privateKey = privateKey;
-        cypher = new CypherImpl(factory.getLoadCurve(), this.privateKey.getIntValue());
+        cypher = new CypherImpl(factory.getLoadCurve(), privateKey.getIntValue());
     }
 
     /**

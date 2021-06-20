@@ -6,7 +6,6 @@ import cat.udl.cig.sms.busom.SubstationBusomControllerInt;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 import cat.udl.cig.sms.recsi.State;
-import cat.udl.cig.sms.recsi.StateContext;
 import cat.udl.cig.sms.recsi.substation.states.ConsumptionTransmissionSubstation;
 import cat.udl.cig.sms.recsi.substation.states.KeyEstablishmentSubstation;
 
@@ -17,7 +16,7 @@ import java.util.Optional;
 /**
  * Factory that makes the management of the states and busom controller
  */
-public class SubstationContext implements StateContext {
+public class SubstationContextSubstation implements SubstationStateContextInt {
 
     private final CurveConfiguration curveConfiguration;
     private final ConnectionSubstationInt connection;
@@ -28,7 +27,7 @@ public class SubstationContext implements StateContext {
      * @param curveConfiguration  that contains the information of the ECC
      * @param connection that makes the connection with the smart meters
      */
-    public SubstationContext(CurveConfiguration curveConfiguration, ConnectionSubstationInt connection) {
+    public SubstationContextSubstation(CurveConfiguration curveConfiguration, ConnectionSubstationInt connection) {
         this.curveConfiguration = curveConfiguration;
         this.connection = connection;
         this.state = new KeyEstablishmentSubstation(this);

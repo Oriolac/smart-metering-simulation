@@ -1,4 +1,4 @@
-package cat.udl.cig.sms.recsi;
+package cat.udl.cig.sms.recsi.substation;
 
 import cat.udl.cig.sms.busom.NullMessageException;
 
@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
 
-public interface StateContext {
+public interface SubstationStateContextInt {
 
     public void startKeyEstablishment() throws IOException, NullMessageException;
 

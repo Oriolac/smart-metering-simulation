@@ -4,7 +4,7 @@ import cat.udl.cig.fields.PrimeFieldElement;
 import cat.udl.cig.sms.busom.MeterBusomControllerInt;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.recsi.State;
-import cat.udl.cig.sms.recsi.meter.MeterContext;
+import cat.udl.cig.sms.recsi.meter.MeterStateContext;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -14,17 +14,17 @@ import java.util.List;
 /**
  * Meter state that represents the Key Establishment of the protocol
  */
-public class KeyEstablishment implements State {
+public class KeyEstablishmentMeter implements State {
 
     private MeterBusomControllerInt meterBusom;
     private PrimeFieldElement privateKey;
-    private final MeterContext factory;
+    private final MeterStateContext factory;
 
     /**
      * @param factory Factory that has the information of the ECC and connection and
      *                creates the different states.
      */
-    public KeyEstablishment(MeterContext factory) {
+    public KeyEstablishmentMeter(MeterStateContext factory) {
         this.factory = factory;
         privateKey = generatePrivateKey();
         meterBusom = factory.makeMeterBusomController();
@@ -70,7 +70,7 @@ public class KeyEstablishment implements State {
      * @throws NullMessageException in case the message is null.
      */
     @Override
-    public ConsumptionTransmission next() throws IOException, NullMessageException {
+    public ConsumptionTransmissionMeter next() throws IOException, NullMessageException {
         meterBusom.start();
         meterBusom.sendMessage(generateChunksOfPrivateKey());
         return factory.makeConsumptionTransmission(privateKey);

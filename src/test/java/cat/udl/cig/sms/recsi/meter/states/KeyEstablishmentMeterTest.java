@@ -8,7 +8,7 @@ import cat.udl.cig.sms.connection.ConnectionMeterInt;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
 import cat.udl.cig.sms.consumption.ConsumptionRandom;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
-import cat.udl.cig.sms.recsi.meter.MeterContext;
+import cat.udl.cig.sms.recsi.meter.MeterStateContext;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -16,29 +16,29 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class KeyEstablishmentTest {
+public class KeyEstablishmentMeterTest {
 
     private CurveConfiguration curveConfiguration;
-    private KeyEstablishment keyEstablishment;
+    private KeyEstablishmentMeter keyEstablishmentMeter;
     private ConnectionMeterMock connection;
     private MeterBusomControllerMock controller;
-    private MeterContext factory;
+    private MeterStateContext factory;
 
     @BeforeEach
     void setUp() {
         curveConfiguration = CurveConfiguration.P192();
         connection = new ConnectionMeterMock();
         controller = new MeterBusomControllerMock();
-        factory = new MeterContext(curveConfiguration, connection, new ConsumptionRandom(), "");
-        keyEstablishment = factory.makeKeyEstablishment();
-        keyEstablishment.setMeterBusom(controller);
+        factory = new MeterStateContext(curveConfiguration, connection, new ConsumptionRandom(), "");
+        keyEstablishmentMeter = factory.makeKeyEstablishment();
+        keyEstablishmentMeter.setMeterBusom(controller);
     }
 
     @Test
     void generateChunksOfPrivateKey() {
         BigInteger value = BigInteger.valueOf(1234567890L);
-        keyEstablishment.setPrivateKey(curveConfiguration.getField().toElement(value));
-        List<BigInteger> chunks = keyEstablishment.generateChunksOfPrivateKey();
+        keyEstablishmentMeter.setPrivateKey(curveConfiguration.getField().toElement(value));
+        List<BigInteger> chunks = keyEstablishmentMeter.generateChunksOfPrivateKey();
         BigInteger res = BigInteger.ZERO;
         for (int i = 0; i < chunks.size(); i++) {
             res = res.add(chunks.get(i).multiply(BigInteger.TWO.pow(i * 13)));
@@ -48,7 +48,7 @@ public class KeyEstablishmentTest {
 
     @Test
     void next() throws IOException, NullMessageException {
-        keyEstablishment.next();
+        keyEstablishmentMeter.next();
         assertEquals(2, controller.getCount());
     }
 
