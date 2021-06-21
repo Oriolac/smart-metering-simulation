@@ -2,7 +2,6 @@ package cat.udl.cig.sms.connection.datagram;
 
 import org.junit.jupiter.api.Test;
 import cat.udl.cig.sms.connection.Datagrams;
-import cat.udl.cig.sms.connection.datagram.BigIntegerDatagram;
 
 import java.math.BigInteger;
 

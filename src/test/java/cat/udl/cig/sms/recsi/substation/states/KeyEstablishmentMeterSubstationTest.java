@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import cat.udl.cig.sms.busom.NullMessageException;
-import cat.udl.cig.sms.busom.SubstationBusomControllerInt;
+import cat.udl.cig.sms.busom.SubstationBusomServiceInt;
 import cat.udl.cig.sms.connection.ConnectionSubstation;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 import cat.udl.cig.sms.recsi.substation.SubstationContextSubstation;
@@ -25,7 +25,7 @@ class KeyEstablishmentMeterSubstationTest {
 
     @BeforeEach
     void setUp() throws IOException, NullMessageException {
-        SubstationBusomControllerInt controller = Mockito.mock(SubstationBusomControllerInt.class);
+        SubstationBusomServiceInt controller = Mockito.mock(SubstationBusomServiceInt.class);
         Mockito.when(controller.receiveSecretKey()).then((Answer<BigInteger>) invoc -> SUM);
         ConnectionSubstation connection = Mockito.mock(ConnectionSubstation.class);
         substationContext = new SubstationContextSubstation(CurveConfiguration.P192(), connection);

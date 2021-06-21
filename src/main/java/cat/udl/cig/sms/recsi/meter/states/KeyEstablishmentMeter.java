@@ -1,7 +1,7 @@
 package cat.udl.cig.sms.recsi.meter.states;
 
 import cat.udl.cig.fields.PrimeFieldElement;
-import cat.udl.cig.sms.busom.MeterBusomControllerInt;
+import cat.udl.cig.sms.busom.MeterBusomServiceInt;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.recsi.State;
 import cat.udl.cig.sms.recsi.meter.MeterStateContext;
@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class KeyEstablishmentMeter implements State {
 
-    private MeterBusomControllerInt meterBusom;
+    private MeterBusomServiceInt meterBusom;
     private PrimeFieldElement privateKey;
     private final MeterStateContext factory;
 
@@ -79,7 +79,7 @@ public class KeyEstablishmentMeter implements State {
     /**
      * @param meterBusom The meter controller of the busom protocol.
      */
-    protected void setMeterBusom(MeterBusomControllerInt meterBusom) {
+    protected void setMeterBusom(MeterBusomServiceInt meterBusom) {
         this.meterBusom = meterBusom;
     }
 }

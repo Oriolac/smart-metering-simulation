@@ -2,7 +2,7 @@ package cat.udl.cig.sms.recsi.meter.states;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import cat.udl.cig.sms.busom.MeterBusomControllerInt;
+import cat.udl.cig.sms.busom.MeterBusomServiceInt;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
@@ -21,14 +21,14 @@ public class KeyEstablishmentMeterTest {
     private CurveConfiguration curveConfiguration;
     private KeyEstablishmentMeter keyEstablishmentMeter;
     private ConnectionMeterMock connection;
-    private MeterBusomControllerMock controller;
+    private MeterBusomServiceMock controller;
     private MeterStateContext factory;
 
     @BeforeEach
     void setUp() {
         curveConfiguration = CurveConfiguration.P192();
         connection = new ConnectionMeterMock();
-        controller = new MeterBusomControllerMock();
+        controller = new MeterBusomServiceMock();
         factory = new MeterStateContext(curveConfiguration, connection, new ConsumptionRandom(), "");
         keyEstablishmentMeter = factory.makeKeyEstablishment();
         keyEstablishmentMeter.setMeterBusom(controller);
@@ -52,11 +52,11 @@ public class KeyEstablishmentMeterTest {
         assertEquals(2, controller.getCount());
     }
 
-    public static class MeterBusomControllerMock implements MeterBusomControllerInt {
+    public static class MeterBusomServiceMock implements MeterBusomServiceInt {
 
         private int count;
 
-        public MeterBusomControllerMock() {
+        public MeterBusomServiceMock() {
             count = 0;
         }
 

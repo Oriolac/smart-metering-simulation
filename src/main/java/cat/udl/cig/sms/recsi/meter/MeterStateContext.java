@@ -1,8 +1,8 @@
 package cat.udl.cig.sms.recsi.meter;
 
 import cat.udl.cig.fields.PrimeFieldElement;
-import cat.udl.cig.sms.busom.MeterBusomController;
-import cat.udl.cig.sms.busom.MeterBusomControllerInt;
+import cat.udl.cig.sms.busom.MeterBusomService;
+import cat.udl.cig.sms.busom.MeterBusomServiceInt;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
 import cat.udl.cig.sms.consumption.ConsumptionReader;
@@ -57,8 +57,8 @@ public class MeterStateContext implements MeterStateContextInt {
     /**
      * @return the meter's controller of the busom protocol
      */
-    public MeterBusomControllerInt makeMeterBusomController() {
-        return new MeterBusomController(certificate, curveConfiguration, connection);
+    public MeterBusomServiceInt makeMeterBusomController() {
+        return new MeterBusomService(certificate, curveConfiguration, connection);
     }
 
     /**

@@ -1,8 +1,8 @@
 package cat.udl.cig.sms.recsi.substation;
 
 import cat.udl.cig.sms.busom.NullMessageException;
-import cat.udl.cig.sms.busom.SubstationBusomController;
-import cat.udl.cig.sms.busom.SubstationBusomControllerInt;
+import cat.udl.cig.sms.busom.SubstationBusomService;
+import cat.udl.cig.sms.busom.SubstationBusomServiceInt;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 import cat.udl.cig.sms.recsi.State;
@@ -53,8 +53,8 @@ public class SubstationContextSubstation implements SubstationStateContextInt {
     /**
      * @return the protocol busom controller of the substation
      */
-    public SubstationBusomController makeSubstationBusomController() {
-        return new SubstationBusomController(curveConfiguration, connection);
+    public SubstationBusomService makeSubstationBusomController() {
+        return new SubstationBusomService(curveConfiguration, connection);
     }
 
     /**
@@ -86,7 +86,7 @@ public class SubstationContextSubstation implements SubstationStateContextInt {
         return privateKey;
     }
 
-    public void setSubstationBusomControllerInt(SubstationBusomControllerInt controllerInt) {
+    public void setSubstationBusomControllerInt(SubstationBusomServiceInt controllerInt) {
         ((KeyEstablishmentSubstation) state).setController(controllerInt);
     }
 

@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ConnectionMeterSubstation {
+class ConnectionMeterSubstationTest {
 
     private static ConnectionSubstation connectionSubstation;
     private static List<ConnectionMeter> connectionMeters;

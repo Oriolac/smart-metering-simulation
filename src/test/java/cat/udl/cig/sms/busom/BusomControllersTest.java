@@ -19,8 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BusomControllersTest {
 
-    private static List<MeterBusomController> meterContrs;
-    private static SubstationBusomController substContr;
+    private static List<MeterBusomService> meterContrs;
+    private static SubstationBusomService substContr;
 
     private static ConnectionSubstation connectionSubstation;
     private static List<ConnectionMeter> connectionMeters;
@@ -37,9 +37,9 @@ class BusomControllersTest {
         setUpSockets();
         meterContrs = new ArrayList<>();
         for (ConnectionMeter meter : connectionMeters) {
-            meterContrs.add(new MeterBusomController(curveConfiguration, meter));
+            meterContrs.add(new MeterBusomService(curveConfiguration, meter));
         }
-        substContr = new SubstationBusomController(curveConfiguration, connectionSubstation);
+        substContr = new SubstationBusomService(curveConfiguration, connectionSubstation);
     }
 
     private static List<BigInteger> getMessage() {
@@ -65,7 +65,7 @@ class BusomControllersTest {
     void sendMessages() throws IOException, NullMessageException, InterruptedException {
         List<BigInteger> message = getMessage();
         List<Thread> threads = new ArrayList<>();
-        for (MeterBusomController meter : meterContrs) {
+        for (MeterBusomService meter : meterContrs) {
             threads.add(new Thread(() -> {
                 try {
                     meter.meterSetUp();

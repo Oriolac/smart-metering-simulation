@@ -12,24 +12,25 @@ import cat.udl.cig.sms.recsi.State;
 import cat.udl.cig.sms.recsi.meter.MeterStateContext;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 /**
  * Meter state that represents the consumption transmission.
  */
 public class ConsumptionTransmissionMeter implements State {
 
-    private final MeterStateContext factory;
+    private final MeterStateContext context;
     private final Cypher cypher;
 
     /**
-     * @param factory    Factory that has the information of the ECC and connection and
+     * @param context    Factory that has the information of the ECC and connection and
      *                   creates the different states.
      * @param privateKey or s0 which is the private key of the smart metering protocol
      */
-    public ConsumptionTransmissionMeter(MeterStateContext factory,
+    public ConsumptionTransmissionMeter(MeterStateContext context,
                                         PrimeFieldElement privateKey) {
-        this.factory = factory;
-        cypher = new CypherImpl(factory.getLoadCurve(), privateKey.getIntValue());
+        this.context = context;
+        cypher = new CypherImpl(context.getLoadCurve(), privateKey.getIntValue());
     }
 
     /**
@@ -39,15 +40,16 @@ public class ConsumptionTransmissionMeter implements State {
      */
     @Override
     public State next() throws IOException, NullMessageException {
-        SMSDatagram data = factory.getConnection().receive();
+        SMSDatagram data = context.getConnection().receive();
         if (data instanceof BigIntegerDatagram) {
             GeneralECPoint cypherMessage;
-            cypherMessage = cypher.encrypt(factory.getConsumption().read(),
+            BigInteger consumption = context.getConsumption().read();
+            cypherMessage = cypher.encrypt(consumption,
                     ((BigIntegerDatagram) data).getBigInteger());
-            factory.getConnection().send(new GroupElementDatagram(cypherMessage));
+            context.getConnection().send(new GroupElementDatagram(cypherMessage));
             return this;
         }
-        return factory.makeKeyEstablishment();
+        return context.makeKeyEstablishment();
     }
 }
 

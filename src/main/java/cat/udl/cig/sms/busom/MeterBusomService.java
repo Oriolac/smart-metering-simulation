@@ -14,7 +14,7 @@ import java.util.List;
  * Controller of the protocol. Encapsulates the protocol to make it
  * easier for high architecture classes.
  */
-public class MeterBusomController implements MeterBusomControllerInt {
+public class MeterBusomService implements MeterBusomServiceInt {
 
     private BusomState state;
 
@@ -25,8 +25,21 @@ public class MeterBusomController implements MeterBusomControllerInt {
      * @param curveConfiguration   parameters of the ECC curve
      * @param connection  to the substation.
      */
-    public MeterBusomController(String certificate, CurveConfiguration curveConfiguration, ConnectionMeterInt connection) {
+    public MeterBusomService(String certificate, CurveConfiguration curveConfiguration, ConnectionMeterInt connection) {
         this.state = new BusomSetUp(certificate, curveConfiguration, connection);
+    }
+
+    /**
+     * Generates a meter busom Controller. Used for testing
+     *
+     * @param curveConfiguration  parameters of the ECC curve
+     * @param connection to the substation.
+     * @throws IOException          if connection fails.
+     * @throws NullMessageException Never throws this exception
+     */
+    public MeterBusomService(CurveConfiguration curveConfiguration, ConnectionMeterInt connection) throws IOException, NullMessageException {
+        this("", curveConfiguration, connection);
+        this.state = state.next();
     }
 
     /**
@@ -40,18 +53,6 @@ public class MeterBusomController implements MeterBusomControllerInt {
         this.state = state.next().next();
     }
 
-    /**
-     * Generates a meter busom Controller. Used for testing
-     *
-     * @param curveConfiguration  parameters of the ECC curve
-     * @param connection to the substation.
-     * @throws IOException          if connection fails.
-     * @throws NullMessageException Never throws this exception
-     */
-    public MeterBusomController(CurveConfiguration curveConfiguration, ConnectionMeterInt connection) throws IOException, NullMessageException {
-        this.state = new BusomSetUp("", curveConfiguration, connection);
-        this.state = state.next();
-    }
 
     /**
      * Used for tests

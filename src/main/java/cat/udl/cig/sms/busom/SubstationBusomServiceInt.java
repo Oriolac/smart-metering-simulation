@@ -3,7 +3,7 @@ package cat.udl.cig.sms.busom;
 import java.io.IOException;
 import java.math.BigInteger;
 
-public interface SubstationBusomControllerInt {
+public interface SubstationBusomServiceInt {
 
     /**
      * Receives and computes a key, adding all the messages (sis) with their power.
