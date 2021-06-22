@@ -24,33 +24,35 @@ class ConsumptionTransmissionMeterTest {
 
     private ConnectionMeterInt connectionMeter;
     private ConsumptionReader consumptionReader;
-    private MeterStateContext factory;
+    private MeterStateContext context;
     private PrimeFieldElement privateKey;
     private ConsumptionTransmissionMeter consumptTrans;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException, NullMessageException {
         connectionMeter = Mockito.mock(ConnectionMeterInt.class);
         consumptionReader = Mockito.mock(ConsumptionReader.class);
         Mockito.when(consumptionReader.read()).then((Answer<BigInteger>) invoc -> BigInteger.ONE);
-        factory = new MeterStateContext(CurveConfiguration.P192(), connectionMeter, consumptionReader,"");
         privateKey = CurveConfiguration.P192().getField().toElement(BigInteger.ONE);
-        consumptTrans = new ConsumptionTransmissionMeter(factory, privateKey);
     }
 
     @Test
     void correctNext() throws IOException, NullMessageException {
         Mockito.when(connectionMeter.receive()).then((Answer<BigIntegerDatagram>) invocationOnMock -> new BigIntegerDatagram(BigInteger.ONE));
+        context = new MeterStateContext(CurveConfiguration.P192(), connectionMeter, consumptionReader,"");
+        consumptTrans = new ConsumptionTransmissionMeter(context, privateKey);
         assertTrue(consumptTrans.next() instanceof ConsumptionTransmissionMeter);
-        Mockito.verify(connectionMeter, Mockito.times(1))
+        Mockito.verify(connectionMeter, Mockito.times(2))
                 .send(Mockito.any(SMSDatagram.class));
     }
 
     @Test
     void badNext() throws IOException, NullMessageException {
         Mockito.when(connectionMeter.receive()).then((Answer<SMSDatagram>) invocationOnMock -> new EndOfDatagram());
+        context = new MeterStateContext(CurveConfiguration.P192(), connectionMeter, consumptionReader,"");
+        consumptTrans = new ConsumptionTransmissionMeter(context, privateKey);
         assertTrue(consumptTrans.next() instanceof KeyEstablishmentMeter);
-        Mockito.verify(connectionMeter, Mockito.times(0))
+        Mockito.verify(connectionMeter, Mockito.times(2))
                 .send(Mockito.any(SMSDatagram.class));
     }
 }

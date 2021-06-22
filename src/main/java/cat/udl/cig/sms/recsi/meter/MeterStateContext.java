@@ -31,7 +31,7 @@ public class MeterStateContext implements MeterStateContextInt {
      * @param certificate of the smart meter
      */
     public MeterStateContext(CurveConfiguration curveConfiguration, ConnectionMeterInt connection,
-                             ConsumptionReader consumption, String certificate) {
+                             ConsumptionReader consumption, String certificate) throws IOException, NullMessageException {
         this.curveConfiguration = curveConfiguration;
         this.connection = connection;
         this.consumption = consumption;
@@ -50,14 +50,14 @@ public class MeterStateContext implements MeterStateContextInt {
     /**
      * @return the key establishment state of the meter in order to set the keys
      */
-    public KeyEstablishmentMeter makeKeyEstablishment() {
+    public KeyEstablishmentMeter makeKeyEstablishment() throws IOException, NullMessageException {
         return new KeyEstablishmentMeter(this);
     }
 
     /**
      * @return the meter's controller of the busom protocol
      */
-    public MeterBusomServiceInt makeMeterBusomController() {
+    public MeterBusomServiceInt makeMeterBusomController() throws IOException, NullMessageException {
         return new MeterBusomService(certificate, curveConfiguration, connection);
     }
 

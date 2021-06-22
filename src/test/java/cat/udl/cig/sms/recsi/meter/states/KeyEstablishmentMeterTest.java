@@ -21,17 +21,17 @@ public class KeyEstablishmentMeterTest {
     private CurveConfiguration curveConfiguration;
     private KeyEstablishmentMeter keyEstablishmentMeter;
     private ConnectionMeterMock connection;
-    private MeterBusomServiceMock controller;
-    private MeterStateContext factory;
+    private MeterBusomServiceMock busomService;
+    private MeterStateContext context;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException, NullMessageException {
         curveConfiguration = CurveConfiguration.P192();
         connection = new ConnectionMeterMock();
-        controller = new MeterBusomServiceMock();
-        factory = new MeterStateContext(curveConfiguration, connection, new ConsumptionRandom(), "");
-        keyEstablishmentMeter = factory.makeKeyEstablishment();
-        keyEstablishmentMeter.setMeterBusom(controller);
+        busomService = new MeterBusomServiceMock();
+        context = new MeterStateContext(curveConfiguration, connection, new ConsumptionRandom(), "");
+        keyEstablishmentMeter = context.makeKeyEstablishment();
+        keyEstablishmentMeter.setBusomService(busomService);
     }
 
     @Test
@@ -44,12 +44,20 @@ public class KeyEstablishmentMeterTest {
             res = res.add(chunks.get(i).multiply(BigInteger.TWO.pow(i * 13)));
         }
         assertEquals(value, res);
+        assertEquals(0, connection.getCountReceive());
+        assertEquals(2, connection.getCountSend());
     }
 
     @Test
     void next() throws IOException, NullMessageException {
         keyEstablishmentMeter.next();
-        assertEquals(2, controller.getCount());
+        assertEquals(2, busomService.getCount());
+    }
+
+    @Test
+    void assertCounts() {
+        assertEquals(0, connection.getCountReceive());
+        assertEquals(2, connection.getCountSend());
     }
 
     public static class MeterBusomServiceMock implements MeterBusomServiceInt {
@@ -77,19 +85,31 @@ public class KeyEstablishmentMeterTest {
 
     public static class ConnectionMeterMock implements ConnectionMeterInt {
 
+        private int countReceive = 0;
+        private int countSend = 0;
+
         @Override
         public SMSDatagram receive() throws IOException {
-            throw new IOException("Unreachable exception");
+            countReceive += 1;
+            return null;
         }
 
         @Override
         public void send(SMSDatagram data) throws IOException {
-            throw new IOException("Unreachable exception");
+            countSend += 1;
         }
 
         @Override
         public void close() throws IOException {
 
+        }
+
+        public int getCountReceive() {
+            return countReceive;
+        }
+
+        public int getCountSend() {
+            return countSend;
         }
     }
 }

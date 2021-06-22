@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class KeyEstablishmentMeter implements State {
 
-    private MeterBusomServiceInt meterBusom;
+    private MeterBusomServiceInt busomService;
     private PrimeFieldElement privateKey;
     private final MeterStateContext factory;
 
@@ -24,10 +24,10 @@ public class KeyEstablishmentMeter implements State {
      * @param factory Factory that has the information of the ECC and connection and
      *                creates the different states.
      */
-    public KeyEstablishmentMeter(MeterStateContext factory) {
+    public KeyEstablishmentMeter(MeterStateContext factory) throws IOException, NullMessageException {
         this.factory = factory;
         privateKey = generatePrivateKey();
-        meterBusom = factory.makeMeterBusomController();
+        busomService = factory.makeMeterBusomController();
     }
 
     /**
@@ -71,15 +71,15 @@ public class KeyEstablishmentMeter implements State {
      */
     @Override
     public ConsumptionTransmissionMeter next() throws IOException, NullMessageException {
-        meterBusom.start();
-        meterBusom.sendMessage(generateChunksOfPrivateKey());
+        busomService.start();
+        busomService.sendMessage(generateChunksOfPrivateKey());
         return factory.makeConsumptionTransmission(privateKey);
     }
 
     /**
-     * @param meterBusom The meter controller of the busom protocol.
+     * @param busomService The meter controller of the busom protocol.
      */
-    protected void setMeterBusom(MeterBusomServiceInt meterBusom) {
-        this.meterBusom = meterBusom;
+    protected void setBusomService(MeterBusomServiceInt busomService) {
+        this.busomService = busomService;
     }
 }
