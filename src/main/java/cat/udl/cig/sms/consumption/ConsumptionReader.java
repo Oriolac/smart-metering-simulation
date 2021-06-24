@@ -1,5 +1,6 @@
 package cat.udl.cig.sms.consumption;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -13,5 +14,5 @@ public interface ConsumptionReader {
      *
      * @return consumption read as a BigInteger
      */
-    BigInteger read();
+    BigInteger read() throws IOException;
 }

@@ -19,16 +19,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class BusomSubstationSetupTest {
+class BusomSubstationSetUpTest {
 
-    BusomSubstationSetup substationSetup;
+    BusomSubstationSetUp substationSetup;
     CurveConfiguration curveConfiguration;
     ReceiverSpy receiverSpy;
 
     @BeforeEach
     void setUp() {
         curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
-        substationSetup = new BusomSubstationSetup(curveConfiguration.getGroup());
+        substationSetup = new BusomSubstationSetUp(curveConfiguration.getGroup());
         substationSetup.setValidation(new CertificateTrueMock<>());
         receiverSpy = new ReceiverSpy(curveConfiguration.getGroup().getGenerator());
         substationSetup.setReceiver(receiverSpy);

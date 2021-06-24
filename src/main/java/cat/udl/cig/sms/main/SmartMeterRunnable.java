@@ -4,8 +4,8 @@ package cat.udl.cig.sms.main;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.ConnectionMeter;
 import cat.udl.cig.sms.consumption.ConsumptionRandom;
+import cat.udl.cig.sms.consumption.ConsumptionReader;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
-import cat.udl.cig.sms.recsi.State;
 import cat.udl.cig.sms.recsi.meter.MeterStateContext;
 import cat.udl.cig.sms.recsi.meter.MeterStateContextInt;
 
@@ -21,12 +21,13 @@ public class SmartMeterRunnable implements Runnable {
 
     private static final CurveConfiguration CURVE_READER = new CurveConfiguration(new File("data/p192.toml"));
     private final File substation;
+    private final ConsumptionReader consumptionReader;
 
     /**
      * Generates a SMR with the predefined substation
      */
     public SmartMeterRunnable() {
-        substation = new File("data/substation1.toml");
+        this(new File("data/substation1.toml"));
     }
 
     /**
@@ -36,6 +37,12 @@ public class SmartMeterRunnable implements Runnable {
      */
     public SmartMeterRunnable(File file) {
         this.substation = file;
+        this.consumptionReader = new ConsumptionRandom();
+    }
+
+    public SmartMeterRunnable(File file, ConsumptionReader consumptionReader) {
+        this.substation = file;
+        this.consumptionReader = consumptionReader;
     }
 
     /**
@@ -52,8 +59,7 @@ public class SmartMeterRunnable implements Runnable {
         MeterStateContextInt context;
         long now, then;
         try {
-            context = new MeterStateContext(CURVE_READER, new ConnectionMeter(substation, CURVE_READER),
-                    new ConsumptionRandom(), "");
+            context = new MeterStateContext(CURVE_READER, new ConnectionMeter(substation, CURVE_READER), this.consumptionReader, "");
             then = Instant.now().toEpochMilli();
             context.establishKey();
             now = Instant.now().toEpochMilli();

@@ -4,7 +4,6 @@ import cat.udl.cig.ecc.ECPrimeOrderSubgroup;
 import cat.udl.cig.sms.busom.BusomState;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
-import cat.udl.cig.sms.recsi.State;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -15,12 +14,12 @@ public class SubstationBusomContext implements SubstationBusomContextInt {
     private BusomState state;
 
     public SubstationBusomContext(ECPrimeOrderSubgroup group, ConnectionSubstationInt connection) {
-        this.state = new BusomSubstationSetup(group, connection);
+        this.state = new BusomSubstationSetUp(group, connection);
     }
 
     @Override
     public void setUp() throws IOException, NullMessageException {
-        if (!(state instanceof  BusomSubstationSetup)) {
+        if (!(state instanceof BusomSubstationSetUp)) {
             throw new IllegalStateException();
         }
         this.state = state.next();

@@ -22,14 +22,13 @@ public class KeyEstablishmentMeterTest {
     private KeyEstablishmentMeter keyEstablishmentMeter;
     private ConnectionMeterMock connection;
     private MeterBusomServiceMock busomService;
-    private MeterStateContext context;
 
     @BeforeEach
     void setUp() throws IOException, NullMessageException {
         curveConfiguration = CurveConfiguration.P192();
         connection = new ConnectionMeterMock();
         busomService = new MeterBusomServiceMock();
-        context = new MeterStateContext(curveConfiguration, connection, new ConsumptionRandom(), "");
+        MeterStateContext context = new MeterStateContext(curveConfiguration, connection, new ConsumptionRandom(), "");
         keyEstablishmentMeter = context.makeKeyEstablishment();
         keyEstablishmentMeter.setBusomService(busomService);
     }

@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 /**
  * Busom Set up for substations.
  */
-public class BusomSubstationSetup implements BusomState {
+public class BusomSubstationSetUp implements BusomState {
 
     private final MultiplicativeSubgroup group;
     private ConnectionSubstationInt connection;
@@ -35,7 +35,7 @@ public class BusomSubstationSetup implements BusomState {
      *
      * @param group multiplicative group.
      */
-    protected BusomSubstationSetup(MultiplicativeSubgroup group) {
+    protected BusomSubstationSetUp(MultiplicativeSubgroup group) {
         this.group = group;
         datagrams = new ArrayList<>();
     }
@@ -46,7 +46,7 @@ public class BusomSubstationSetup implements BusomState {
      * @param group      multiplicative group.
      * @param connection to all meters
      */
-    public BusomSubstationSetup(MultiplicativeSubgroup group, ConnectionSubstationInt connection) {
+    public BusomSubstationSetUp(MultiplicativeSubgroup group, ConnectionSubstationInt connection) {
         this.group = group;
         datagrams = new ArrayList<>();
         this.connection = connection;

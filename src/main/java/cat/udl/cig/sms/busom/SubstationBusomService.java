@@ -1,7 +1,5 @@
 package cat.udl.cig.sms.busom;
 
-import cat.udl.cig.sms.busom.substation.BusomSubstationSetup;
-import cat.udl.cig.sms.busom.substation.DecriptChunk;
 import cat.udl.cig.sms.busom.substation.SubstationBusomContext;
 import cat.udl.cig.sms.busom.substation.SubstationBusomContextInt;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
