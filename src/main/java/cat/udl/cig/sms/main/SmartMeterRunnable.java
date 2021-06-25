@@ -3,7 +3,7 @@ package cat.udl.cig.sms.main;
 
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.ConnectionMeter;
-import cat.udl.cig.sms.consumption.ConsumptionRandom;
+import cat.udl.cig.sms.consumption.RandomConsumption;
 import cat.udl.cig.sms.consumption.ConsumptionReader;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 import cat.udl.cig.sms.recsi.meter.MeterStateContext;
@@ -37,7 +37,7 @@ public class SmartMeterRunnable implements Runnable {
      */
     public SmartMeterRunnable(File file) {
         this.substation = file;
-        this.consumptionReader = new ConsumptionRandom();
+        this.consumptionReader = new RandomConsumption();
     }
 
     public SmartMeterRunnable(File file, ConsumptionReader consumptionReader) {

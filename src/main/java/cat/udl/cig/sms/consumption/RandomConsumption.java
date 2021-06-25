@@ -7,7 +7,7 @@ import java.security.SecureRandom;
  * Extracts dependecy of ConsumptionReader. Used so changing
  * the reader can be easily done.
  */
-public class ConsumptionRandom implements ConsumptionReader {
+public class RandomConsumption implements ConsumptionReader {
 
 
     private static final int LENGTH_OF_CONSUMPTION = 13;

@@ -6,7 +6,7 @@ import cat.udl.cig.sms.busom.MeterBusomServiceInt;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
-import cat.udl.cig.sms.consumption.ConsumptionRandom;
+import cat.udl.cig.sms.consumption.RandomConsumption;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 import cat.udl.cig.sms.recsi.meter.MeterStateContext;
 
@@ -28,7 +28,7 @@ public class KeyEstablishmentMeterTest {
         curveConfiguration = CurveConfiguration.P192();
         connection = new ConnectionMeterMock();
         busomService = new MeterBusomServiceMock();
-        MeterStateContext context = new MeterStateContext(curveConfiguration, connection, new ConsumptionRandom(), "");
+        MeterStateContext context = new MeterStateContext(curveConfiguration, connection, new RandomConsumption(), "");
         keyEstablishmentMeter = context.makeKeyEstablishment();
         keyEstablishmentMeter.setBusomService(busomService);
     }
