@@ -2,11 +2,13 @@ package cat.udl.cig.sms.main;
 
 import cat.udl.cig.operations.wrapper.HashedAlgorithm;
 import cat.udl.cig.sms.consumption.ConsumptionFileReader;
+import cat.udl.cig.sms.consumption.RandomConsumption;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.*;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Makes a runnable simulation of a neighborhood. It needs the number of meters
@@ -43,7 +45,7 @@ public class NeighborhoodSimulation {
         for (int i = 0; i < numberOfMeters; i++) {
             BufferedReader reader = new BufferedReader(new FileReader("consumptions/meter" + i + ".txt"));
             int finalI = i;
-            new Thread(() -> new SmartMeterRunnable(finalI, substationFile, new ConsumptionFileReader(reader)).run()).start();
+            new Thread(() -> new SmartMeterRunnable(finalI, substationFile, new RandomConsumption()).run()).start();
         }
     }
 }

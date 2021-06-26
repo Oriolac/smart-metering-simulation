@@ -46,9 +46,8 @@ public class SubstationStateContext implements SubstationStateContextInt {
         return new ConsumptionTransmissionSubstation(this, privateKey);
     }
 
-    public State makeConsumptionTransmission(BigInteger privateKey, BigInteger message) {
+    public void saveMessage(BigInteger message) {
         this.message = message;
-        return this.makeConsumptionTransmission(privateKey);
     }
 
     /**
@@ -100,12 +99,7 @@ public class SubstationStateContext implements SubstationStateContextInt {
     public Optional<BigInteger> getMessage() throws IOException, NullMessageException {
         if (!(state instanceof ConsumptionTransmissionSubstation))
             return Optional.empty();
-        try {
-            this.state = state.next();
-        } catch (KeyRenewalException exception) {
-            this.state = makeKeyEstablishment();
-            startKeyEstablishment();
-        }
+        this.state = ((ConsumptionTransmissionSubstation) state).next();
         return Optional.of(this.message);
     }
 }

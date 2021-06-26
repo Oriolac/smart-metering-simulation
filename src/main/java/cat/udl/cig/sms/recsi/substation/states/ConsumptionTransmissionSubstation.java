@@ -58,7 +58,8 @@ public class ConsumptionTransmissionSubstation implements State {
             Optional<BigInteger> message = decipher.decrypt(cyphered, t);
             if (message.isEmpty())
                 return substationContext.makeKeyEstablishment();
-            return substationContext.makeConsumptionTransmission(privateKey, message.get());
+            substationContext.saveMessage(message.get());
+            return substationContext.makeConsumptionTransmission(privateKey);
         } else {
             return  substationContext.makeKeyEstablishment();
         }

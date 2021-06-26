@@ -4,6 +4,7 @@ import cat.udl.cig.cryptography.cryptosystems.ciphertexts.HomomorphicCiphertext;
 import cat.udl.cig.fields.MultiplicativeSubgroup;
 import cat.udl.cig.operations.wrapper.HashedAlgorithm;
 import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
+import cat.udl.cig.operations.wrapper.PollardsLambda;
 import cat.udl.cig.sms.busom.BusomMeterState;
 import cat.udl.cig.sms.busom.BusomSubstationState;
 import cat.udl.cig.sms.busom.NullMessageException;
@@ -25,7 +26,7 @@ public class SubstationBusomContext implements SubstationBusomContextInt {
 
     public SubstationBusomContext(MultiplicativeSubgroup group, ConnectionSubstationInt connection) {
         this.connection = connection;
-        logarithmAlgorithm = HashedAlgorithm.getHashedInstance();
+        logarithmAlgorithm = new PollardsLambda(group.getGenerator());
         this.certificateValidation = new CertificateTrueMock<String>();
         this.group = group;
         this.state = new BusomSubstationSetUp(group, this);

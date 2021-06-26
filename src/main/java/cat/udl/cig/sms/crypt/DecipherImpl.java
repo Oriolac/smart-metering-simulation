@@ -7,6 +7,7 @@ import cat.udl.cig.fields.PrimeField;
 import cat.udl.cig.operations.wrapper.BruteForce;
 import cat.udl.cig.operations.wrapper.HashedAlgorithm;
 import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
+import cat.udl.cig.operations.wrapper.PollardsLambda;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -27,7 +28,7 @@ public class DecipherImpl implements Decipher, Hash {
         this.curve = curveConfiguration.getCurve();
         this.field = curveConfiguration.getField();
         this.grup = curveConfiguration.getGroup();
-        lambda = HashedAlgorithm.getHashedInstance();
+        lambda = new PollardsLambda(grup.getGenerator());
         //lambda = new BruteForce(grup.getGenerator());
         this.privateKey = privateKey;
     }
