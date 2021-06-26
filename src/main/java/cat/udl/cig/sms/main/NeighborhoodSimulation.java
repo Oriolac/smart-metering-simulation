@@ -30,6 +30,7 @@ public class NeighborhoodSimulation {
             numberOfMeters = 3;
             substationFile = new File("data/substation3.toml");
         }
+        System.out.println(numberOfMeters);
         HashedAlgorithm.loadHashedInstance(CurveConfiguration.P192().getGroup().getGenerator(),
                 BigInteger.TWO.pow(20), BigInteger.TWO.pow(5));
         new Thread(() -> {
@@ -45,7 +46,7 @@ public class NeighborhoodSimulation {
         for (int i = 0; i < numberOfMeters; i++) {
             BufferedReader reader = new BufferedReader(new FileReader("consumptions/meter" + i + ".txt"));
             int finalI = i;
-            new Thread(() -> new SmartMeterRunnable(finalI, substationFile, new ConsumptionFileReader(reader)).run()).start();
+            new Thread(() -> new SmartMeterRunnable(finalI, substationFile, new RandomConsumption()).run()).start();
         }
     }
 }

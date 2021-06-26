@@ -58,17 +58,18 @@ public class SubstationRunnable implements Runnable {
     public void run() {
         long now, then;
         try {
-            BufferedWriter consumption = new BufferedWriter(new FileWriter("analysis/ct-pollards"+ this.substation.getConnection().getNumberOfMeters() +".csv"));
+            BufferedWriter consumption = new BufferedWriter(new FileWriter("analysis/ct-brute"+ this.substation.getConnection().getNumberOfMeters() +".csv"));
             consumption.write("timedelta");
             consumption.newLine();
             then = Instant.now().toEpochMilli();
             substation.startKeyEstablishment();
             now = Instant.now().toEpochMilli();
-            System.out.println("SSt-KE: " + (now - then));
+            //System.out.println("SSt-KE: " + (now - then));
             then = now;
-            for (int i = 0; i < 96; i++) {
+            for (int i = 0; i < 50; i++) {
                 Optional<BigInteger> message = substation.getMessage();
-                message.ifPresent(System.out::println);
+                int finalI = i;
+                message.ifPresent((a) -> System.out.println(finalI));
                 now = Instant.now().toEpochMilli();
                 consumption.write(String.valueOf(now - then));
                 consumption.newLine();

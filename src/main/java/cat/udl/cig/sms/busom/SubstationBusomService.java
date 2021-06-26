@@ -43,7 +43,7 @@ public class SubstationBusomService implements SubstationBusomServiceInt {
      */
     @Override
     public BigInteger receiveSecretKey() throws IOException, NullMessageException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("analysis/ke-pollards" + this.connection.getNumberOfMeters() +".csv"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("analysis/ke-brute" + this.connection.getNumberOfMeters() +".csv"));
         writer.write("timedelta");
         writer.newLine();
         substationBusomContextInt.setUp();
