@@ -1,33 +1,48 @@
 package cat.udl.cig.sms.main;
 
 import cat.udl.cig.operations.wrapper.HashedAlgorithm;
+import cat.udl.cig.sms.consumption.ConsumptionFileReader;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 
-import java.io.File;
+import java.io.*;
 import java.math.BigInteger;
+import java.util.Arrays;
 
 /**
  * Makes a runnable simulation of a neighborhood. It needs the number of meters
  */
 public class NeighborhoodSimulation {
 
-    private static int NUM_METERS = 2;
-    private static File substation = new File("./data/substation2.toml");
+    private static File substationFile;
+    private static SubstationRunnable substation;
 
-    public static void main(String[] args) throws InterruptedException {
-        if (args.length >= 1) {
-            NUM_METERS = Integer.parseInt(args[0]);
-            substation = new File("./data/substation" + NUM_METERS + ".toml");
+    public static void main(String[] args) throws InterruptedException, IOException {
+        int numberOfMeters;
+        if (args.length > 1 ){
+            String algorithm = args[1];
+        }
+        if (args.length > 0) {
+            numberOfMeters = Integer.parseInt(args[0]);
+            substationFile = new File("data/substation" + numberOfMeters + ".toml");
         } else {
-            NUM_METERS = 3;
-            substation = new File("./data/substation3.toml");
+            numberOfMeters = 3;
+            substationFile = new File("data/substation3.toml");
         }
         HashedAlgorithm.loadHashedInstance(CurveConfiguration.P192().getGroup().getGenerator(),
                 BigInteger.TWO.pow(20), BigInteger.TWO.pow(5));
-        new Thread(() -> new SubstationRunnable(substation).run()).start();
+        new Thread(() -> {
+            try {
+                substation = new SubstationRunnable(substationFile);
+                substation.run();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
         Thread.sleep(100);
-        for (int i = 0; i < NUM_METERS; i++) {
-            new Thread(() -> new SmartMeterRunnable(substation).run()).start();
+
+        for (int i = 0; i < numberOfMeters; i++) {
+            BufferedReader reader = new BufferedReader(new FileReader("consumptions/meter" + i + ".txt"));
+            new Thread(() -> new SmartMeterRunnable(substationFile, new ConsumptionFileReader(reader)).run()).start();
         }
     }
 }

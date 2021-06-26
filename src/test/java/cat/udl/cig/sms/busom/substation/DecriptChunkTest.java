@@ -7,13 +7,14 @@ import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.GroupElement;
 import cat.udl.cig.fields.PrimeField;
 import cat.udl.cig.operations.wrapper.BruteForce;
+import cat.udl.cig.sms.connection.ConnectionSubstationInt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import cat.udl.cig.sms.busom.BusomState;
-import cat.udl.cig.sms.connection.ReceiverSubstation;
 import cat.udl.cig.sms.connection.datagram.GroupElementDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
+import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,36 +25,39 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DecriptChunkTest {
 
     DecriptChunk currentState;
     CurveConfiguration curveConfiguration;
-    ReceiverSpy receiverSpy;
+    ConnectionSpy connectionSpy;
+    SubstationBusomContextInt substationContextInt;
 
     @BeforeEach
     void setUp() {
         curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
-        receiverSpy = new ReceiverSpy(curveConfiguration);
-        ElGamalCiphertext ciphertext = new ElGamalCiphertext(receiverSpy.getPoints("6209844826947604790038975056267208146258025268519512417642",
+        connectionSpy = new ConnectionSpy(curveConfiguration);
+        ElGamalCiphertext ciphertext = new ElGamalCiphertext(connectionSpy.getPoints("6209844826947604790038975056267208146258025268519512417642",
                 "2994524308329009013576298176683420492475513562601889388197", "3322243116407084751555570864568066673271311194669141092600",
                 "3196076688455990248772493899225500830789111078873298446819"));
-        currentState = new DecriptChunk(curveConfiguration.getGroup(), ciphertext);
-        currentState.setReceiver(receiverSpy);
+        substationContextInt = Mockito.mock(SubstationBusomContextInt.class);
+        Mockito.when(substationContextInt.getConnection()).then( c -> connectionSpy);
+        Mockito.when(substationContextInt.getDiscreteLogarithmAlgorithm()).then(c -> new BruteForce(curveConfiguration.getGroup().getGenerator()));
+        Mockito.when(substationContextInt.makeReceiveChunk(Mockito.any())).then(c -> new ReceiveChunk(c.getArgument(0), substationContextInt));
+        currentState = new DecriptChunk(curveConfiguration.getGroup(), ciphertext, substationContextInt);
     }
 
     @Test
     void next() throws IOException {
         BusomState nextState = currentState.next();
-        assertTrue(nextState instanceof ReceiveChunk);
+        assertNotNull(nextState);
     }
 
     @Test
     void receiveAndCompute() throws IOException {
         currentState.receiveAndCompute();
-        assertEquals(1, receiverSpy.getCount());
+        assertEquals(1, connectionSpy.getCount());
         assertEquals(curveConfiguration.getGroup().getGenerator().pow(BigInteger.valueOf(6L)),currentState.getPartialDecryption())
         ;
     }
@@ -65,11 +69,10 @@ class DecriptChunkTest {
         GeneralECPoint partialDecryption = generator.pow(message);
         currentState.setPartialDecryption(partialDecryption);
         assertEquals(Optional.of(message), currentState.readMessage());
-        currentState.setLogarithm(new BruteForce(curveConfiguration.getGroup().getGenerator()));
         assertEquals(Optional.of(message), currentState.readMessage());
     }
 
-    private static class ReceiverSpy implements ReceiverSubstation {
+    private static class ConnectionSpy implements ConnectionSubstationInt {
 
         private final GeneralEC curve;
         private final PrimeField field;
@@ -77,7 +80,7 @@ class DecriptChunkTest {
         private HashMap<Integer, GroupElement> elements;
         private ECPrimeOrderSubgroup group;
 
-        protected ReceiverSpy(CurveConfiguration curveConfiguration) {
+        protected ConnectionSpy(CurveConfiguration curveConfiguration) {
             this.count = 0;
             curve = curveConfiguration.getCurve();
             group = curveConfiguration.getGroup();
@@ -112,6 +115,16 @@ class DecriptChunkTest {
 
         public int getCount() {
             return count;
+        }
+
+        @Override
+        public int getNumberOfMeters() {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public void send(SMSDatagram data) throws IOException {
+            throw new IllegalStateException();
         }
     }
 }

@@ -36,8 +36,7 @@ public class SmartMeterRunnable implements Runnable {
      * @param file neighborhood toml containing configuration
      */
     public SmartMeterRunnable(File file) {
-        this.substation = file;
-        this.consumptionReader = new RandomConsumption();
+        this(file, new RandomConsumption());
     }
 
     public SmartMeterRunnable(File file, ConsumptionReader consumptionReader) {
@@ -63,12 +62,12 @@ public class SmartMeterRunnable implements Runnable {
             then = Instant.now().toEpochMilli();
             context.establishKey();
             now = Instant.now().toEpochMilli();
-            System.out.println("SM-KE: " + (now - then));
+            // System.out.println("SM-KE: " + (now - then));
             then = now;
-            for (int i = 0; i < 15; i++) {
+            for (int i = 0; i < 96; i++) {
                 context.sendConsumption();
                 now = Instant.now().toEpochMilli();
-                System.out.println("SM-CT: " + (now - then));
+                //System.out.println("SM-CT: " + (now - then));
                 then = now;
             }
             context.closeConnection();

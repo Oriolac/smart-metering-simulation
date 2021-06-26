@@ -21,31 +21,22 @@ import java.util.List;
 public class ReceiveChunk implements BusomState {
 
     private final MultiplicativeSubgroup group;
-    private ConnectionSubstationInt connection;
+    private final SubstationBusomContextInt substationBusomContextInt;
     private Sender sender;
     private ReceiverSubstation receiver;
     private HomomorphicCiphertext ciphertext;
 
     /**
-     * Genereates a ReceiveChunk state. Used for testing.
-     *
-     * @param group Group used for encrypt and decrypt.
-     */
-    public ReceiveChunk(MultiplicativeSubgroup group) {
-        this.group = group;
-    }
-
-    /**
      * Generates a ReceiverChunk state.
      *
      * @param group      Group used for encrypt and decrypt.
-     * @param connection to all the meters.
+     * @param substationBusomContextInt context of state-machine design.
      */
-    public ReceiveChunk(MultiplicativeSubgroup group, ConnectionSubstationInt connection) {
+    public ReceiveChunk(MultiplicativeSubgroup group, SubstationBusomContextInt substationBusomContextInt) {
         this.group = group;
-        receiver = connection;
-        sender = connection;
-        this.connection = connection;
+        this.substationBusomContextInt = substationBusomContextInt;
+        receiver = substationBusomContextInt.getConnection();
+        sender = substationBusomContextInt.getConnection();
     }
 
     /**
@@ -58,7 +49,7 @@ public class ReceiveChunk implements BusomState {
     public DecriptChunk next() throws IOException {
         receiveAndCompute();
         sendC();
-        return new DecriptChunk(group, ciphertext, connection);
+        return substationBusomContextInt.makeDecriptChunk(group, ciphertext);
     }
 
     /**
@@ -99,24 +90,6 @@ public class ReceiveChunk implements BusomState {
      */
     protected void sendC() throws IOException {
         sender.send(new GroupElementDatagram(ciphertext.getParts()[0]));
-    }
-
-    /**
-     * Sets sender. Used for testing
-     *
-     * @param sender mock of sender
-     */
-    public void setSender(Sender sender) {
-        this.sender = sender;
-    }
-
-    /**
-     * Sets the receiver. Used for testing.
-     *
-     * @param receiver mock of receiver.
-     */
-    public void setReceiver(ReceiverSubstation receiver) {
-        this.receiver = receiver;
     }
 
     /**

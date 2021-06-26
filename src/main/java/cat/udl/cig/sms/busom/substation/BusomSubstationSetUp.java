@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 public class BusomSubstationSetUp implements BusomState {
 
     private final MultiplicativeSubgroup group;
+    private final SubstationBusomContextInt substationBusomContext;
     private ConnectionSubstationInt connection;
     private ReceiverSubstation receiver;
     private Sender sender;
@@ -31,28 +32,18 @@ public class BusomSubstationSetUp implements BusomState {
     private static final Logger LOGGER = Logger.getAnonymousLogger();
 
     /**
-     * Sets up the parameters needed for the ecryption. Used for testing
-     *
-     * @param group multiplicative group.
-     */
-    protected BusomSubstationSetUp(MultiplicativeSubgroup group) {
-        this.group = group;
-        datagrams = new ArrayList<>();
-    }
-
-    /**
      * Generates a BusomSubstationSetup
-     *
-     * @param group      multiplicative group.
-     * @param connection to all meters
+     *  @param group      multiplicative group.
+     * @param substationBusomContext context of state-machine design
      */
-    public BusomSubstationSetUp(MultiplicativeSubgroup group, ConnectionSubstationInt connection) {
+    public BusomSubstationSetUp(MultiplicativeSubgroup group, SubstationBusomContextInt substationBusomContext) {
         this.group = group;
         datagrams = new ArrayList<>();
-        this.connection = connection;
-        this.sender = connection;
-        this.receiver = connection;
-        this.validation = new CertificateTrueMock<>();
+        this.connection = substationBusomContext.getConnection();
+        this.sender = substationBusomContext.getConnection();
+        this.receiver = substationBusomContext.getConnection();
+        this.validation = substationBusomContext.getCertificateValidation();
+        this.substationBusomContext = substationBusomContext;
     }
 
     /**
@@ -65,7 +56,7 @@ public class BusomSubstationSetUp implements BusomState {
     public BusomState next() throws IOException {
         receivePublicKeys();
         sendPublicKey();
-        return new ReceiveChunk(group, connection);
+        return substationBusomContext.makeReceiveChunk(group);
     }
 
     /**
@@ -104,33 +95,6 @@ public class BusomSubstationSetUp implements BusomState {
             sender.send(data);
         }
         sender.send(new EndOfDatagram());
-    }
-
-    /**
-     * Sets the validation. Used for tests.
-     *
-     * @param validation mock of validation.
-     */
-    public void setValidation(CertificateValidation<String> validation) {
-        this.validation = validation;
-    }
-
-    /**
-     * Sets the receiver of the substation. Used for tests.
-     *
-     * @param receiver mock of sender
-     */
-    public void setReceiver(ReceiverSubstation receiver) {
-        this.receiver = receiver;
-    }
-
-    /**
-     * Sets the sender of the substation. Used for tests.
-     *
-     * @param sender mock of sender.
-     */
-    public void setSender(Sender sender) {
-        this.sender = sender;
     }
 
     /**

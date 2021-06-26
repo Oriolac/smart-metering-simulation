@@ -87,7 +87,7 @@ public class SubstationContextSubstation implements SubstationStateContextInt {
     }
 
     public void setSubstationBusomControllerInt(SubstationBusomServiceInt controllerInt) {
-        ((KeyEstablishmentSubstation) state).setController(controllerInt);
+        ((KeyEstablishmentSubstation) state).setService(controllerInt);
     }
 
     @Override

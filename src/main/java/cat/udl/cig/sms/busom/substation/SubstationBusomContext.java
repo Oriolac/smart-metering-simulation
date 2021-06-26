@@ -1,8 +1,14 @@
 package cat.udl.cig.sms.busom.substation;
 
-import cat.udl.cig.ecc.ECPrimeOrderSubgroup;
+import cat.udl.cig.cryptography.cryptosystems.ciphertexts.HomomorphicCiphertext;
+import cat.udl.cig.fields.GroupElement;
+import cat.udl.cig.fields.MultiplicativeSubgroup;
+import cat.udl.cig.operations.wrapper.BruteForce;
+import cat.udl.cig.operations.wrapper.HashedAlgorithm;
+import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
 import cat.udl.cig.sms.busom.BusomState;
 import cat.udl.cig.sms.busom.NullMessageException;
+import cat.udl.cig.sms.busom.certificate.CertificateTrueMock;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
 
 import java.io.IOException;
@@ -11,10 +17,16 @@ import java.util.Optional;
 
 public class SubstationBusomContext implements SubstationBusomContextInt {
 
+    private final ConnectionSubstationInt connection;
+    private final CertificateTrueMock<String> certificateValidation;
     private BusomState state;
+    private final LogarithmAlgorithm logarithmAlgorithm;
 
-    public SubstationBusomContext(ECPrimeOrderSubgroup group, ConnectionSubstationInt connection) {
-        this.state = new BusomSubstationSetUp(group, connection);
+    public SubstationBusomContext(MultiplicativeSubgroup group, ConnectionSubstationInt connection) {
+        this.connection = connection;
+        logarithmAlgorithm = new BruteForce(group.getGenerator());
+        this.certificateValidation = new CertificateTrueMock<String>();
+        this.state = new BusomSubstationSetUp(group, this);
     }
 
     @Override
@@ -42,5 +54,29 @@ public class SubstationBusomContext implements SubstationBusomContextInt {
         Optional<BigInteger> message = ((DecriptChunk) state).readMessage();
         this.state = receiveChunk;
         return message;
+    }
+
+    @Override
+    public ConnectionSubstationInt getConnection() {
+        return this.connection;
+    }
+
+    @Override
+    public LogarithmAlgorithm getDiscreteLogarithmAlgorithm() {
+        return this.logarithmAlgorithm;
+    }
+
+    @Override
+    public ReceiveChunk makeReceiveChunk(MultiplicativeSubgroup group) {
+        return new ReceiveChunk(group, this);
+    }
+
+    @Override
+    public DecriptChunk makeDecriptChunk(MultiplicativeSubgroup group, HomomorphicCiphertext ciphertext) {
+        return new DecriptChunk(group, ciphertext, this);
+    }
+
+    public CertificateTrueMock<String> getCertificateValidation() {
+        return certificateValidation;
     }
 }

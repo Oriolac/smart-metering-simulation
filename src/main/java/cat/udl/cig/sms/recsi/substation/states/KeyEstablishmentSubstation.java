@@ -14,7 +14,7 @@ import java.math.BigInteger;
 public class KeyEstablishmentSubstation implements State {
 
 
-    private SubstationBusomServiceInt controller;
+    private SubstationBusomServiceInt service;
     private final SubstationContextSubstation context;
 
     /**
@@ -23,14 +23,14 @@ public class KeyEstablishmentSubstation implements State {
      */
     public KeyEstablishmentSubstation(SubstationContextSubstation context) {
         this.context = context;
-        this.controller = context.makeSubstationBusomController();
+        this.service = context.makeSubstationBusomController();
     }
 
     /**
-     * @param controller of the busom
+     * @param service of the busom
      */
-    public void setController(SubstationBusomServiceInt controller) {
-        this.controller = controller;
+    public void setService(SubstationBusomServiceInt service) {
+        this.service = service;
     }
 
     /**
@@ -41,7 +41,7 @@ public class KeyEstablishmentSubstation implements State {
     @Override
     public State next() throws IOException, NullMessageException {
         BigInteger order = context.getLoadCurve().getGroup().getSize();
-        BigInteger privateKey = controller.receiveSecretKey().remainder(order);
+        BigInteger privateKey = service.receiveSecretKey().remainder(order);
         privateKey = order.subtract(privateKey);
         return context.makeConsumptionTransmission(privateKey);
     }

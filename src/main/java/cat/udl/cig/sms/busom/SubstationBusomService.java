@@ -5,6 +5,8 @@ import cat.udl.cig.sms.busom.substation.SubstationBusomContextInt;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -17,6 +19,7 @@ public class SubstationBusomService implements SubstationBusomServiceInt {
 
     private final int numberOfChunks;
     private final SubstationBusomContextInt substationBusomContextInt;
+    private final ConnectionSubstationInt connection;
 
     /**
      * Generates a Substation Busom Controller.
@@ -25,6 +28,7 @@ public class SubstationBusomService implements SubstationBusomServiceInt {
      * @param connection to all the meters
      */
     public SubstationBusomService(CurveConfiguration curveConfiguration, ConnectionSubstationInt connection) {
+        this.connection = connection;
         this.substationBusomContextInt = new SubstationBusomContext(curveConfiguration.getGroup(), connection);
         int bits = curveConfiguration.getField().getSize().bitLength();
         this.numberOfChunks = bits / 13 + ((bits % 13 == 0) ? 0 : 1);
@@ -39,6 +43,9 @@ public class SubstationBusomService implements SubstationBusomServiceInt {
      */
     @Override
     public BigInteger receiveSecretKey() throws IOException, NullMessageException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("analysis/ke" + this.connection.getNumberOfMeters() +".csv"));
+        writer.write("timedelta");
+        writer.newLine();
         substationBusomContextInt.setUp();
         BigInteger message = BigInteger.ZERO;
         long then, now;
@@ -51,9 +58,11 @@ public class SubstationBusomService implements SubstationBusomServiceInt {
             }
             message = message.add(chunk.get().multiply(BigInteger.TWO.pow(13 * i)));
             now = Instant.now().toEpochMilli();
-            System.out.println("SSt-BS: " + (now - then));
+            writer.write(String.valueOf((now - then)));
+            writer.newLine();
             then = now;
         }
+        writer.close();
         return message;
     }
 

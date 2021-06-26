@@ -7,6 +7,7 @@ import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.GroupElement;
 import cat.udl.cig.fields.PrimeField;
+import cat.udl.cig.sms.connection.ConnectionSubstationInt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import cat.udl.cig.sms.busom.BusomState;
@@ -15,6 +16,9 @@ import cat.udl.cig.sms.connection.ReceiverSubstation;
 import cat.udl.cig.sms.connection.datagram.CipherTextDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,30 +28,37 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ReceiveChunkTest {
 
     CurveConfiguration curveConfiguration;
+    SubstationBusomContextInt substationBusomContextInt;
     ReceiveChunk currentState;
+    ConnectionSpy connectionSpy;
     ReceiverSpy receiver;
     SenderSpy senderSpy;
+    private ElGamalCiphertext cipherText;
 
     @BeforeEach
     void setUp() {
         curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
-        currentState = new ReceiveChunk(curveConfiguration.getGroup());
         receiver = new ReceiverSpy(curveConfiguration);
-        currentState.setReceiver(receiver);
         senderSpy = new SenderSpy();
-        currentState.setSender(senderSpy);
+        cipherText = new ElGamalCiphertext(receiver.getPoints("6209844826947604790038975056267208146258025268519512417642",
+                "2994524308329009013576298176683420492475513562601889388197", "3322243116407084751555570864568066673271311194669141092600",
+                "3196076688455990248772493899225500830789111078873298446819"));
+        substationBusomContextInt = Mockito.mock(SubstationBusomContextInt.class);
+        connectionSpy = new ConnectionSpy(receiver, senderSpy);
+        Mockito.when(substationBusomContextInt.getConnection()).thenReturn(connectionSpy);
+        Mockito.when(substationBusomContextInt.makeDecriptChunk(Mockito.any(), Mockito.any())).then((Answer<DecriptChunk>) invocationOnMock -> new DecriptChunk(invocationOnMock.getArgument(0), invocationOnMock.getArgument(1) , substationBusomContextInt));
+        currentState = new ReceiveChunk(curveConfiguration.getGroup(), substationBusomContextInt);
     }
 
     @Test
     void next() throws IOException {
         BusomState nextState = currentState.next();
-        assertTrue(nextState instanceof DecriptChunk);
+        assertNotNull(nextState);
     }
 
     @Test
@@ -55,15 +66,12 @@ class ReceiveChunkTest {
         currentState.receiveAndCompute();
         assertEquals(1, receiver.getCount());
         ElGamalCiphertext ciphertext = (ElGamalCiphertext) currentState.getCiphertext();
-        ElGamalCiphertext expected = new ElGamalCiphertext(receiver.getPoints("6209844826947604790038975056267208146258025268519512417642",
-                "2994524308329009013576298176683420492475513562601889388197", "3322243116407084751555570864568066673271311194669141092600",
-                "3196076688455990248772493899225500830789111078873298446819"));
+        ElGamalCiphertext expected = ciphertext;
         assertEquals(expected, ciphertext);
     }
 
     @Test
     void sendC() throws IOException {
-        currentState.setSender(senderSpy);
         ElGamalCiphertext ciphertext = new ElGamalCiphertext(receiver.getPoints("6209844826947604790038975056267208146258025268519512417642",
                 "2994524308329009013576298176683420492475513562601889388197", "3322243116407084751555570864568066673271311194669141092600",
                 "3196076688455990248772493899225500830789111078873298446819"));
@@ -72,7 +80,33 @@ class ReceiveChunkTest {
         assertEquals(1, senderSpy.getCount());
     }
 
-    protected static class ReceiverSpy implements ReceiverSubstation {
+    public static class ConnectionSpy implements ConnectionSubstationInt {
+
+        private final ReceiverSpy receiverSpy;
+        private final SenderSpy senderSpy;
+
+        protected ConnectionSpy(ReceiverSpy receiverSpy, SenderSpy senderSpy) {
+            this.receiverSpy = receiverSpy;
+            this.senderSpy = senderSpy;
+        }
+
+        @Override
+        public int getNumberOfMeters() {
+            throw new IllegalStateException();
+        }
+
+        @Override
+        public List<SMSDatagram> receive() throws IOException {
+            return this.receiverSpy.receive();
+        }
+
+        @Override
+        public void send(SMSDatagram data) throws IOException {
+            this.senderSpy.send(data);
+        }
+    }
+
+    public static class ReceiverSpy implements ReceiverSubstation {
 
 
         private final PrimeField field;

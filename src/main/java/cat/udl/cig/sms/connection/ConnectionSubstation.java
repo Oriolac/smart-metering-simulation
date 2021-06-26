@@ -82,4 +82,8 @@ public class ConnectionSubstation implements ConnectionSubstationInt {
         }
     }
 
+    @Override
+    public int getNumberOfMeters() {
+        return this.numberOfMeters;
+    }
 }

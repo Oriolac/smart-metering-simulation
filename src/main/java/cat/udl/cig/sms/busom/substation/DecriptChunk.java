@@ -25,40 +25,27 @@ import java.util.logging.Logger;
 public class DecriptChunk implements BusomState {
 
     private final HomomorphicCiphertext ciphertext;
+    private final SubstationBusomContextInt substationBusomContextInt;
     private ConnectionSubstationInt connection;
-    private LogarithmAlgorithm logarithm;
     private final MultiplicativeSubgroup group;
     private GroupElement partialDecryption;
     private ReceiverSubstation receiver;
     private static final Logger LOGGER = Logger.getAnonymousLogger();
 
     /**
-     * Generates DecriptChunkState for testing.
-     *
-     * @param group      Group be needed to encrypt and decrypt.
-     * @param ciphertext [C, D], used to compute the adding of messages.
-     */
-    public DecriptChunk(MultiplicativeSubgroup group, HomomorphicCiphertext ciphertext) {
-        this.group = group;
-        partialDecryption = group.getNeuterElement();
-        this.ciphertext = ciphertext;
-        logarithm = new BruteForce(group.getGenerator());
-    }
-
-    /**
      * Generates DecriptChunkState.
      *
      * @param group      Group be needed to encrypt and decrypt.
      * @param ciphertext [C, D], used to compute the adding of messages.
-     * @param connection to all the meters.
+     * @param substationBusomContextInt context of state-machine context.
      */
     public DecriptChunk(MultiplicativeSubgroup group,
-                        HomomorphicCiphertext ciphertext, ConnectionSubstationInt connection) {
+                        HomomorphicCiphertext ciphertext, SubstationBusomContextInt substationBusomContextInt) {
         this.group = group;
         partialDecryption = group.getNeuterElement();
         this.ciphertext = ciphertext;
-        logarithm = HashedAlgorithm.getHashedInstance();
-        this.connection = connection;
+        this.substationBusomContextInt = substationBusomContextInt;
+        this.connection = substationBusomContextInt.getConnection();
         receiver = connection;
     }
 
@@ -72,7 +59,7 @@ public class DecriptChunk implements BusomState {
     @Override
     public ReceiveChunk next() throws IOException {
         receiveAndCompute();
-        return new ReceiveChunk(group, connection);
+        return this.substationBusomContextInt.makeReceiveChunk(group);
     }
 
     /**
@@ -110,7 +97,7 @@ public class DecriptChunk implements BusomState {
      * @return Optional of the read message (it can fail)
      */
     public Optional<BigInteger> readMessage() {
-        return logarithm.algorithm(partialDecryption);
+        return substationBusomContextInt.getDiscreteLogarithmAlgorithm().algorithm(partialDecryption);
     }
 
     /**
@@ -123,29 +110,11 @@ public class DecriptChunk implements BusomState {
     }
 
     /**
-     * Sets the logarithm algorithm
-     *
-     * @param logarithm to be set.
-     */
-    public void setLogarithm(LogarithmAlgorithm logarithm) {
-        this.logarithm = logarithm;
-    }
-
-    /**
      * Gets the partialDecryption.
      *
      * @return partialDecryption
      */
     protected GroupElement getPartialDecryption() {
         return partialDecryption;
-    }
-
-    /**
-     * Sets a mock of receiver.
-     *
-     * @param receiver mock of receiver
-     */
-    public void setReceiver(ReceiverSubstation receiver) {
-        this.receiver = receiver;
     }
 }

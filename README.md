@@ -2,7 +2,7 @@
 Simulation of smart matering system 
 
 ```
-mvn exec:java -D exec.mainClass=cat.udl.cig.sms.main.NeighborhoodSimulation
+mvn exec:java -Dexec.mainClass=cat.udl.cig.sms.main.NeighborhoodSimulation -Dexec.args="<>"
 ```
 
 ```
