@@ -1,13 +1,13 @@
 package cat.udl.cig.sms.busom.substation;
 
 import cat.udl.cig.fields.GroupElement;
+import cat.udl.cig.sms.busom.BusomSubstationState;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
 import cat.udl.cig.sms.connection.ReceiverSubstation;
-import cat.udl.cig.sms.connection.Sender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import cat.udl.cig.sms.busom.BusomState;
+import cat.udl.cig.sms.busom.BusomMeterState;
 import cat.udl.cig.sms.busom.certificate.CertificateTrueMock;
 import cat.udl.cig.sms.busom.meter.doubles.SenderSpy;
 import cat.udl.cig.sms.connection.datagram.NeighborhoodDatagram;
@@ -48,7 +48,7 @@ class BusomSubstationSetUpTest {
 
     @Test
     void next() throws IOException {
-        BusomState nextState = substationSetup.next();
+        BusomSubstationState nextState = substationSetup.next();
         assertNotNull(nextState);
         assertTrue(nextState instanceof ReceiveChunk, "nextState is " + nextState.getClass());
     }

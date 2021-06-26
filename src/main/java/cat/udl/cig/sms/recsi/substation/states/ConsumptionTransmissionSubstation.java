@@ -9,7 +9,7 @@ import cat.udl.cig.sms.connection.datagram.SMSDatagram;
 import cat.udl.cig.sms.crypt.DecipherImpl;
 import cat.udl.cig.sms.crypt.Decipher;
 import cat.udl.cig.sms.recsi.State;
-import cat.udl.cig.sms.recsi.substation.SubstationContextSubstation;
+import cat.udl.cig.sms.recsi.substation.SubstationStateContext;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -24,7 +24,7 @@ import java.util.Optional;
 public class ConsumptionTransmissionSubstation implements State {
 
     private Decipher decipher;
-    private final SubstationContextSubstation substationContext;
+    private final SubstationStateContext substationContext;
     private final BigInteger privateKey;
     private static final int NUM_BITS = 13;
 
@@ -33,7 +33,7 @@ public class ConsumptionTransmissionSubstation implements State {
      *                               creates the different states.
      * @param privateKey             or s0 which is the private key of the smart metering protocol
      */
-    public ConsumptionTransmissionSubstation(SubstationContextSubstation substationContext, BigInteger privateKey) {
+    public ConsumptionTransmissionSubstation(SubstationStateContext substationContext, BigInteger privateKey) {
         this.substationContext = substationContext;
         decipher = new DecipherImpl(substationContext.getLoadCurve(), privateKey);
         this.privateKey = privateKey;

@@ -7,17 +7,17 @@ import cat.udl.cig.ecc.GeneralEC;
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.GroupElement;
 import cat.udl.cig.fields.PrimeField;
+import cat.udl.cig.sms.busom.BusomSubstationState;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import cat.udl.cig.sms.busom.BusomState;
+import cat.udl.cig.sms.busom.BusomMeterState;
 import cat.udl.cig.sms.busom.meter.doubles.SenderSpy;
 import cat.udl.cig.sms.connection.ReceiverSubstation;
 import cat.udl.cig.sms.connection.datagram.CipherTextDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.File;
@@ -57,7 +57,7 @@ class ReceiveChunkTest {
 
     @Test
     void next() throws IOException {
-        BusomState nextState = currentState.next();
+        BusomSubstationState nextState = currentState.next();
         assertNotNull(nextState);
     }
 

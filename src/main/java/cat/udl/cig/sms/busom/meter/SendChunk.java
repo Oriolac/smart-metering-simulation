@@ -2,10 +2,9 @@ package cat.udl.cig.sms.busom.meter;
 
 import cat.udl.cig.cryptography.cryptosystems.ElGamalCypher;
 import cat.udl.cig.cryptography.cryptosystems.HomomorphicCypher;
-import cat.udl.cig.cryptography.cryptosystems.ciphertexts.ElGamalCiphertext;
 import cat.udl.cig.cryptography.cryptosystems.ciphertexts.HomomorphicCiphertext;
 import cat.udl.cig.fields.GroupElement;
-import cat.udl.cig.sms.busom.BusomState;
+import cat.udl.cig.sms.busom.BusomMeterState;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.busom.data.MeterKey;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
@@ -20,7 +19,7 @@ import java.util.Random;
 /**
  * Sends a chunk of a message to the substation
  */
-public class SendChunk implements BusomState {
+public class SendChunk implements BusomMeterState {
 
     private final GroupElement generator;
     private final CurveConfiguration curveConfiguration;
@@ -65,7 +64,7 @@ public class SendChunk implements BusomState {
      * @throws IOException,          if connection has failed.
      */
     @Override
-    public BusomState next() throws NullMessageException, IOException {
+    public BusomMeterState next() throws NullMessageException, IOException {
         BigInteger noise = SendChunk.generateNoise();
         if (message == null)
             throw new NullMessageException();

@@ -2,12 +2,14 @@ package cat.udl.cig.sms.busom.meter;
 
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.fields.GroupElement;
-import cat.udl.cig.sms.busom.BusomState;
+import cat.udl.cig.sms.busom.BusomMeterState;
 import cat.udl.cig.sms.busom.data.MeterKey;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
+import cat.udl.cig.sms.connection.KeyRenewalException;
 import cat.udl.cig.sms.connection.ReceiverMeter;
 import cat.udl.cig.sms.connection.Sender;
 import cat.udl.cig.sms.connection.datagram.GroupElementDatagram;
+import cat.udl.cig.sms.connection.datagram.KeyRenewalDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 
@@ -17,7 +19,7 @@ import java.math.BigInteger;
 /**
  * Sends partial Decryption to substation.
  */
-public class SendPartialDecryption implements BusomState {
+public class SendPartialDecryption implements BusomMeterState {
 
     private final MeterKey meterKey;
     private final BigInteger noise;
@@ -65,7 +67,7 @@ public class SendPartialDecryption implements BusomState {
      * @throws IOException, if connection has failed.
      */
     @Override
-    public BusomState next() throws IOException {
+    public BusomMeterState next() throws IOException, KeyRenewalException {
         partialDecryption = generatePartialDecryption();
         sendDecryption();
         return new SendChunk(meterKey, curveConfiguration, connection);
@@ -76,14 +78,15 @@ public class SendPartialDecryption implements BusomState {
      *
      * @return partial decryption or null if connection fails to receive.
      */
-    protected GroupElement generatePartialDecryption() {
-        //TODO: S'han de vigilar els errors
+    protected GroupElement generatePartialDecryption() throws KeyRenewalException {
         SMSDatagram data;
         try {
             data = receiverMeter.receive();
             if (data instanceof GroupElementDatagram) {
                 GroupElementDatagram elementDatagram = (GroupElementDatagram) data;
                 return elementDatagram.getElement().pow(meterKey.getPrivateKey()).multiply(generator.pow(noise));
+            } else if (data instanceof KeyRenewalDatagram) {
+                throw new KeyRenewalException();
             }
         } catch (IOException e) {
             e.printStackTrace();

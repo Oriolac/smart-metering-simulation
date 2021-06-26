@@ -50,12 +50,18 @@ public class SubstationBusomService implements SubstationBusomServiceInt {
         BigInteger message = BigInteger.ZERO;
         long then, now;
         then = Instant.now().toEpochMilli();
+        //BufferedWriter writerMessage = new BufferedWriter(new FileWriter("analysis/msgm/192/sst.csv"));
+        //writerMessage.write("round,message");
+        //writerMessage.newLine();
         for (int i = 0; i < this.numberOfChunks; ++i) {
             substationBusomContextInt.computeC();
             Optional<BigInteger> chunk = substationBusomContextInt.decrypt();
             if (chunk.isEmpty()) {
+                substationBusomContextInt.keyRenewal();
                 throw new NullMessageException();
             }
+            //writerMessage.write(i + "," + chunk.get());
+            //writerMessage.newLine();
             message = message.add(chunk.get().multiply(BigInteger.TWO.pow(13 * i)));
             now = Instant.now().toEpochMilli();
             writer.write(String.valueOf((now - then)));
@@ -63,6 +69,7 @@ public class SubstationBusomService implements SubstationBusomServiceInt {
             then = now;
         }
         writer.close();
+        //writerMessage.close();
         return message;
     }
 

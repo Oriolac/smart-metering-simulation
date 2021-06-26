@@ -35,6 +35,8 @@ public class SerializerRepository {
         serializers[Datagrams.GROUP_ELEMENT_DATAGRAM.ordinal()] = new GroupElementDatagramSerializer(loadcurve);
         serializers[Datagrams.NEIGHBORHOOD_DATAGRAM.ordinal()] = new NeighborhoodDatagramSerializer(loadcurve);
         serializers[Datagrams.BIG_INTEGER_DATAGRAM.ordinal()] = new BigIntegerDatagramSerializer();
+        serializers[Datagrams.KEY_RENEWAL_DATAGRAM.ordinal()] = new KeyRenewalDatagramSerializer();
+
     }
 
     /**

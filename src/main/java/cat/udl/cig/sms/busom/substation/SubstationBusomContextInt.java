@@ -3,10 +3,10 @@ package cat.udl.cig.sms.busom.substation;
 import cat.udl.cig.cryptography.cryptosystems.ciphertexts.HomomorphicCiphertext;
 import cat.udl.cig.fields.MultiplicativeSubgroup;
 import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
-import cat.udl.cig.sms.busom.BusomState;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.busom.certificate.CertificateValidation;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
+import cat.udl.cig.sms.connection.KeyRenewalException;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -29,4 +29,6 @@ public interface SubstationBusomContextInt {
     DecriptChunk makeDecriptChunk(MultiplicativeSubgroup group, HomomorphicCiphertext ciphertext);
 
     CertificateValidation<String> getCertificateValidation();
+
+    void keyRenewal() throws IOException;
 }

@@ -1,15 +1,15 @@
 package cat.udl.cig.sms.busom.substation;
 
 import cat.udl.cig.cryptography.cryptosystems.ciphertexts.HomomorphicCiphertext;
-import cat.udl.cig.fields.GroupElement;
 import cat.udl.cig.fields.MultiplicativeSubgroup;
-import cat.udl.cig.operations.wrapper.BruteForce;
 import cat.udl.cig.operations.wrapper.HashedAlgorithm;
 import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
-import cat.udl.cig.sms.busom.BusomState;
+import cat.udl.cig.sms.busom.BusomMeterState;
+import cat.udl.cig.sms.busom.BusomSubstationState;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.busom.certificate.CertificateTrueMock;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
+import cat.udl.cig.sms.connection.datagram.KeyRenewalDatagram;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -19,13 +19,15 @@ public class SubstationBusomContext implements SubstationBusomContextInt {
 
     private final ConnectionSubstationInt connection;
     private final CertificateTrueMock<String> certificateValidation;
-    private BusomState state;
+    private final MultiplicativeSubgroup group;
+    private BusomSubstationState state;
     private final LogarithmAlgorithm logarithmAlgorithm;
 
     public SubstationBusomContext(MultiplicativeSubgroup group, ConnectionSubstationInt connection) {
         this.connection = connection;
-        logarithmAlgorithm = new BruteForce(group.getGenerator());
+        logarithmAlgorithm = HashedAlgorithm.getHashedInstance();
         this.certificateValidation = new CertificateTrueMock<String>();
+        this.group = group;
         this.state = new BusomSubstationSetUp(group, this);
     }
 
@@ -50,7 +52,7 @@ public class SubstationBusomContext implements SubstationBusomContextInt {
         if (!(state instanceof  DecriptChunk)) {
             throw new IllegalStateException();
         }
-        BusomState receiveChunk = state.next();
+        BusomSubstationState receiveChunk = state.next();
         Optional<BigInteger> message = ((DecriptChunk) state).readMessage();
         this.state = receiveChunk;
         return message;
@@ -78,5 +80,11 @@ public class SubstationBusomContext implements SubstationBusomContextInt {
 
     public CertificateTrueMock<String> getCertificateValidation() {
         return certificateValidation;
+    }
+
+    @Override
+    public void keyRenewal() throws IOException {
+        connection.send(new KeyRenewalDatagram());
+        this.state = new BusomSubstationSetUp(this.group, this);
     }
 }

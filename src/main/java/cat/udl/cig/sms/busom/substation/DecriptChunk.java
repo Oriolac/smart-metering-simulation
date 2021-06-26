@@ -3,10 +3,8 @@ package cat.udl.cig.sms.busom.substation;
 import cat.udl.cig.cryptography.cryptosystems.ciphertexts.HomomorphicCiphertext;
 import cat.udl.cig.fields.GroupElement;
 import cat.udl.cig.fields.MultiplicativeSubgroup;
-import cat.udl.cig.operations.wrapper.BruteForce;
-import cat.udl.cig.operations.wrapper.HashedAlgorithm;
-import cat.udl.cig.operations.wrapper.LogarithmAlgorithm;
-import cat.udl.cig.sms.busom.BusomState;
+import cat.udl.cig.sms.busom.BusomMeterState;
+import cat.udl.cig.sms.busom.BusomSubstationState;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
 import cat.udl.cig.sms.connection.ReceiverSubstation;
 import cat.udl.cig.sms.connection.datagram.GroupElementDatagram;
@@ -22,7 +20,7 @@ import java.util.logging.Logger;
 /**
  * Decripts Chunk, requesting the data necessary to be computed.
  */
-public class DecriptChunk implements BusomState {
+public class DecriptChunk implements BusomSubstationState {
 
     private final HomomorphicCiphertext ciphertext;
     private final SubstationBusomContextInt substationBusomContextInt;

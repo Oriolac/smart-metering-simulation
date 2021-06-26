@@ -4,8 +4,8 @@ import cat.udl.cig.cryptography.cryptosystems.ciphertexts.ElGamalCiphertext;
 import cat.udl.cig.cryptography.cryptosystems.ciphertexts.HomomorphicCiphertext;
 import cat.udl.cig.fields.GroupElement;
 import cat.udl.cig.fields.MultiplicativeSubgroup;
-import cat.udl.cig.sms.busom.BusomState;
-import cat.udl.cig.sms.connection.ConnectionSubstationInt;
+import cat.udl.cig.sms.busom.BusomMeterState;
+import cat.udl.cig.sms.busom.BusomSubstationState;
 import cat.udl.cig.sms.connection.ReceiverSubstation;
 import cat.udl.cig.sms.connection.Sender;
 import cat.udl.cig.sms.connection.datagram.CipherTextDatagram;
@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Receive chunk state of protocol
  */
-public class ReceiveChunk implements BusomState {
+public class ReceiveChunk implements BusomSubstationState {
 
     private final MultiplicativeSubgroup group;
     private final SubstationBusomContextInt substationBusomContextInt;

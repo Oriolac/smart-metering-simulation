@@ -5,6 +5,7 @@ import cat.udl.cig.sms.busom.MeterBusomService;
 import cat.udl.cig.sms.busom.MeterBusomServiceInt;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
+import cat.udl.cig.sms.connection.KeyRenewalException;
 import cat.udl.cig.sms.consumption.ConsumptionReader;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 import cat.udl.cig.sms.recsi.State;
@@ -18,6 +19,7 @@ import java.io.IOException;
  */
 public class MeterStateContext implements MeterStateContextInt {
 
+    private final int numMeter;
     private final CurveConfiguration curveConfiguration;
     private final ConnectionMeterInt connection;
     private final ConsumptionReader consumption;
@@ -25,13 +27,15 @@ public class MeterStateContext implements MeterStateContextInt {
     private State state;
 
     /**
+     * @param numMeter code of Meter
      * @param curveConfiguration   which has all the information of the ECC
      * @param connection  which manages the connection with the substation
      * @param consumption which reads all the consumption of the meter
      * @param certificate of the smart meter
      */
-    public MeterStateContext(CurveConfiguration curveConfiguration, ConnectionMeterInt connection,
+    public MeterStateContext(int numMeter, CurveConfiguration curveConfiguration, ConnectionMeterInt connection,
                              ConsumptionReader consumption, String certificate) throws IOException, NullMessageException {
+        this.numMeter = numMeter;
         this.curveConfiguration = curveConfiguration;
         this.connection = connection;
         this.consumption = consumption;
@@ -44,7 +48,7 @@ public class MeterStateContext implements MeterStateContextInt {
      * @return the consumption transmition state of the meter in order to send the consumption
      */
     public ConsumptionTransmissionMeter makeConsumptionTransmission(PrimeFieldElement privateKey) {
-        return new ConsumptionTransmissionMeter(this, privateKey);
+         return new ConsumptionTransmissionMeter(this, privateKey);
     }
 
     /**
@@ -57,8 +61,8 @@ public class MeterStateContext implements MeterStateContextInt {
     /**
      * @return the meter's controller of the busom protocol
      */
-    public MeterBusomServiceInt makeMeterBusomController() throws IOException, NullMessageException {
-        return new MeterBusomService(certificate, curveConfiguration, connection);
+    public MeterBusomServiceInt makeMeterBusomService() throws IOException, NullMessageException {
+        return new MeterBusomService(numMeter, certificate, curveConfiguration, connection);
     }
 
     /**
@@ -99,7 +103,11 @@ public class MeterStateContext implements MeterStateContextInt {
         if (!(state instanceof KeyEstablishmentMeter)) {
             throw new IllegalStateException();
         }
-        state = state.next();
+        try {
+            state = state.next();
+        } catch (KeyRenewalException exception) {
+            state = makeKeyEstablishment();
+        }
     }
 
     @Override
@@ -107,6 +115,10 @@ public class MeterStateContext implements MeterStateContextInt {
         if (!(state instanceof ConsumptionTransmissionMeter)) {
             throw new IllegalStateException();
         }
-        state = state.next();
+        try {
+            state = state.next();
+        } catch (KeyRenewalException exception) {
+            state = makeKeyEstablishment();
+        }
     }
 }

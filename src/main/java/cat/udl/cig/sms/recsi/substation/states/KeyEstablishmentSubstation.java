@@ -3,7 +3,7 @@ package cat.udl.cig.sms.recsi.substation.states;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.busom.SubstationBusomServiceInt;
 import cat.udl.cig.sms.recsi.State;
-import cat.udl.cig.sms.recsi.substation.SubstationContextSubstation;
+import cat.udl.cig.sms.recsi.substation.SubstationStateContext;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -15,13 +15,13 @@ public class KeyEstablishmentSubstation implements State {
 
 
     private SubstationBusomServiceInt service;
-    private final SubstationContextSubstation context;
+    private final SubstationStateContext context;
 
     /**
      * @param context Factory that has the information of the ECC and connection and
      *                creates the different states.
      */
-    public KeyEstablishmentSubstation(SubstationContextSubstation context) {
+    public KeyEstablishmentSubstation(SubstationStateContext context) {
         this.context = context;
         this.service = context.makeSubstationBusomController();
     }
@@ -41,8 +41,12 @@ public class KeyEstablishmentSubstation implements State {
     @Override
     public State next() throws IOException, NullMessageException {
         BigInteger order = context.getLoadCurve().getGroup().getSize();
-        BigInteger privateKey = service.receiveSecretKey().remainder(order);
-        privateKey = order.subtract(privateKey);
-        return context.makeConsumptionTransmission(privateKey);
+        try {
+            BigInteger privateKey = service.receiveSecretKey().remainder(order);
+            privateKey = order.subtract(privateKey);
+            return context.makeConsumptionTransmission(privateKey);
+        } catch (NullMessageException exception) {
+            return context.makeKeyEstablishment();
+        }
     }
 }

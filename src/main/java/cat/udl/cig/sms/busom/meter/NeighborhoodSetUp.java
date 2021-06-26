@@ -1,12 +1,14 @@
 package cat.udl.cig.sms.busom.meter;
 
 import cat.udl.cig.fields.GroupElement;
-import cat.udl.cig.sms.busom.BusomState;
+import cat.udl.cig.sms.busom.BusomMeterState;
 import cat.udl.cig.sms.busom.certificate.CertificateTrueMock;
 import cat.udl.cig.sms.busom.certificate.CertificateValidation;
 import cat.udl.cig.sms.busom.data.MeterKey;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
+import cat.udl.cig.sms.connection.KeyRenewalException;
 import cat.udl.cig.sms.connection.ReceiverMeter;
+import cat.udl.cig.sms.connection.datagram.KeyRenewalDatagram;
 import cat.udl.cig.sms.connection.datagram.NeighborhoodDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
@@ -18,7 +20,7 @@ import java.math.BigInteger;
  * Sets up the parametrs of the neighborhood, like the
  * general key.
  */
-public class NeighborhoodSetUp implements BusomState {
+public class NeighborhoodSetUp implements BusomMeterState {
 
 
     private final BigInteger privateKey;
@@ -62,7 +64,7 @@ public class NeighborhoodSetUp implements BusomState {
      * @throws IOException, if connection has failed.
      */
     @Override
-    public BusomState next() throws IOException {
+    public BusomMeterState next() throws IOException, KeyRenewalException {
         receivePublicKeysAndCertificates();
         MeterKey meterKey = new MeterKey(privateKey, generalKey);
         return new SendChunk(meterKey, curveConfiguration, connection);
@@ -74,7 +76,7 @@ public class NeighborhoodSetUp implements BusomState {
      *
      * @throws IOException If connection is closed, or have some other troubles.
      */
-    protected void receivePublicKeysAndCertificates() throws IOException {
+    protected void receivePublicKeysAndCertificates() throws IOException, KeyRenewalException {
         generalKey = generator.getGroup().getNeuterElement();
         SMSDatagram data;
         data = receiverMeter.receive();
@@ -84,6 +86,9 @@ public class NeighborhoodSetUp implements BusomState {
             if (dataN.validate(this.validation))
                 generalKey = generalKey.multiply(dataN.getPublicKey());
             data = receiverMeter.receive();
+        }
+        if (data instanceof KeyRenewalDatagram) {
+            throw new KeyRenewalException();
         }
     }
 

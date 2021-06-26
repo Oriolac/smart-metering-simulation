@@ -1,6 +1,7 @@
 package cat.udl.cig.sms.busom;
 
 import cat.udl.cig.operations.wrapper.HashedAlgorithm;
+import cat.udl.cig.sms.connection.KeyRenewalException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import cat.udl.cig.sms.connection.ConnectionMeter;
@@ -28,7 +29,7 @@ class BusomControllersTest {
     private static CurveConfiguration curveConfiguration;
 
     @BeforeAll
-    static void setUp() throws IOException, NullMessageException {
+    static void setUp() throws IOException, NullMessageException, KeyRenewalException {
         fileSubst = new File("./data/test/substation3.toml");
         curveConfiguration = new CurveConfiguration(new File("./data/p192.toml"));
         HashedAlgorithm.loadHashedInstance(curveConfiguration.getGroup().getGenerator(), BigInteger.valueOf(1024 * 1024),
@@ -68,9 +69,9 @@ class BusomControllersTest {
         for (MeterBusomService meter : meterContrs) {
             threads.add(new Thread(() -> {
                 try {
-                    meter.meterSetUp();
+                    meter.start();
                     meter.sendMessage(message);
-                } catch (IOException | NullMessageException e) {
+                } catch (IOException | NullMessageException | KeyRenewalException e) {
                     e.printStackTrace();
                 }
             }));

@@ -8,7 +8,7 @@ import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.busom.SubstationBusomServiceInt;
 import cat.udl.cig.sms.connection.ConnectionSubstation;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
-import cat.udl.cig.sms.recsi.substation.SubstationContextSubstation;
+import cat.udl.cig.sms.recsi.substation.SubstationStateContext;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class KeyEstablishmentMeterSubstationTest {
 
-    private SubstationContextSubstation substationContext;
+    private SubstationStateContext substationContext;
     private final BigInteger SUM = BigInteger.TEN;
     private BigInteger EXPECTED_PRIVATE_KEY;
 
@@ -28,7 +28,7 @@ class KeyEstablishmentMeterSubstationTest {
         SubstationBusomServiceInt controller = Mockito.mock(SubstationBusomServiceInt.class);
         Mockito.when(controller.receiveSecretKey()).then((Answer<BigInteger>) invoc -> SUM);
         ConnectionSubstation connection = Mockito.mock(ConnectionSubstation.class);
-        substationContext = new SubstationContextSubstation(CurveConfiguration.P192(), connection);
+        substationContext = new SubstationStateContext(CurveConfiguration.P192(), connection);
         BigInteger order = substationContext.getLoadCurve().getGroup().getSize();
         EXPECTED_PRIVATE_KEY = SUM.negate().add(order).remainder(order);
         substationContext.setSubstationBusomControllerInt(controller);

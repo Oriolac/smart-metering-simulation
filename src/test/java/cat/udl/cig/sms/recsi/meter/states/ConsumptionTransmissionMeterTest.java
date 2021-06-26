@@ -39,7 +39,7 @@ class ConsumptionTransmissionMeterTest {
     @Test
     void correctNext() throws IOException, NullMessageException {
         Mockito.when(connectionMeter.receive()).then((Answer<BigIntegerDatagram>) invocationOnMock -> new BigIntegerDatagram(BigInteger.ONE));
-        context = new MeterStateContext(CurveConfiguration.P192(), connectionMeter, consumptionReader,"");
+        context = new MeterStateContext(1, CurveConfiguration.P192(), connectionMeter, consumptionReader,"");
         consumptTrans = new ConsumptionTransmissionMeter(context, privateKey);
         assertTrue(consumptTrans.next() instanceof ConsumptionTransmissionMeter);
         Mockito.verify(connectionMeter, Mockito.times(2))
@@ -49,7 +49,7 @@ class ConsumptionTransmissionMeterTest {
     @Test
     void badNext() throws IOException, NullMessageException {
         Mockito.when(connectionMeter.receive()).then((Answer<SMSDatagram>) invocationOnMock -> new EndOfDatagram());
-        context = new MeterStateContext(CurveConfiguration.P192(), connectionMeter, consumptionReader,"");
+        context = new MeterStateContext(1, CurveConfiguration.P192(), connectionMeter, consumptionReader,"");
         consumptTrans = new ConsumptionTransmissionMeter(context, privateKey);
         assertTrue(consumptTrans.next() instanceof KeyEstablishmentMeter);
         Mockito.verify(connectionMeter, Mockito.times(2))

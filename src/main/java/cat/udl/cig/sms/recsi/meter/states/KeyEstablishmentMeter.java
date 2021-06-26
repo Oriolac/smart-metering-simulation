@@ -3,6 +3,7 @@ package cat.udl.cig.sms.recsi.meter.states;
 import cat.udl.cig.fields.PrimeFieldElement;
 import cat.udl.cig.sms.busom.MeterBusomServiceInt;
 import cat.udl.cig.sms.busom.NullMessageException;
+import cat.udl.cig.sms.connection.KeyRenewalException;
 import cat.udl.cig.sms.recsi.State;
 import cat.udl.cig.sms.recsi.meter.MeterStateContext;
 
@@ -18,16 +19,16 @@ public class KeyEstablishmentMeter implements State {
 
     private MeterBusomServiceInt busomService;
     private PrimeFieldElement privateKey;
-    private final MeterStateContext factory;
+    private final MeterStateContext context;
 
     /**
-     * @param factory Factory that has the information of the ECC and connection and
+     * @param context Factory that has the information of the ECC and connection and
      *                creates the different states.
      */
-    public KeyEstablishmentMeter(MeterStateContext factory) throws IOException, NullMessageException {
-        this.factory = factory;
+    public KeyEstablishmentMeter(MeterStateContext context) throws IOException, NullMessageException {
+        this.context = context;
         privateKey = generatePrivateKey();
-        busomService = factory.makeMeterBusomController();
+        busomService = context.makeMeterBusomService();
     }
 
     /**
@@ -37,7 +38,7 @@ public class KeyEstablishmentMeter implements State {
         BigInteger divisor = BigInteger.TWO.pow(13);
         List<BigInteger> result = new ArrayList<>();
         BigInteger[] tmp = privateKey.getIntValue().divideAndRemainder(divisor);
-        int bits = factory.getLoadCurve().getField().getSize().bitLength();
+        int bits = context.getLoadCurve().getField().getSize().bitLength();
         int numberOfChunks = bits / 13 + ((bits % 13 == 0) ? 0 : 1);
         for (int j = 0; j < numberOfChunks; j++) {
             result.add(tmp[1]);
@@ -47,7 +48,7 @@ public class KeyEstablishmentMeter implements State {
     }
 
     private PrimeFieldElement generatePrivateKey() {
-        return factory.getLoadCurve().getField().getRandomElement();
+        return context.getLoadCurve().getField().getRandomElement();
     }
 
     /**
@@ -70,10 +71,14 @@ public class KeyEstablishmentMeter implements State {
      * @throws NullMessageException in case the message is null.
      */
     @Override
-    public ConsumptionTransmissionMeter next() throws IOException, NullMessageException {
-        busomService.start();
-        busomService.sendMessage(generateChunksOfPrivateKey());
-        return factory.makeConsumptionTransmission(privateKey);
+    public State next() throws IOException, NullMessageException, KeyRenewalException {
+        try {
+            busomService.start();
+            busomService.sendMessage(generateChunksOfPrivateKey());
+            return context.makeConsumptionTransmission(privateKey);
+        } catch (KeyRenewalException exception) {
+            return context.makeKeyEstablishment();
+        }
     }
 
     /**

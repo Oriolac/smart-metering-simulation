@@ -1,5 +1,6 @@
 package cat.udl.cig.sms.recsi.meter.states;
 
+import cat.udl.cig.sms.connection.KeyRenewalException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import cat.udl.cig.sms.busom.MeterBusomServiceInt;
@@ -28,7 +29,7 @@ public class KeyEstablishmentMeterTest {
         curveConfiguration = CurveConfiguration.P192();
         connection = new ConnectionMeterMock();
         busomService = new MeterBusomServiceMock();
-        MeterStateContext context = new MeterStateContext(curveConfiguration, connection, new RandomConsumption(), "");
+        MeterStateContext context = new MeterStateContext(1, curveConfiguration, connection, new RandomConsumption(), "");
         keyEstablishmentMeter = context.makeKeyEstablishment();
         keyEstablishmentMeter.setBusomService(busomService);
     }
@@ -48,7 +49,7 @@ public class KeyEstablishmentMeterTest {
     }
 
     @Test
-    void next() throws IOException, NullMessageException {
+    void next() throws IOException, NullMessageException, KeyRenewalException {
         keyEstablishmentMeter.next();
         assertEquals(2, busomService.getCount());
     }

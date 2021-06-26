@@ -5,8 +5,11 @@ import cat.udl.cig.sms.busom.meter.MeterBusomContext;
 import cat.udl.cig.sms.busom.meter.MeterBusomContextInt;
 import cat.udl.cig.sms.busom.meter.SendChunk;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
+import cat.udl.cig.sms.connection.KeyRenewalException;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -19,6 +22,7 @@ import java.util.List;
 public class MeterBusomService implements MeterBusomServiceInt {
 
     private final MeterBusomContextInt context;
+    private final int numMeter;
 
     /**
      * Generates a meter busom controller
@@ -27,7 +31,8 @@ public class MeterBusomService implements MeterBusomServiceInt {
      * @param curveConfiguration   parameters of the ECC curve
      * @param connection  to the substation.
      */
-    public MeterBusomService(String certificate, CurveConfiguration curveConfiguration, ConnectionMeterInt connection) throws IOException, NullMessageException {
+    public MeterBusomService(int numMeter, String certificate, CurveConfiguration curveConfiguration, ConnectionMeterInt connection) throws IOException, NullMessageException {
+        this.numMeter = numMeter;
         context = new MeterBusomContext(certificate, curveConfiguration, connection);
         context.generatePrivateKey();
     }
@@ -40,8 +45,8 @@ public class MeterBusomService implements MeterBusomServiceInt {
      * @throws IOException          if connection fails.
      * @throws NullMessageException Never throws this exception
      */
-    public MeterBusomService(CurveConfiguration curveConfiguration, ConnectionMeterInt connection) throws IOException, NullMessageException {
-        this("", curveConfiguration, connection);
+    public MeterBusomService(CurveConfiguration curveConfiguration, ConnectionMeterInt connection) throws IOException, NullMessageException, KeyRenewalException {
+        this(1, "", curveConfiguration, connection);
     }
 
     /**
@@ -51,18 +56,7 @@ public class MeterBusomService implements MeterBusomServiceInt {
      * @throws IOException          if connection fails.
      */
     @Override
-    public void start() throws NullMessageException, IOException {
-        context.setUpNeighborHood();
-    }
-
-
-    /**
-     * Used for tests
-     *
-     * @throws IOException          if connection fails
-     * @throws NullMessageException never throwed.
-     */
-    protected void meterSetUp() throws IOException, NullMessageException {
+    public void start() throws NullMessageException, IOException, KeyRenewalException {
         context.setUpNeighborHood();
     }
 
@@ -74,16 +68,24 @@ public class MeterBusomService implements MeterBusomServiceInt {
      * @throws NullMessageException if some message is null.
      */
     @Override
-    public void sendMessage(List<BigInteger> messages) throws IOException, NullMessageException {
+    public void sendMessage(List<BigInteger> messages) throws IOException, NullMessageException, KeyRenewalException {
         long now, then;
         then = Instant.now().toEpochMilli();
+        int i = 0;
+        //BufferedWriter writer = new BufferedWriter(new FileWriter("analysis/msgm/192/met" + numMeter +  ".csv"));
+        //writer.write("round,message");
+        //writer.newLine();
         for (BigInteger message : messages) {
+            //writer.write(i + "," + message.toString());
+            //writer.newLine();
             context.sendChunk(message);
             context.sendPartialDecryption();
             now = Instant.now().toEpochMilli();
-            System.out.println("SM-BS: " + (now - then));
+            //System.out.println("SM-BS: " + (now - then));
             then = now;
+            i++;
         }
+        //writer.close();
     }
 
 

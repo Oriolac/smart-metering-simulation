@@ -1,8 +1,8 @@
 package cat.udl.cig.sms.busom.substation;
 
 import cat.udl.cig.fields.MultiplicativeSubgroup;
-import cat.udl.cig.sms.busom.BusomState;
-import cat.udl.cig.sms.busom.certificate.CertificateTrueMock;
+import cat.udl.cig.sms.busom.BusomMeterState;
+import cat.udl.cig.sms.busom.BusomSubstationState;
 import cat.udl.cig.sms.busom.certificate.CertificateValidation;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
 import cat.udl.cig.sms.connection.ReceiverSubstation;
@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 /**
  * Busom Set up for substations.
  */
-public class BusomSubstationSetUp implements BusomState {
+public class BusomSubstationSetUp implements BusomSubstationState {
 
     private final MultiplicativeSubgroup group;
     private final SubstationBusomContextInt substationBusomContext;
@@ -53,7 +53,7 @@ public class BusomSubstationSetUp implements BusomState {
      * @throws IOException if connection fails.
      */
     @Override
-    public BusomState next() throws IOException {
+    public BusomSubstationState next() throws IOException {
         receivePublicKeys();
         sendPublicKey();
         return substationBusomContext.makeReceiveChunk(group);

@@ -3,23 +3,25 @@ package cat.udl.cig.sms.busom.meter;
 import cat.udl.cig.ecc.ECPrimeOrderSubgroup;
 import cat.udl.cig.ecc.GeneralECPoint;
 import cat.udl.cig.sms.busom.CertificateFalseMock;
+import cat.udl.cig.sms.connection.KeyRenewalException;
+import cat.udl.cig.sms.connection.datagram.KeyRenewalDatagram;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import cat.udl.cig.sms.busom.BusomState;
+import cat.udl.cig.sms.busom.BusomMeterState;
 import cat.udl.cig.sms.busom.certificate.CertificateTrueMock;
 import cat.udl.cig.sms.connection.ReceiverMeter;
 import cat.udl.cig.sms.connection.datagram.EndOfDatagram;
 import cat.udl.cig.sms.connection.datagram.NeighborhoodDatagram;
 import cat.udl.cig.sms.connection.datagram.SMSDatagram;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
+import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class NeighborhoodSetUpTest {
 
@@ -42,17 +44,17 @@ class NeighborhoodSetUpTest {
     }
 
     @Test
-    void next() throws IOException {
+    void next() throws IOException, KeyRenewalException {
         neighborhoodSetUp.setValidation(new CertificateTrueMock<>());
         neighborhoodSetUp.setReceiverMeter(new ReceiverMeterSpy(curveConfiguration.getGroup()));
-        BusomState nextState = neighborhoodSetUp.next();
+        BusomMeterState nextState = neighborhoodSetUp.next();
         assertTrue(nextState instanceof SendChunk);
         SendChunk state = (SendChunk) nextState;
         assertEquals(privateKey, state.getPrivateKey());
     }
 
     @Test
-    void receivePublicKeysAndCorrectCertificates() throws IOException {
+    void receivePublicKeysAndCorrectCertificates() throws IOException, KeyRenewalException {
         CertificateTrueMock<String> validation = new CertificateTrueMock<>();
         neighborhoodSetUp.setValidation(validation);
         ReceiverMeterSpy receiver = new ReceiverMeterSpy(curveConfiguration.getGroup());
@@ -63,7 +65,17 @@ class NeighborhoodSetUpTest {
     }
 
     @Test
-    void receivePublicKeysAndFalseCertificates() throws IOException {
+    void receiveKeyRenewal() throws IOException {
+        CertificateTrueMock<String> validation = new CertificateTrueMock<>();
+        neighborhoodSetUp.setValidation(validation);
+        ReceiverMeter receiver = Mockito.mock(ReceiverMeter.class);
+        Mockito.when(receiver.receive()).thenReturn(new KeyRenewalDatagram());
+        neighborhoodSetUp.setReceiverMeter(receiver);
+        assertThrows(KeyRenewalException.class, () -> neighborhoodSetUp.receivePublicKeysAndCertificates());
+    }
+
+    @Test
+    void receivePublicKeysAndFalseCertificates() throws IOException, KeyRenewalException {
         CertificateFalseMock<String> validation = new CertificateFalseMock<>();
         neighborhoodSetUp.setValidation(validation);
         ReceiverMeterSpy receiver = new ReceiverMeterSpy(curveConfiguration.getGroup());

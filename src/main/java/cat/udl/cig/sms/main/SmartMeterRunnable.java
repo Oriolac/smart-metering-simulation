@@ -22,12 +22,13 @@ public class SmartMeterRunnable implements Runnable {
     private static final CurveConfiguration CURVE_READER = new CurveConfiguration(new File("data/p192.toml"));
     private final File substation;
     private final ConsumptionReader consumptionReader;
+    private final int numMeter;
 
     /**
      * Generates a SMR with the predefined substation
      */
     public SmartMeterRunnable() {
-        this(new File("data/substation1.toml"));
+        this(1, new File("data/substation1.toml"));
     }
 
     /**
@@ -35,11 +36,12 @@ public class SmartMeterRunnable implements Runnable {
      *
      * @param file neighborhood toml containing configuration
      */
-    public SmartMeterRunnable(File file) {
-        this(file, new RandomConsumption());
+    public SmartMeterRunnable(int numMeter, File file) {
+        this(numMeter, file, new RandomConsumption());
     }
 
-    public SmartMeterRunnable(File file, ConsumptionReader consumptionReader) {
+    public SmartMeterRunnable(int numMeter, File file, ConsumptionReader consumptionReader) {
+        this.numMeter = numMeter;
         this.substation = file;
         this.consumptionReader = consumptionReader;
     }
@@ -58,7 +60,7 @@ public class SmartMeterRunnable implements Runnable {
         MeterStateContextInt context;
         long now, then;
         try {
-            context = new MeterStateContext(CURVE_READER, new ConnectionMeter(substation, CURVE_READER), this.consumptionReader, "");
+            context = new MeterStateContext(numMeter, CURVE_READER, new ConnectionMeter(substation, CURVE_READER), this.consumptionReader, "");
             then = Instant.now().toEpochMilli();
             context.establishKey();
             now = Instant.now().toEpochMilli();

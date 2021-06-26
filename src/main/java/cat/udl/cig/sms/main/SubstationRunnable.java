@@ -4,7 +4,7 @@ import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.ConnectionSubstation;
 import cat.udl.cig.sms.connection.ConnectionSubstationInt;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
-import cat.udl.cig.sms.recsi.substation.SubstationContextSubstation;
+import cat.udl.cig.sms.recsi.substation.SubstationStateContext;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,7 +22,7 @@ public class SubstationRunnable implements Runnable {
 
     private static final CurveConfiguration CURVE_READER = new CurveConfiguration(new File("data/p192.toml"));
     private final File substationFile;
-    private final SubstationContextSubstation substation;
+    private final SubstationStateContext substation;
     private final ConnectionSubstationInt connectionSubstationInt;
 
     /**
@@ -41,7 +41,7 @@ public class SubstationRunnable implements Runnable {
     public SubstationRunnable(File file) throws IOException {
         this.substationFile = file;
         connectionSubstationInt = new ConnectionSubstation(substationFile, CURVE_READER);
-        substation = new SubstationContextSubstation(CURVE_READER, connectionSubstationInt);
+        substation = new SubstationStateContext(CURVE_READER, connectionSubstationInt);
 
     }
 

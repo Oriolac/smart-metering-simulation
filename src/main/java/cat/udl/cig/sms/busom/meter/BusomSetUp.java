@@ -1,7 +1,7 @@
 package cat.udl.cig.sms.busom.meter;
 
 import cat.udl.cig.fields.GroupElement;
-import cat.udl.cig.sms.busom.BusomState;
+import cat.udl.cig.sms.busom.BusomMeterState;
 import cat.udl.cig.sms.connection.ConnectionMeterInt;
 import cat.udl.cig.sms.connection.Sender;
 import cat.udl.cig.sms.connection.datagram.NeighborhoodDatagram;
@@ -14,7 +14,7 @@ import java.util.Random;
 /**
  * Sets up parameters needed for the protocol
  */
-public class BusomSetUp implements BusomState {
+public class BusomSetUp implements BusomMeterState {
 
 
     private final GroupElement generator;
@@ -60,7 +60,7 @@ public class BusomSetUp implements BusomState {
      * @throws IOException, if connection has failed.
      */
     @Override
-    public BusomState next() throws IOException {
+    public BusomMeterState next() throws IOException {
         generatePrivateKey();
         calculatePublicKey();
         sendPublicKey();

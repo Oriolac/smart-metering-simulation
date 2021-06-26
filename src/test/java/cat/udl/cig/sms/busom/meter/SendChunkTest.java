@@ -7,7 +7,7 @@ import cat.udl.cig.fields.GroupElement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import cat.udl.cig.sms.busom.meter.doubles.SenderSpy;
-import cat.udl.cig.sms.busom.BusomState;
+import cat.udl.cig.sms.busom.BusomMeterState;
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.busom.data.MeterKey;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
@@ -39,7 +39,7 @@ class SendChunkTest {
         sendChunk.setMessage(message);
         SenderSpy sender = new SenderSpy();
         sendChunk.setSender(sender);
-        BusomState nextState = sendChunk.next();
+        BusomMeterState nextState = sendChunk.next();
         assertTrue(nextState instanceof SendPartialDecryption);
     }
 

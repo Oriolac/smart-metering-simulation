@@ -4,7 +4,7 @@ import cat.udl.cig.fields.GroupElement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import cat.udl.cig.sms.busom.meter.doubles.SenderSpy;
-import cat.udl.cig.sms.busom.BusomState;
+import cat.udl.cig.sms.busom.BusomMeterState;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 
 import java.io.File;
@@ -28,7 +28,7 @@ class BusomSetUpTest {
     void next() throws IOException {
         SenderSpy senderSpy = new SenderSpy();
         busomSetUp.setSender(senderSpy);
-        BusomState nextState = busomSetUp.next();
+        BusomMeterState nextState = busomSetUp.next();
         assertTrue(nextState instanceof NeighborhoodSetUp);
     }
 
