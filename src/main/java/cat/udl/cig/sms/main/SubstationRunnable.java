@@ -58,7 +58,7 @@ public class SubstationRunnable implements Runnable {
     public void run() {
         long now, then;
         try {
-            BufferedWriter consumption = new BufferedWriter(new FileWriter("analysis/hashed"+ this.substation.getConnection().getNumberOfMeters() +".csv"));
+            BufferedWriter consumption = new BufferedWriter(new FileWriter("analysis/ct-pollards"+ this.substation.getConnection().getNumberOfMeters() +".csv"));
             consumption.write("timedelta");
             consumption.newLine();
             then = Instant.now().toEpochMilli();

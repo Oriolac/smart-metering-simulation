@@ -45,7 +45,7 @@ public class NeighborhoodSimulation {
         for (int i = 0; i < numberOfMeters; i++) {
             BufferedReader reader = new BufferedReader(new FileReader("consumptions/meter" + i + ".txt"));
             int finalI = i;
-            new Thread(() -> new SmartMeterRunnable(finalI, substationFile, new RandomConsumption()).run()).start();
+            new Thread(() -> new SmartMeterRunnable(finalI, substationFile, new ConsumptionFileReader(reader)).run()).start();
         }
     }
 }

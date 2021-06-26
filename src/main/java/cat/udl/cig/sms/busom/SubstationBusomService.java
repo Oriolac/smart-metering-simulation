@@ -43,9 +43,9 @@ public class SubstationBusomService implements SubstationBusomServiceInt {
      */
     @Override
     public BigInteger receiveSecretKey() throws IOException, NullMessageException {
-        //BufferedWriter writer = new BufferedWriter(new FileWriter("analysis/ke" + this.connection.getNumberOfMeters() +".csv"));
-        //writer.write("timedelta");
-        //writer.newLine();
+        BufferedWriter writer = new BufferedWriter(new FileWriter("analysis/ke-pollards" + this.connection.getNumberOfMeters() +".csv"));
+        writer.write("timedelta");
+        writer.newLine();
         substationBusomContextInt.setUp();
         BigInteger message = BigInteger.ZERO;
         long then, now;
@@ -64,11 +64,11 @@ public class SubstationBusomService implements SubstationBusomServiceInt {
             //writerMessage.newLine();
             message = message.add(chunk.get().multiply(BigInteger.TWO.pow(13 * i)));
             now = Instant.now().toEpochMilli();
-            //writer.write(String.valueOf((now - then)));
-            //writer.newLine();
+            writer.write(String.valueOf((now - then)));
+            writer.newLine();
             then = now;
         }
-        //writer.close();
+        writer.close();
         //writerMessage.close();
         return message;
     }
