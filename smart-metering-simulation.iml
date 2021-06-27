@@ -13,7 +13,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: cat.udl.cig:cig-lib:1.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: cat.udl.cig:cig-lib:1.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.plugins:maven-compiler-plugin:3.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-plugin-api:2.0.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-artifact:2.0.9" level="project" />

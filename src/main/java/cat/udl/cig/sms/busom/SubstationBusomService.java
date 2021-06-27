@@ -17,7 +17,7 @@ import java.util.Optional;
  */
 public class SubstationBusomService implements SubstationBusomServiceInt {
 
-    private final int numberOfChunks;
+    private int numberOfChunks;
     private final SubstationBusomContextInt substationBusomContextInt;
     private final ConnectionSubstationInt connection;
 
@@ -71,6 +71,10 @@ public class SubstationBusomService implements SubstationBusomServiceInt {
         writer.close();
         //writerMessage.close();
         return message;
+    }
+
+    public void setNumberOfChunks(int numberOfChunks) {
+        this.numberOfChunks = numberOfChunks;
     }
 
 }
