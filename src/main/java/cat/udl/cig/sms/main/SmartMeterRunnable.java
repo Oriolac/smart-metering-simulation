@@ -66,7 +66,7 @@ public class SmartMeterRunnable implements Runnable {
             now = Instant.now().toEpochMilli();
             // System.out.println("SM-KE: " + (now - then));
             then = now;
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < 1000; i++) {
                 context.sendConsumption();
                 now = Instant.now().toEpochMilli();
                 //System.out.println("SM-CT: " + (now - then));

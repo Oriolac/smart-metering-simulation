@@ -29,7 +29,7 @@ public class DecipherImpl implements Decipher, Hash {
         this.field = curveConfiguration.getField();
         this.grup = curveConfiguration.getGroup();
         //lambda = HashedAlgorithm.getHashedInstance();
-        lambda = new BruteForce(grup.getGenerator());
+        lambda = new PollardsLambda(grup.getGenerator());
         this.privateKey = privateKey;
     }
 
