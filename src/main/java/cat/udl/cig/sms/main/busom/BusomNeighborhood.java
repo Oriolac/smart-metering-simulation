@@ -12,18 +12,23 @@ public class BusomNeighborhood {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length != 2) {
+            System.out.println("args: <numMeters> <numMsgs>");
             System.exit(-1);
         }
         final int numMeters = Integer.parseInt(args[0]);
         final int numMsgs = Integer.parseInt(args[0]);
         final File file = new File("data/substation" + numMeters + ".toml");
-        BusomSubstationRunnable substationRunnable = new BusomSubstationRunnable(file, numMsgs);
-        new Thread(substationRunnable).start();
+        new Thread(() -> {
+            try {
+                new BusomSubstationRunnable(file, numMsgs).run();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
         Thread.sleep(100);
         for (int i = 0; i < numMeters; i++) {
-            BufferedReader reader = new BufferedReader(new FileReader("consumptions/meter" + i + ".txt"));
             int finalI = i;
-            new Thread(() -> new BusomMeterRunnable(finalI, file, numMsgs)).start();
+            new Thread(() -> new BusomMeterRunnable(finalI, file, numMsgs).run()).start();
         }
     }
 }

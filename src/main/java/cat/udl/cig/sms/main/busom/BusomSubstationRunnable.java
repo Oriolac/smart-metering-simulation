@@ -58,6 +58,7 @@ public class BusomSubstationRunnable implements Runnable{
             then = Instant.now().toEpochMilli();
             service.receiveSecretKey();
             now = Instant.now().toEpochMilli();
+            System.out.println((now - then));
             consumption.close();
         } catch (IOException | NullMessageException e) {
             e.printStackTrace();
