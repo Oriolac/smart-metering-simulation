@@ -27,7 +27,8 @@ public class SubstationBusomContext implements SubstationBusomContextInt {
 
     public SubstationBusomContext(MultiplicativeSubgroup group, ConnectionSubstationInt connection) {
         this.connection = connection;
-        logarithmAlgorithm = new PollardsLambda(group.getGenerator());
+        logarithmAlgorithm = HashedAlgorithm.getHashedInstance();
+        //logarithmAlgorithm = new PollardsLambda(group.getGenerator());
         this.certificateValidation = new CertificateTrueMock<String>();
         this.group = group;
         this.state = new BusomSubstationSetUp(group, this);

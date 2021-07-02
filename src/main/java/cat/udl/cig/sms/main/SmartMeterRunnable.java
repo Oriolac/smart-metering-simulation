@@ -3,14 +3,14 @@ package cat.udl.cig.sms.main;
 
 import cat.udl.cig.sms.busom.NullMessageException;
 import cat.udl.cig.sms.connection.ConnectionMeter;
+import cat.udl.cig.sms.consumption.ConsumptionFileReader;
 import cat.udl.cig.sms.consumption.RandomConsumption;
 import cat.udl.cig.sms.consumption.ConsumptionReader;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 import cat.udl.cig.sms.recsi.meter.MeterStateContext;
 import cat.udl.cig.sms.recsi.meter.MeterStateContextInt;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.time.Instant;
 
 /**
@@ -23,6 +23,7 @@ public class SmartMeterRunnable implements Runnable {
     private final File substation;
     private final ConsumptionReader consumptionReader;
     private final int numMeter;
+    private final int numMsgs;
 
     /**
      * Generates a SMR with the predefined substation
@@ -44,15 +45,32 @@ public class SmartMeterRunnable implements Runnable {
         this.numMeter = numMeter;
         this.substation = file;
         this.consumptionReader = consumptionReader;
+        this.numMsgs = 50;
     }
+
+    public SmartMeterRunnable(int numMeter, File file, ConsumptionReader consumptionReader, int numMsgs) {
+        this.numMeter = numMeter;
+        this.substation = file;
+        this.consumptionReader = consumptionReader;
+        this.numMsgs = numMsgs;
+    }
+
 
     /**
      * Main. Executes the 'normal' substation file.
      *
      * @param args -- not used
      */
-    public static void main(String[] args) {
-        new SmartMeterRunnable().run();
+    public static void main(String[] args) throws FileNotFoundException {
+        int numMeter = Integer.parseInt(args[0]);
+        File substationFile = new File(args[1]);
+        if (args.length < 3) {
+            ConsumptionReader consumptionReader = new ConsumptionFileReader(new BufferedReader(new FileReader("consumptions/meter" + numMeter + ".txt")));
+            new SmartMeterRunnable(numMeter, substationFile, consumptionReader).run();
+        } else {
+            int numMsgs = Integer.parseInt(args[2]);
+            new SmartMeterRunnable(numMeter, substationFile, new RandomConsumption(), numMsgs).run();
+        }
     }
 
     @Override
@@ -61,18 +79,10 @@ public class SmartMeterRunnable implements Runnable {
         long now, then;
         try {
             context = new MeterStateContext(numMeter, CURVE_READER, new ConnectionMeter(substation, CURVE_READER), this.consumptionReader, "");
-            then = Instant.now().toEpochMilli();
             context.establishKey();
-            now = Instant.now().toEpochMilli();
-            // System.out.println("SM-KE: " + (now - then));
-            then = now;
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < this.numMsgs; i++) {
                 context.sendConsumption();
-                now = Instant.now().toEpochMilli();
-                //System.out.println("SM-CT: " + (now - then));
-                then = now;
             }
-            context.closeConnection();
         } catch (IOException | NullMessageException e) {
             e.printStackTrace();
         }

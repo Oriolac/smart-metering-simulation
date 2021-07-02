@@ -18,6 +18,7 @@ public class BusomSubstationRunnable implements Runnable{
     private final File substationFile;
     private final SubstationBusomService service;
     private final ConnectionSubstationInt connectionSubstationInt;
+    private final int numMsgs;
 
     /**
      * Generates SubstationRunnable with default file.
@@ -34,6 +35,7 @@ public class BusomSubstationRunnable implements Runnable{
      */
     public BusomSubstationRunnable(File file, int numMsgs) throws IOException {
         this.substationFile = file;
+        this.numMsgs = numMsgs;
         connectionSubstationInt = new ConnectionSubstation(substationFile, CURVE_READER);
         service = new SubstationBusomService(CURVE_READER, connectionSubstationInt);
         service.setNumberOfChunks(numMsgs);
@@ -45,20 +47,23 @@ public class BusomSubstationRunnable implements Runnable{
      * @param args -- Not used
      */
     public static void main(String[] args) throws IOException {
-        new BusomSubstationRunnable(Integer.parseInt(args[0])).run();
+        int numMsgs = 92;
+        if (args.length <= 2) {
+            numMsgs = Integer.parseInt(args[1]);
+        }
+        new BusomSubstationRunnable(new File(args[0]), numMsgs).run();
     }
 
     @Override
     public void run() {
         long now, then;
         try {
-            BufferedWriter consumption = new BufferedWriter(new FileWriter("analysis/ct-pollards"+ this.connectionSubstationInt.getNumberOfMeters() +".csv"));
-            consumption.write("timedelta");
-            consumption.newLine();
+            BufferedWriter consumption = new BufferedWriter(new FileWriter("analysis/msgm/busom"+ this.connectionSubstationInt.getNumberOfMeters() +".csv", true));
             then = Instant.now().toEpochMilli();
             service.receiveSecretKey();
             now = Instant.now().toEpochMilli();
-            System.out.println((now - then));
+            consumption.write( this.numMsgs + "," + (now - then));
+            consumption.newLine();
             consumption.close();
         } catch (IOException | NullMessageException e) {
             e.printStackTrace();

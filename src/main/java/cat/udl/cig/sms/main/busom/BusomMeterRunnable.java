@@ -12,8 +12,7 @@ import cat.udl.cig.sms.main.SmartMeterRunnable;
 import cat.udl.cig.sms.recsi.meter.MeterStateContext;
 import cat.udl.cig.sms.recsi.meter.MeterStateContextInt;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -44,13 +43,25 @@ public class BusomMeterRunnable implements Runnable{
         this.numMsgs = numMsgs;
     }
 
+    public BusomMeterRunnable(int numMeter, File file, ConsumptionReader consumptionReader) {
+        this(numMeter, file, consumptionReader, 92);
+    }
+
     /**
      * Main. Executes the 'normal' substation file.
      *
      * @param args -- not used
      */
-    public static void main(String[] args) {
-        new SmartMeterRunnable().run();
+    public static void main(String[] args) throws FileNotFoundException {
+        int numMeter = Integer.parseInt(args[0]);
+        File substationFile = new File(args[1]);
+        if (args.length < 3) {
+            ConsumptionReader consumptionReader = new ConsumptionFileReader(new BufferedReader(new FileReader("consumptions/meter" + numMeter + ".txt")));
+            new BusomMeterRunnable(numMeter, substationFile, consumptionReader).run();
+        } else {
+            int numMsgs = Integer.parseInt(args[2]);
+            new BusomMeterRunnable(numMeter, substationFile, new RandomConsumption(), numMsgs).run();
+        }
     }
 
     @Override

@@ -6,10 +6,7 @@ import cat.udl.cig.sms.connection.ConnectionSubstationInt;
 import cat.udl.cig.sms.crypt.CurveConfiguration;
 import cat.udl.cig.sms.recsi.substation.SubstationStateContext;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.Optional;
@@ -24,13 +21,8 @@ public class SubstationRunnable implements Runnable {
     private final File substationFile;
     private final SubstationStateContext substation;
     private final ConnectionSubstationInt connectionSubstationInt;
-
-    /**
-     * Generates SubstationRunnable with default file.
-     */
-    public SubstationRunnable() throws IOException {
-        this(new File("data/substation1.toml"));
-    }
+    private final int numMeters;
+    private final int numMsgs;
 
 
     /**
@@ -38,11 +30,12 @@ public class SubstationRunnable implements Runnable {
      *
      * @param file toml config file for substation.
      */
-    public SubstationRunnable(File file) throws IOException {
+    public SubstationRunnable(File file, int numMeters, int numMsgs) throws IOException {
         this.substationFile = file;
         connectionSubstationInt = new ConnectionSubstation(substationFile, CURVE_READER);
         substation = new SubstationStateContext(CURVE_READER, connectionSubstationInt);
-
+        this.numMeters = numMeters;
+        this.numMsgs = numMsgs;
     }
 
     /**
@@ -51,31 +44,34 @@ public class SubstationRunnable implements Runnable {
      * @param args -- Not used
      */
     public static void main(String[] args) throws IOException {
-        new SubstationRunnable().run();
+        int numMsgs = 92;
+        if (args.length <= 3) {
+            numMsgs = Integer.parseInt(args[2]);
+        }
+        new SubstationRunnable(new File(args[0]), Integer.parseInt(args[1]), numMsgs).run();
     }
 
     @Override
     public void run() {
         long now, then;
         try {
-            BufferedWriter consumption = new BufferedWriter(new FileWriter("analysis/ct-pollards"+ this.substation.getConnection().getNumberOfMeters() +".csv"));
-            consumption.write("timedelta");
-            consumption.newLine();
+            //BufferedWriter writer = new BufferedWriter(new FileWriter("analysis/dataset/recsip" + this.numMeters + ".csv", true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter("analysis/ke-hashed.csv", true));
             then = Instant.now().toEpochMilli();
             substation.startKeyEstablishment();
             now = Instant.now().toEpochMilli();
-            //System.out.println("SSt-KE: " + (now - then));
-            then = now;
-            for (int i = 0; i < 1000; i++) {
-                Optional<BigInteger> message = substation.getMessage();
-                int finalI = i;
-                //message.ifPresent((a) -> System.out.println(finalI));
-                now = Instant.now().toEpochMilli();
-                consumption.write(String.valueOf(now - then));
-                consumption.newLine();
-                then = now;
+            writer.write(this.numMeters + "," + (now-then));
+            writer.newLine();
+            writer.close();
+            writer = new BufferedWriter(new FileWriter("analysis/ct-hashed.csv", true));
+            then = Instant.now().toEpochMilli();
+            for (int i = 0; i < this.numMsgs; i++) {
+                substation.getMessage();
             }
-            consumption.close();
+            now = Instant.now().toEpochMilli();
+            writer.write(this.numMeters + "," + (now-then));
+            writer.newLine();
+            writer.close();
         } catch (IOException | NullMessageException e) {
             e.printStackTrace();
         }
